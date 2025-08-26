@@ -11,6 +11,11 @@
     "prefix": ""
   },
   "iconLibrary": "lucide",
+    "baseColor": "slate",
+    "cssVariables": true,
+    "prefix": ""
+  },
+
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
@@ -18,5 +23,9 @@
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
+
   "registries": {}
+}
+
+  "iconLibrary": "lucide"
 }
