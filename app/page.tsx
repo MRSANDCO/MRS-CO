@@ -172,8 +172,8 @@ export default function MRSCoSite() {
                   ["About", "about"],
                   ["Services", "services"],
                   ["Testimonials", "testimonials"],
-                  ["Consultation", "consult"],
                   ["Careers", "careers"],
+                  ["Startup Advisory","startup-advisory"],
                   ["Contact", "contact"],
                 ].map(([label, id]) => (
                   <a key={id} href={`#${id}`} className="px-3 py-2 rounded-xl hover:bg-slate-100 text-sm font-medium">
@@ -204,8 +204,8 @@ export default function MRSCoSite() {
                   ["About", "about"],
                   ["Services", "services"],
                   ["Testimonials", "testimonials"],
-                  ["Consultation", "consult"],
                   ["Careers", "careers"],
+                   ["Startup Advisory","startup-advisory"],
                   ["Contact", "contact"],
                 ].map(([label, id]) => (
                   <a
@@ -494,8 +494,66 @@ export default function MRSCoSite() {
         </div>
       </section>
 
-      {/* CONSULTATION */}
-      <Section id="consult" className="bg-white">
+      {/* CONSULTATION - book a consultation*/}
+      
+<Section id="consult" className="bg-white">
+  <div className="max-w-3xl mx-auto px-4 md:px-6">
+    <SectionHeader
+      eyebrow="Book a consultation"
+      title="Speak with a Chartered Accountant"
+      subtitle="Tell us a bit about your requirement and we'll get back promptly."
+    />
+    <form
+      className="grid gap-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const data = new FormData(e.currentTarget);
+        const payload = Object.fromEntries(data.entries());
+        alert(`Thanks! We'll reach out shortly.\n\n${JSON.stringify(payload, null, 2)}`);
+      }}
+    >
+      <Input name="name" placeholder="Your name" required className="rounded-2xl" />
+      <Input name="email" type="email" placeholder="Email" required className="rounded-2xl" />
+      <Input name="phone" type="tel" placeholder="Phone" className="rounded-2xl" />
+      <Input name="company" placeholder="Company (optional)" className="rounded-2xl" />
+      <Textarea name="message" placeholder="Briefly describe your requirement" required className="rounded-2xl" rows={5} />
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-muted-foreground flex items-center gap-2"><Calendar className="w-4 h-4" /> Typical reply within 1 business day</div>
+        <Button type="submit" className="rounded-2xl">Submit</Button>
+      </div>
+    </form>
+  </div>
+</Section>
+
+{/* STARTUP ADVISORY - Separate Section */}
+<Section id="startup-advisory" className="bg-white">
+  <div className="max-w-3xl mx-auto px-4 md:px-6">
+    <SectionHeader
+      eyebrow="Advisory for Startups & SMBs"
+      title="Launch, comply, scale"
+      subtitle="From incorporation and GST to board-ready MIS and fundraising—we're your finance stack."
+    />
+    <div className="grid gap-4 mb-6">
+      {[
+        "Incorporation advisory (Company/LLP, licenses, bank A/C)",
+        "Founders' agreements, ESOPs, cap table & registry",
+        "GST & TDS registrations, returns, reconciliations",
+        "Virtual CFO: KPIs, runway, budget vs actual, MIS",
+        "Investor readiness: data room, policies, valuation support",
+      ].map((p, i) => (
+        <div key={i} className="flex items-start gap-3">
+          <CheckCircle2 className="w-5 h-5 mt-0.5" />
+          <div className="text-slate-700">{p}</div>
+        </div>
+      ))}
+    </div>
+    <div className="flex gap-3">
+      <Button asChild className="rounded-2xl"><a href="#services">View Services</a></Button>
+      <Button asChild variant="outline" className="rounded-2xl"><a href="#contact">Contact us</a></Button>
+    </div>
+  </div>
+</Section>
+      {/* <Section id="consult" className="bg-white">
         <div className="max-w-6xl mx-auto px-4 md:px-6 grid md:grid-cols-2 gap-10 items-start">
           <div>
             <SectionHeader
@@ -550,7 +608,7 @@ export default function MRSCoSite() {
             </div>
           </div>
         </div>
-      </Section>
+      </Section> */}
 
       {/* CAREERS */}
       <Section id="careers" className="bg-slate-50">
