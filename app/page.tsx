@@ -11,6 +11,32 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "../components/ui/badge";
 import { Mail, Phone, MapPin, Calendar, ArrowLeft, ArrowRight, ChevronRight, CheckCircle2, Linkedin, Instagram, Facebook, Menu, X, Award, Shield, Target, TrendingUp, CheckCircle } from "lucide-react";
 
+// Add this right after your imports and before the services array
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
+// Utility function to handle API calls
+const submitForm = async (endpoint: string, data: Record<string, unknown>) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Something went wrong');
+    }
+
+    return result;
+  } catch (error) {
+    console.error(`Error submitting ${endpoint} form:`, error);
+    throw error;
+  }
+};
 // ------------------------
 // Helper Data
 // ------------------------
@@ -148,6 +174,88 @@ export default function MRSCoSite() {
     }
   };
 
+  // Add these functions inside your MRSCoSite component, before the return statement
+  const handleConsultationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const submitButton = (e.target as HTMLFormElement).querySelector('button[type="submit"]');
+    if (!submitButton) {
+      alert("Submit button not found.");
+      return;
+    }
+    const originalText = submitButton.textContent ?? '';
+
+    try {
+      // Show loading state
+      submitButton.textContent = 'Submitting...';
+      (submitButton as HTMLButtonElement).disabled = true;
+
+      const formData = new FormData(e.currentTarget);
+      const data = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone') || '',
+        company: formData.get('company') || '',
+        message: formData.get('message')
+      };
+
+      const result = await submitForm('consultation', data);
+
+      // Show success message
+      alert(`✅ ${result.message}`);
+
+      // Reset form
+      (e.target as HTMLFormElement).reset();
+
+    } catch (error) {
+      // Show error message
+      alert(`❌ ${typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : String(error)}`);
+    } finally {
+      // Reset button state
+      submitButton.textContent = originalText;
+      (submitButton as HTMLButtonElement).disabled = false;
+    }
+  };
+
+  const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const submitButton = (e.target as HTMLFormElement).querySelector('button[type="submit"]');
+    if (!submitButton) {
+      alert("Submit button not found.");
+      return;
+    }
+    const originalText = submitButton.textContent ?? '';
+
+    try {
+      // Show loading state
+      submitButton.textContent = 'Submitting...';
+      (submitButton as HTMLButtonElement).disabled = true;
+
+      const formData = new FormData(e.currentTarget);
+      const data = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone') || '',
+        role: formData.get('role') || '',
+        notes: formData.get('notes') || ''
+      };
+
+      const result = await submitForm('careers', data);
+
+      // Show success message
+      alert(`✅ ${result.message}`);
+
+      // Reset form
+      (e.target as HTMLFormElement).reset();
+
+    } catch (error) {
+      // Show error message
+      alert(`❌ ${typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : String(error)}`);
+    } finally {
+      // Reset button state
+      submitButton.textContent = originalText;
+      (submitButton as HTMLButtonElement).disabled = false;
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
       {/* NAVBAR */}
@@ -169,7 +277,7 @@ export default function MRSCoSite() {
               {/* Desktop Nav */}
               <nav className="hidden md:flex items-center gap-2">
                 {[
-                  ["Home", "home"], 
+                  ["Home", "home"],
                   ["About", "about"],
                   ["Services", "services"],
                   ["Testimonials", "testimonials"],
@@ -515,8 +623,12 @@ export default function MRSCoSite() {
             eyebrow="Book a consultation"
             title="Speak with a Chartered Accountant"
             subtitle="Tell us a bit about your requirement and we'll get back promptly."
-          />
+          />/
           <form
+            className="grid gap-4"
+            onSubmit={handleConsultationSubmit}
+          >
+            {/* <form
             className="grid gap-4"
             onSubmit={(e) => {
               e.preventDefault();
@@ -524,7 +636,7 @@ export default function MRSCoSite() {
               const payload = Object.fromEntries(data.entries());
               alert(`Thanks! We'll reach out shortly.\n\n${JSON.stringify(payload, null, 2)}`);
             }}
-          >
+          > */}
             <Input name="name" placeholder="Your name" required className="rounded-2xl" />
             <Input name="email" type="email" placeholder="Email" required className="rounded-2xl" />
             <Input name="phone" type="tel" placeholder="Phone" className="rounded-2xl" />
@@ -670,13 +782,17 @@ export default function MRSCoSite() {
               <CardContent>
                 <form
                   className="grid gap-3"
+                  onSubmit={handleCareerSubmit}
+                >
+                  {/* <form
+                  className="grid gap-3"
                   onSubmit={(e) => {
                     e.preventDefault();
                     const data = new FormData(e.currentTarget);
                     const payload = Object.fromEntries(data.entries());
                     alert(`Application submitted!\n\n${JSON.stringify(payload, null, 2)}`);
                   }}
-                >
+                > */}
                   <Input name="name" placeholder="Full name" required className="rounded-2xl" />
                   <Input name="email" type="email" placeholder="Email" required className="rounded-2xl" />
                   <Input name="phone" type="tel" placeholder="Phone" className="rounded-2xl" />
