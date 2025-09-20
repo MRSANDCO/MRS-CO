@@ -11,11 +11,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "../components/ui/badge";
 import { Mail, Phone, MapPin, Calendar, ArrowLeft, ArrowRight, ChevronRight, CheckCircle2, Linkedin, Instagram, Facebook, Menu, X, Award, Shield, Target, TrendingUp, CheckCircle } from "lucide-react";
 
-// Add this right after your imports and before the services array
+// API Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 // Utility function to handle API calls
-const submitForm = async (endpoint: string, data: Record<string, unknown>) => {
+const submitForm = async (endpoint: string, data: any) => {
   try {
     const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
       method: 'POST',
@@ -37,6 +37,7 @@ const submitForm = async (endpoint: string, data: Record<string, unknown>) => {
     throw error;
   }
 };
+
 // ------------------------
 // Helper Data
 // ------------------------
@@ -174,28 +175,24 @@ export default function MRSCoSite() {
     }
   };
 
-  // Add these functions inside your MRSCoSite component, before the return statement
+  // Form submission handlers
   const handleConsultationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const submitButton = (e.target as HTMLFormElement).querySelector('button[type="submit"]');
-    if (!submitButton) {
-      alert("Submit button not found.");
-      return;
-    }
-    const originalText = submitButton.textContent ?? '';
+    const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const originalText = submitButton.textContent;
 
     try {
       // Show loading state
       submitButton.textContent = 'Submitting...';
-      (submitButton as HTMLButtonElement).disabled = true;
+      submitButton.disabled = true;
 
       const formData = new FormData(e.currentTarget);
       const data = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        phone: formData.get('phone') || '',
-        company: formData.get('company') || '',
-        message: formData.get('message')
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        phone: formData.get('phone') as string || '',
+        company: formData.get('company') as string || '',
+        message: formData.get('message') as string
       };
 
       const result = await submitForm('consultation', data);
@@ -204,39 +201,44 @@ export default function MRSCoSite() {
       alert(`✅ ${result.message}`);
 
       // Reset form
-      (e.target as HTMLFormElement).reset();
+      const form = e.currentTarget;
+      if (form) {
+        form.reset();
+      }
 
-    } catch (error) {
+    } catch (error: unknown) {
       // Show error message
-      alert(`❌ ${typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : String(error)}`);
+      if (error instanceof Error) {
+        alert(`❌ ${error.message}`);
+      } else {
+        alert('❌ An unexpected error occurred');
+      }
     } finally {
       // Reset button state
-      submitButton.textContent = originalText;
-      (submitButton as HTMLButtonElement).disabled = false;
+      if (submitButton) {
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+      }
     }
   };
 
   const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const submitButton = (e.target as HTMLFormElement).querySelector('button[type="submit"]');
-    if (!submitButton) {
-      alert("Submit button not found.");
-      return;
-    }
-    const originalText = submitButton.textContent ?? '';
+    const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const originalText = submitButton.textContent;
 
     try {
       // Show loading state
       submitButton.textContent = 'Submitting...';
-      (submitButton as HTMLButtonElement).disabled = true;
+      submitButton.disabled = true;
 
       const formData = new FormData(e.currentTarget);
       const data = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        phone: formData.get('phone') || '',
-        role: formData.get('role') || '',
-        notes: formData.get('notes') || ''
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        phone: formData.get('phone') as string || '',
+        role: formData.get('role') as string || '',
+        notes: formData.get('notes') as string || ''
       };
 
       const result = await submitForm('careers', data);
@@ -245,17 +247,26 @@ export default function MRSCoSite() {
       alert(`✅ ${result.message}`);
 
       // Reset form
-      (e.target as HTMLFormElement).reset();
-
-    } catch (error) {
+      const form = e.currentTarget;
+      if (form) {
+        form.reset();
+      }
+    } catch (error: unknown) {
       // Show error message
-      alert(`❌ ${typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : String(error)}`);
+      if (error instanceof Error) {
+        alert(`❌ ${error.message}`);
+      } else {
+        alert('❌ An unexpected error occurred');
+      }
     } finally {
       // Reset button state
-      submitButton.textContent = originalText;
-      (submitButton as HTMLButtonElement).disabled = false;
+      if (submitButton) {
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+      }
     }
   };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
       {/* NAVBAR */}
@@ -372,9 +383,6 @@ export default function MRSCoSite() {
                 >
                   Book Consultation
                 </button>
-                {/* <button className="border-2 border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors font-medium">
-                  Book Consultation
-                </button> */}
               </div>
 
               <div className="flex items-center space-x-6 text-sm text-gray-600">
@@ -616,27 +624,17 @@ export default function MRSCoSite() {
       </section>
 
       {/* CONSULTATION - book a consultation*/}
-
       <Section id="consult" className="bg-white">
         <div className="max-w-3xl mx-auto px-4 md:px-6">
           <SectionHeader
             eyebrow="Book a consultation"
             title="Speak with a Chartered Accountant"
             subtitle="Tell us a bit about your requirement and we'll get back promptly."
-          />/
+          />
           <form
             className="grid gap-4"
             onSubmit={handleConsultationSubmit}
           >
-            {/* <form
-            className="grid gap-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const data = new FormData(e.currentTarget);
-              const payload = Object.fromEntries(data.entries());
-              alert(`Thanks! We'll reach out shortly.\n\n${JSON.stringify(payload, null, 2)}`);
-            }}
-          > */}
             <Input name="name" placeholder="Your name" required className="rounded-2xl" />
             <Input name="email" type="email" placeholder="Email" required className="rounded-2xl" />
             <Input name="phone" type="tel" placeholder="Phone" className="rounded-2xl" />
@@ -678,62 +676,6 @@ export default function MRSCoSite() {
           </div>
         </div>
       </Section>
-      {/* <Section id="consult" className="bg-white">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 grid md:grid-cols-2 gap-10 items-start">
-          <div>
-            <SectionHeader
-              eyebrow="Book a consultation"
-              title="Speak with a Chartered Accountant"
-              subtitle="Tell us a bit about your requirement and we'll get back promptly."
-            />
-            <form
-              className="grid gap-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                const data = new FormData(e.currentTarget);
-                const payload = Object.fromEntries(data.entries());
-                alert(`Thanks! We'll reach out shortly.\n\n${JSON.stringify(payload, null, 2)}`);
-              }}
-            >
-              <Input name="name" placeholder="Your name" required className="rounded-2xl" />
-              <Input name="email" type="email" placeholder="Email" required className="rounded-2xl" />
-              <Input name="phone" type="tel" placeholder="Phone" className="rounded-2xl" />
-              <Input name="company" placeholder="Company (optional)" className="rounded-2xl" />
-              <Textarea name="message" placeholder="Briefly describe your requirement" required className="rounded-2xl" rows={5} />
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground flex items-center gap-2"><Calendar className="w-4 h-4" /> Typical reply within 1 business day</div>
-                <Button type="submit" className="rounded-2xl">Submit</Button>
-              </div>
-            </form>
-          </div>
-
-          <div>
-            <SectionHeader
-              eyebrow="Advisory for Startups & SMBs"
-              title="Launch, comply, scale"
-              subtitle="From incorporation and GST to board-ready MIS and fundraising—we're your finance stack."
-            />
-            <div className="grid gap-4">
-              {[
-                "Incorporation advisory (Company/LLP, licenses, bank A/C)",
-                "Founders' agreements, ESOPs, cap table & registry",
-                "GST & TDS registrations, returns, reconciliations",
-                "Virtual CFO: KPIs, runway, budget vs actual, MIS",
-                "Investor readiness: data room, policies, valuation support",
-              ].map((p, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 mt-0.5" />
-                  <div className="text-slate-700">{p}</div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 flex gap-3">
-              <Button asChild className="rounded-2xl"><a href="#services">View Services</a></Button>
-              <Button asChild variant="outline" className="rounded-2xl"><a href="#contact">Contact us</a></Button>
-            </div>
-          </div>
-        </div>
-      </Section> */}
 
       {/* CAREERS */}
       <Section id="careers" className="bg-slate-50">
@@ -784,15 +726,6 @@ export default function MRSCoSite() {
                   className="grid gap-3"
                   onSubmit={handleCareerSubmit}
                 >
-                  {/* <form
-                  className="grid gap-3"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const data = new FormData(e.currentTarget);
-                    const payload = Object.fromEntries(data.entries());
-                    alert(`Application submitted!\n\n${JSON.stringify(payload, null, 2)}`);
-                  }}
-                > */}
                   <Input name="name" placeholder="Full name" required className="rounded-2xl" />
                   <Input name="email" type="email" placeholder="Email" required className="rounded-2xl" />
                   <Input name="phone" type="tel" placeholder="Phone" className="rounded-2xl" />
