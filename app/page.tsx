@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "../components/ui/badge";
-import { Mail, Phone, MapPin, Calendar, ArrowLeft, ArrowRight, ChevronRight, Linkedin, Instagram, Facebook, Menu, X, Award, Shield, Target, TrendingUp, CheckCircle, Clock, Users, Send, Briefcase, GraduationCap } from "lucide-react";
+import { Mail, Phone, MapPin, Calendar, ArrowLeft, ArrowRight, ChevronRight, Linkedin, Facebook, Menu, X, Award, Shield, Target, TrendingUp, CheckCircle, Clock, Users, Send, Briefcase, GraduationCap } from "lucide-react";
 
 // API Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
@@ -60,8 +60,9 @@ const services = [
   {
     title: "Corporate & ROC Compliance",
     desc: "Company/LLP formation, secretarial, XBRL, and event-based filings.",
-    img: "https://images.unsplash.com/photo-1520607162513-6b67ff0bfee1?q=80&w=1600&auto=format&fit=crop",
+    img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop", // <-- replaced broken URL
   },
+
   {
     title: "Virtual CFO Services",
     desc: "Board-ready MIS, financial modelling, KPIs and cash flow stewardship.",
@@ -75,7 +76,7 @@ const services = [
   {
     title: "Business Valuation",
     desc: "Valuations for fundraising, buy/sell, ESOPs and regulatory purposes.",
-    img: "https://images.unsplash.com/photo-1520607162513-6c5e2a88f5d8?q=80&w=1600&auto=format&fit=crop",
+    img: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1600&auto=format&fit=crop",
   },
   {
     title: "Risk & Process Advisory",
@@ -92,11 +93,7 @@ const services = [
     desc: "Planning, documentation, benchmarking and assessments.",
     img: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1600&auto=format&fit=crop",
   },
-  {
-    title: "Corporate Finance",
-    desc: "Debt/equity advisory, financial modelling and investor relations support.",
-    img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop",
-  },
+
   {
     title: "Litigation & Representation",
     desc: "End-to-end representation across tax and regulatory forums.",
@@ -175,98 +172,276 @@ export default function MRSCoSite() {
     }
   };
 
-  function handleConsultationSubmit(event: FormEvent<HTMLFormElement>): void {
-    throw new Error("Function not implemented.");
-  }
+  // Helper to scroll to any section by id
+  const scrollToSection = (id: string): void => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
-  function handleCareerSubmit(event: FormEvent<HTMLFormElement>): void {
-    throw new Error("Function not implemented.");
-  }
+
 
   // Form submission handlers
+  const handleConsultationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const originalText = submitButton?.textContent || 'Submit';
 
-  // Removed unused handleCareerSubmit function to fix compile error.
+    try {
+      // Show loading state
+      if (submitButton) {
+        submitButton.textContent = 'Submitting...';
+        submitButton.disabled = true;
+      }
+
+      const formData = new FormData(e.currentTarget);
+      const data = {
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        phone: formData.get('phone') as string || '',
+        company: formData.get('company') as string || '',
+        message: formData.get('message') as string
+      };
+
+      const result = await submitForm('consultation', data);
+
+      // Show success message
+      alert(`✅ ${result.message}`);
+
+      // Reset form safely
+      const form = e.currentTarget;
+      if (form) {
+        form.reset();
+      }
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit form';
+      alert(`❌ ${errorMessage}`);
+    } finally {
+      // Reset button state
+      if (submitButton) {
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+      }
+    }
+  };
+
+  const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const originalText = submitButton?.textContent || 'Submit';
+
+    try {
+      // Show loading state
+      if (submitButton) {
+        submitButton.textContent = 'Submitting...';
+        submitButton.disabled = true;
+      }
+
+      const formData = new FormData(e.currentTarget);
+      const data = {
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        phone: formData.get('phone') as string || '',
+        role: formData.get('role') as string || '',
+        experience: formData.get('experience') as string || '',
+        notes: formData.get('notes') as string || ''
+      };
+
+      const result = await submitForm('careers', data);
+
+      // Show success message
+      alert(`✅ ${result.message}`);
+
+      // Reset form safely
+      const form = e.currentTarget;
+      if (form) {
+        form.reset();
+      }
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit form';
+      alert(`❌ ${errorMessage}`);
+    } finally {
+      // Reset button state
+      if (submitButton) {
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
-      {/* NAVBAR */}
+      {/* ENHANCED NAVBAR WITH COLORFUL BACKGROUND */}
       <div className="sticky top-0 z-50">
-        <div className="backdrop-blur-xl bg-white/70 border-b">
-          <div className="max-w-7xl mx-auto px-4 md:px-6">
-            <div className="flex items-center justify-between h-16">
-              {/* Logo */}
-              <a href="#home" className="flex items-center gap-3 group">
-                <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-500 shadow-lg shadow-blue-500/20 grid place-items-center">
-                  <span className="text-white font-bold">M</span>
-                </div>
-                <div>
-                  <div className="text-base md:text-lg font-semibold tracking-tight">MRS & Co.</div>
-                  <div className="text-[10px] md:text-xs text-muted-foreground -mt-0.5">Chartered Accountants</div>
-                </div>
-              </a>
-
-              {/* Desktop Nav */}
-              <nav className="hidden md:flex items-center gap-2">
-                {[
-                  ["Home", "home"],
-                  ["About", "about"],
-                  ["Services", "services"],
-                  ["Testimonials", "testimonials"],
-                  ["Careers", "careers"],
-                  ["Startup Advisory", "startup-advisory"],
-                  ["Contact", "contact"],
-                ].map(([label, id]) => (
-                  <a key={id} href={`#${id}`} className="px-3 py-2 rounded-xl hover:bg-slate-100 text-sm font-medium">
-                    {label}
-                  </a>
-                ))}
-                <Button asChild className="rounded-2xl">
-                  <a href="#consult">Book a Call</a>
-                </Button>
-              </nav>
-
-              {/* Mobile */}
-              <button
-                className="md:hidden p-2 rounded-xl hover:bg-slate-100"
-                aria-label="Toggle Menu"
-                onClick={() => setMenuOpen((s) => !s)}
-              >
-                {menuOpen ? <X /> : <Menu />}
-              </button>
-            </div>
+        <div className="relative overflow-hidden">
+          {/* Background Image for Navbar */}
+          <div className="absolute inset-0">
+            <img
+              src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop"
+              alt="Modern office background"
+              className="w-full h-full object-cover"
+            />
+            {/* Refined Colorful Gradient Overlays */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/12 via-indigo-400/8 to-blue-600/12"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-500/5 via-transparent to-cyan-400/8"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-white/88 via-white/82 to-white/88 backdrop-blur-sm"></div>
           </div>
 
-          {/* Mobile Sheet */}
-          {menuOpen && (
-            <div className="md:hidden border-t bg-white">
-              <div className="max-w-7xl mx-auto px-4 py-4 grid gap-2">
-                {[
-                  ["Home", "home"],
-                  ["About", "about"],
-                  ["Services", "services"],
-                  ["Testimonials", "testimonials"],
-                  ["Careers", "careers"],
-                  ["Startup Advisory", "startup-advisory"],
-                  ["Contact", "contact"],
-                ].map(([label, id]) => (
-                  <a
-                    key={id}
-                    href={`#${id}`}
-                    onClick={() => setMenuOpen(false)}
-                    className="px-3 py-3 rounded-xl hover:bg-slate-100 text-sm font-medium flex items-center justify-between"
-                  >
-                    <span>{label}</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </a>
-                ))}
+          {/* Refined Animated Elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <motion.div
+              animate={{
+                x: [0, 90, 0],
+                y: [0, -8, 0],
+                opacity: [0.25, 0.5, 0.25],
+                scale: [1, 1.15, 1]
+              }}
+              transition={{
+                duration: 12,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="absolute top-3 right-24 w-12 h-12 bg-gradient-to-br from-blue-400/40 to-indigo-500/40 rounded-full shadow-md shadow-blue-400/20"
+            />
+            <motion.div
+              animate={{
+                x: [0, -70, 0],
+                rotate: [0, 120, 240, 360],
+                opacity: [0.2, 0.45, 0.2],
+                scale: [1, 1.2, 1]
+              }}
+              transition={{
+                duration: 16,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 3
+              }}
+              className="absolute bottom-2 left-12 w-8 h-8 bg-gradient-to-br from-cyan-400/45 to-blue-500/45 rounded-lg shadow-sm shadow-cyan-300/25"
+            />
+            <motion.div
+              animate={{
+                x: [0, 60, 0],
+                y: [0, 12, 0],
+                opacity: [0.15, 0.4, 0.15],
+                rotate: [0, -60, 0]
+              }}
+              transition={{
+                duration: 14,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 6
+              }}
+              className="absolute top-1/2 left-1/3 w-6 h-6 bg-gradient-to-br from-indigo-300/50 to-purple-400/50 rounded-full shadow-sm shadow-indigo-300/30"
+            />
+            <motion.div
+              animate={{
+                x: [0, -45, 0],
+                y: [0, -15, 0],
+                opacity: [0.2, 0.4, 0.2],
+                scale: [1, 1.08, 1]
+              }}
+              transition={{
+                duration: 18,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 2
+              }}
+              className="absolute top-4 right-1/2 w-4 h-4 bg-gradient-to-br from-slate-400/40 to-blue-400/40 rounded-lg shadow-sm shadow-slate-300/20"
+            />
+          </div>
+
+          <div className="relative z-10 border-b border-white/50">
+            <div className="max-w-7xl mx-auto px-4 md:px-6">
+              <div className="flex items-center justify-between h-16">
+                {/* Logo */}
+                <button
+                  onClick={() => {
+                    const homeSection = document.getElementById('home');
+                    if (homeSection) {
+                      homeSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="flex items-center gap-3 group hover:opacity-80 transition-opacity"
+                >
+                  {/* Rectangular Logo */}
+                  <div className="relative w-16 h-12 bg-gradient-to-br from-blue-700 via-indigo-700 to-cyan-500 shadow-2xl shadow-blue-500/40 grid place-items-center border-4 border-white rounded-xl group-hover:scale-105 transition-transform duration-300">
+                    <span className="text-white font-bold text-2xl tracking-tight drop-shadow-lg">MRS</span>
+                    {/* Decorative Shine */}
+                    <span className="absolute top-1 left-1 w-8 h-2 bg-white/30 rounded-full blur-sm opacity-70"></span>
+                    {/* Decorative Dot
+                    <span className="absolute bottom-2 right-2 w-2 h-2 bg-cyan-300 rounded-full shadow-lg"></span> */}
+                  </div>
+                  <div>
+                    <div className="text-base md:text-lg font-bold tracking-tight">MRS & Co.</div>
+                    <div className="text-[10px] md:text-xs text-blue-700 font-semibold -mt-0.5 tracking-wide">Chartered Accountants</div>
+                  </div>
+                </button>
+                {/* Desktop Nav */}
+                <nav className="hidden md:flex items-center gap-2">
+                  {[
+                    ["Home", "home"],
+                    ["About", "about"],
+                    ["Services", "services"],
+                    ["Testimonials", "testimonials"],
+                    ["Careers", "careers"],
+                    ["Startup Advisory", "startup-advisory"],
+                    ["Contact", "contact"],
+                  ].map(([label, id]) => (
+                    <a key={id} href={`#${id}`} className="px-3 py-2 rounded-xl hover:bg-white/60 hover:shadow-sm text-sm font-medium transition-all duration-500 hover:text-indigo-700">
+                      {label}
+                    </a>
+                  ))}
+                  <Button asChild className="rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:via-indigo-700 hover:to-blue-800 shadow-md hover:shadow-indigo-500/30 transform hover:scale-105 transition-all duration-500">
+                    <a href="#consult">Book a Call</a>
+                  </Button>
+                </nav>
+
+                {/* Mobile */}
+                <button
+                  className="md:hidden p-2 rounded-xl hover:bg-white/60 hover:shadow-sm transition-all duration-500 hover:text-indigo-600"
+                  aria-label="Toggle Menu"
+                  onClick={() => setMenuOpen((s) => !s)}
+                >
+                  {menuOpen ? <X /> : <Menu />}
+                </button>
               </div>
             </div>
-          )}
+
+            {/* Mobile Sheet */}
+            {menuOpen && (
+              <div className="md:hidden border-t bg-white/95 backdrop-blur-md">
+                <div className="max-w-7xl mx-auto px-4 py-4 grid gap-2">
+                  {[
+                    ["Home", "home"],
+                    ["About", "about"],
+                    ["Services", "services"],
+                    ["Testimonials", "testimonials"],
+                    ["Careers", "careers"],
+                    ["Startup Advisory", "startup-advisory"],
+                    ["Contact", "contact"],
+                  ].map(([label, id]) => (
+                    <a
+                      key={id}
+                      href={`#${id}`}
+                      onClick={() => setMenuOpen(false)}
+                      className="px-3 py-3 rounded-xl hover:bg-slate-100 text-sm font-medium flex items-center justify-between"
+                    >
+                      <span>{label}</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* HERO */}
-      <section id="hero" className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+      {/* <section id="hero" className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -346,22 +521,232 @@ export default function MRSCoSite() {
             </div>
           </div>
         </div>
+      </section> */}
+      {/* HERO with Live Background */}
+      <section id="home" className="relative pt-24 pb-16 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center">
+        {/* Live Background Image with Parallax Effect */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/85 via-slate-800/75 to-indigo-900/80"></div>
+          <img
+            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
+            alt="Modern glass building with blue tones"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-blue-900/30"></div>
+        </div>
+
+        {/* Floating Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              y: [0, -20, 0],
+              rotate: [0, 5, 0]
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute top-20 right-10 w-16 h-16 bg-white/10 rounded-2xl backdrop-blur-sm"
+          />
+          <motion.div
+            animate={{
+              y: [0, -30, 0],
+              rotate: [0, -5, 0]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+            className="absolute top-40 left-10 w-12 h-12 bg-blue-400/15 rounded-full backdrop-blur-sm"
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-medium mb-6 border border-white/30">
+                <Award className="w-4 h-4 mr-2" />
+                Trusted Since 1999
+              </div>
+
+              <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight mb-6">
+                Your Trusted
+                <span className="block bg-gradient-to-r from-cyan-300 to-blue-200 bg-clip-text text-transparent">Financial Partners</span>
+              </h1>
+
+              <p className="text-xl text-gray-200 mb-8 leading-relaxed">
+                We are a premier Chartered Accountant firm providing comprehensive audit, tax, compliance, and strategic finance solutions across India and beyond.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <Button
+                  onClick={scrollToServices}
+                  className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-3 rounded-xl transition-all duration-300 font-medium flex items-center justify-center shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105"
+                >
+                  Explore Services
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+                <Button
+                  onClick={() => scrollToSection('consult')}
+                  variant="outline"
+                  className="border-2 border-white/50 text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-xl backdrop-blur-md transition-all duration-300 font-medium hover:scale-105"
+                >
+                  Book Consultation
+                </Button>
+              </div>
+
+              <div className="flex items-center space-x-6 text-sm text-gray-200">
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
+                  ICAI Registered
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
+                  Pan India Services
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
+                  Startup Friendly
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="relative z-10 bg-white/10 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/20">
+                <div className="grid grid-cols-2 gap-6 text-center">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm"
+                  >
+                    <div className="text-3xl font-bold text-cyan-300">500+</div>
+                    <div className="text-gray-200">Happy Clients</div>
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm"
+                  >
+                    <div className="text-3xl font-bold text-cyan-300">25+</div>
+                    <div className="text-gray-200">Years Experience</div>
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm"
+                  >
+                    <div className="text-3xl font-bold text-cyan-300">40+</div>
+                    <div className="text-gray-200">Industries Served</div>
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm"
+                  >
+                    <div className="text-3xl font-bold text-cyan-300">98%</div>
+                    <div className="text-gray-200">Client Satisfaction</div>
+                  </motion.div>
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/30 to-cyan-500/30 rounded-3xl transform rotate-3 blur-xl"></div>
+            </motion.div>
+          </div>
+        </div>
       </section>
 
+
       {/* ABOUT SECTION */}
-      <section id="about" className="py-16 bg-gray-50 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <section id="about" className="relative py-16 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=2071&auto=format&fit=crop"
+            alt="Professional team working in modern office"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-50/95 via-white/90 to-gray-100/95"></div>
+        </div>
+
+        {/* Floating Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              y: [0, -30, 0],
+              rotate: [0, 180, 360],
+              scale: [1, 1.2, 1]
+            }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute top-20 right-16 w-24 h-24 bg-gradient-to-br from-blue-200/20 to-indigo-200/20 rounded-full"
+          />
+          <motion.div
+            animate={{
+              x: [0, 50, 0],
+              y: [0, -20, 0],
+              rotate: [0, -90, 0]
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 3
+            }}
+            className="absolute bottom-32 left-20 w-20 h-20 bg-gradient-to-br from-green-200/20 to-emerald-200/20 rounded-2xl"
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.5, 1],
+              opacity: [0.3, 0.7, 0.3]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+            className="absolute top-1/2 left-1/3 w-32 h-32 bg-gradient-to-br from-purple-200/15 to-pink-200/15 rounded-full"
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4"
+            >
               About MRS & Co.
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-xl text-gray-600 max-w-3xl mx-auto"
+            >
               We are more than just Chartered Accountants — we are your trusted financial advisors, helping businesses thrive with clarity and confidence.
-            </p>
+            </motion.p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-lg">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/50"
+              whileHover={{ scale: 1.05, y: -5 }}
+            >
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-blue-600" />
               </div>
@@ -369,9 +754,15 @@ export default function MRSCoSite() {
               <p className="text-gray-600">
                 With over 12 years in the industry and a team of experienced CAs, we bring deep expertise across all financial domains.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="bg-white p-6 rounded-xl shadow-lg">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/50"
+              whileHover={{ scale: 1.05, y: -5 }}
+            >
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
                 <Target className="w-6 h-6 text-green-600" />
               </div>
@@ -379,9 +770,15 @@ export default function MRSCoSite() {
               <p className="text-gray-600">
                 We prioritize understanding your unique needs and provide tailored solutions that drive real business value.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="bg-white p-6 rounded-xl shadow-lg">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/50"
+              whileHover={{ scale: 1.05, y: -5 }}
+            >
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
                 <TrendingUp className="w-6 h-6 text-purple-600" />
               </div>
@@ -389,10 +786,11 @@ export default function MRSCoSite() {
               <p className="text-gray-600">
                 From startups to established enterprises, we partner with you at every stage of your business journey.
               </p>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
+
 
       {/* SERVICES SLIDER */}
       <Section id="services" className="pt-2">
@@ -423,14 +821,15 @@ export default function MRSCoSite() {
               {services.map((s, i) => (
                 <div key={i} className="min-w-[85%] md:min-w-[45%] lg:min-w-[32%] snap-start">
                   <Card className="rounded-3xl overflow-hidden h-full">
-                    <div className="relative w-full h-40">
+                    <div className="relative w-full " style={{ height: "170px" }}>
+
                       <Image
                         src={s.img}
                         alt={s.title}
                         fill
                         sizes="100vw"
                         className="object-cover w-full h-full"
-                        style={{ objectFit: "cover" }}
+                        style={{ objectFit: "cover", borderTopLeftRadius: "1.5rem", borderTopRightRadius: "1.5rem" }}
                       />
                     </div>
                     <CardHeader>
@@ -438,15 +837,6 @@ export default function MRSCoSite() {
                     </CardHeader>
                     <CardContent className="text-muted-foreground">{s.desc}</CardContent>
                   </Card>
-                  {/* <Card className="rounded-3xl overflow-hidden h-full">
-                    <div className="h-40 bg-slate-200">
-                      <Image src={s.img} alt={s.title} width={400} height={160} className="w-full h-full object-cover" />
-                    </div>
-                    <CardHeader>
-                      <CardTitle className="text-xl">{s.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-muted-foreground">{s.desc}</CardContent>
-                  </Card> */}
                 </div>
               ))}
             </div>
@@ -579,74 +969,6 @@ export default function MRSCoSite() {
         </div>
       </section>
 
-      {/* UMBRELLA OF OUR SERVICES - GRID with Background
-      <section className="relative py-12 bg-gray-50">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-gray-100 opacity-40"></div>
-        <div className="relative max-w-6xl mx-auto text-center px-4 md:px-6">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Umbrella of Our Services
-          </h2>
-          <p className="max-w-2xl mx-auto text-gray-600 mb-10">
-            From compliance to consulting — explore the complete spectrum of
-            financial expertise we provide.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Audit & Assurance",
-                desc: "Comprehensive audits ensuring accuracy and compliance for your business.",
-                icon: "📊",
-                color: "blue",
-              },
-              {
-                title: "Taxation",
-                desc: "Expert tax planning, filing, and compliance for individuals and corporations.",
-                icon: "💰",
-                color: "green",
-              },
-              {
-                title: "Startup Advisory",
-                desc: "Helping new businesses structure, register, and scale smoothly with financial clarity.",
-                icon: "🚀",
-                color: "purple",
-              },
-              {
-                title: "Business Consultancy",
-                desc: "Strategic advice to optimize operations and improve financial performance.",
-                icon: "📈",
-                color: "red",
-              },
-              {
-                title: "Corporate Compliance",
-                desc: "Ensuring all statutory and regulatory requirements are met seamlessly.",
-                icon: "⚖️",
-                color: "yellow",
-              },
-              {
-                title: "Financial Planning",
-                desc: "Customized solutions to achieve long-term stability and growth.",
-                icon: "🏦",
-                color: "indigo",
-              },
-            ].map((service, idx) => (
-              <motion.div
-                key={idx}
-                className="p-6 rounded-2xl shadow-md bg-white hover:shadow-2xl transition group"
-                whileHover={{ scale: 1.05 }}
-              >
-                <div className="text-3xl mb-4">{service.icon}</div>
-                <h3
-                  className="text-xl font-semibold mb-3 text-blue-700 group-hover:text-blue-900"
-                >
-                  {service.title}
-                </h3>
-                <p className="text-gray-600">{service.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section> */}
 
       {/* TESTIMONIALS */}
       <section id="testimonials" className="py-16 bg-white">
