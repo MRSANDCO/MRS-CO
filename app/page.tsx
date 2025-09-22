@@ -12,7 +12,7 @@ import { Badge } from "../components/ui/badge";
 import { Mail, Phone, MapPin, Calendar, ArrowLeft, ArrowRight, ChevronRight, Linkedin, Facebook, Menu, X, Award, Shield, Target, TrendingUp, CheckCircle, Clock, Users, Send, Briefcase, GraduationCap } from "lucide-react";
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://mrsbackend-production.up.railway.app/api';
 
 // Utility function to handle API calls
 const submitForm = async (endpoint: string, data: Record<string, unknown>) => {
