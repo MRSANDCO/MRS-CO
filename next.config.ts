@@ -17,5 +17,13 @@ export default nextConfig;
 // const nextConfig: NextConfig = {
 //   /* config options here */
 // };
+// /** @type {import('next').NextConfig} */
+// const nextConfig = {
+//   turbopack: {
+//     root: '.', // Specify current directory as root
+//   },
+// };
+
+// module.exports = nextConfig;
 
 // export default nextConfig;
