@@ -6,6 +6,7 @@
 
 // module.exports = nextConfig
 import type { NextConfig } from 'next'
+import path from 'path/win32'
 
 const nextConfig: NextConfig = {
   images: {
@@ -16,6 +17,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+//  output: {
+//     // This is the correct property name
+//     fileTracingRoot: require('path').join(__dirname)
+//   }
 }
 
 export default nextConfig

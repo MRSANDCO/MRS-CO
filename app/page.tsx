@@ -9,18 +9,42 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "../components/ui/badge";
-import { Mail, Phone, MapPin, Calendar, ArrowLeft, ArrowRight, ChevronRight, Linkedin, Facebook, Menu, X, Award, Shield, Target, TrendingUp, CheckCircle, Clock, Users, Send, Briefcase, GraduationCap } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  ArrowLeft,
+  ArrowRight,
+  ChevronRight,
+  Linkedin,
+  Facebook,
+  Menu,
+  X,
+  Award,
+  Shield,
+  Target,
+  TrendingUp,
+  CheckCircle,
+  Clock,
+  Users,
+  Send,
+  Briefcase,
+  GraduationCap,
+} from "lucide-react";
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://mrsbackend-production.up.railway.app/api';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://mrsbackend-production.up.railway.app";
 
 // Utility function to handle API calls
 const submitForm = async (endpoint: string, data: Record<string, unknown>) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
-      method: 'POST',
+    const response = await fetch(`${API_BASE_URL}/api/${endpoint}`, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
@@ -28,7 +52,7 @@ const submitForm = async (endpoint: string, data: Record<string, unknown>) => {
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(result.message || 'Something went wrong');
+      throw new Error(result.message || "Something went wrong");
     }
 
     return result;
@@ -130,16 +154,35 @@ function useLockBody(lock: boolean) {
 }
 
 const Section: React.FC<SectionProps> = ({ id, className = "", children }) => (
-  <section id={id} className={`py-16 md:py-24 ${className}`}>{children}</section>
+  <section id={id} className={`py-16 md:py-24 ${className}`}>
+    {children}
+  </section>
 );
 
-const SectionHeader: React.FC<SectionHeaderProps> = ({ eyebrow, title, subtitle, center }) => (
-  <div className={`max-w-3xl ${center ? "mx-auto text-center" : ""} mb-10 md:mb-14`}>
+const SectionHeader: React.FC<SectionHeaderProps> = ({
+  eyebrow,
+  title,
+  subtitle,
+  center,
+}) => (
+  <div
+    className={`max-w-3xl ${
+      center ? "mx-auto text-center" : ""
+    } mb-10 md:mb-14`}
+  >
     {eyebrow && (
-      <div className="text-xs tracking-widest uppercase font-medium text-muted-foreground mb-3">{eyebrow}</div>
+      <div className="text-xs tracking-widest uppercase font-medium text-muted-foreground mb-3">
+        {eyebrow}
+      </div>
     )}
-    <h2 className="text-3xl md:text-4xl font-semibold leading-tight">{title}</h2>
-    {subtitle && <p className="text-muted-foreground mt-3 text-base md:text-lg">{subtitle}</p>}
+    <h2 className="text-3xl md:text-4xl font-semibold leading-tight">
+      {title}
+    </h2>
+    {subtitle && (
+      <p className="text-muted-foreground mt-3 text-base md:text-lg">
+        {subtitle}
+      </p>
+    )}
   </div>
 );
 
@@ -164,11 +207,13 @@ export default function MRSCoSite() {
 
   const year = useMemo(() => new Date().getFullYear(), []);
 
-  const scrollToServices = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+  const scrollToServices = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void => {
     event.preventDefault();
-    const servicesSection = document.getElementById('services');
+    const servicesSection = document.getElementById("services");
     if (servicesSection) {
-      servicesSection.scrollIntoView({ behavior: 'smooth' });
+      servicesSection.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -176,35 +221,44 @@ export default function MRSCoSite() {
   const scrollToSection = (id: string): void => {
     const section = document.getElementById(id);
     if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
+      section.scrollIntoView({ behavior: "smooth" });
     }
   };
-
-
 
   // Form submission handlers
-  const handleConsultationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleConsultationSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
-    const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
-    const originalText = submitButton?.textContent || 'Submit';
+    const submitButton = e.currentTarget.querySelector(
+      'button[type="submit"]'
+    ) as HTMLButtonElement;
+    const originalText = submitButton?.textContent || "Submit";
 
     try {
       // Show loading state
       if (submitButton) {
-        submitButton.textContent = 'Submitting...';
+        submitButton.textContent = "Submitting...";
         submitButton.disabled = true;
       }
 
       const formData = new FormData(e.currentTarget);
+      const service = formData.get("service") as string;
+      const baseMessage = formData.get("message") as string;
+
       const data = {
-        name: formData.get('name') as string,
-        email: formData.get('email') as string,
-        phone: formData.get('phone') as string || '',
-        company: formData.get('company') as string || '',
-        message: formData.get('message') as string
+        name: formData.get("name") as string,
+        email: formData.get("email") as string,
+        phone: (formData.get("phone") as string) || "",
+        company: (formData.get("company") as string) || "",
+        message: service
+          ? `Service Requested: ${service}\n\n${baseMessage}`
+          : baseMessage,
+        // Remove 'service' field - backend doesn't expect it
       };
 
-      const result = await submitForm('consultation', data);
+      console.log("Sending consultation data:", data); // Debug log
+      const result = await submitForm("consultation", data);
 
       // Show success message
       alert(`✅ ${result.message}`);
@@ -214,9 +268,10 @@ export default function MRSCoSite() {
       if (form) {
         form.reset();
       }
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to submit form';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to submit form";
+      console.error("Consultation error details:", error); // Debug log
       alert(`❌ ${errorMessage}`);
     } finally {
       // Reset button state
@@ -227,29 +282,83 @@ export default function MRSCoSite() {
     }
   };
 
+  // const handleConsultationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+  //   const originalText = submitButton?.textContent || 'Submit';
+
+  //   try {
+  //     // Show loading state
+  //     if (submitButton) {
+  //       submitButton.textContent = 'Submitting...';
+  //       submitButton.disabled = true;
+  //     }
+
+  //     const formData = new FormData(e.currentTarget);
+  //     const data = {
+  //       name: formData.get('name') as string,
+  //       email: formData.get('email') as string,
+  //       phone: formData.get('phone') as string || '',
+  //       company: formData.get('company') as string || '',
+  //       message: formData.get('message') as string
+  //     };
+
+  //     const result = await submitForm('consultation', data);
+
+  //     // Show success message
+  //     alert(`✅ ${result.message}`);
+
+  //     // Reset form safely
+  //     const form = e.currentTarget;
+  //     if (form) {
+  //       form.reset();
+  //     }
+
+  //   } catch (error) {
+  //     const errorMessage = error instanceof Error ? error.message : 'Failed to submit form';
+  //     alert(`❌ ${errorMessage}`);
+  //   } finally {
+  //     // Reset button state
+  //     if (submitButton) {
+  //       submitButton.textContent = originalText;
+  //       submitButton.disabled = false;
+  //     }
+  //   }
+  // };
   const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
-    const originalText = submitButton?.textContent || 'Submit';
+    const submitButton = e.currentTarget.querySelector(
+      'button[type="submit"]'
+    ) as HTMLButtonElement;
+    const originalText = submitButton?.textContent || "Submit";
 
     try {
       // Show loading state
       if (submitButton) {
-        submitButton.textContent = 'Submitting...';
+        submitButton.textContent = "Submitting...";
         submitButton.disabled = true;
       }
 
       const formData = new FormData(e.currentTarget);
+      const experience = (formData.get("experience") as string) || "";
+      const notes = (formData.get("notes") as string) || "";
+
+      // ⚠️ IMPORTANT: Your backend expects 'notes', not 'experience'
       const data = {
-        name: formData.get('name') as string,
-        email: formData.get('email') as string,
-        phone: formData.get('phone') as string || '',
-        role: formData.get('role') as string || '',
-        experience: formData.get('experience') as string || '',
-        notes: formData.get('notes') as string || ''
+        name: formData.get("name") as string,
+        email: formData.get("email") as string,
+        phone: (formData.get("phone") as string) || "",
+        role: (formData.get("role") as string) || "",
+        // Backend expects 'notes' field, so put experience info there
+        notes: experience
+          ? `Experience: ${experience}${
+              notes ? `\n\nAdditional Notes: ${notes}` : ""
+            }`
+          : notes,
       };
 
-      const result = await submitForm('careers', data);
+      console.log("Sending career data:", data); // Debug log
+      const result = await submitForm("careers", data);
 
       // Show success message
       alert(`✅ ${result.message}`);
@@ -259,9 +368,10 @@ export default function MRSCoSite() {
       if (form) {
         form.reset();
       }
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to submit form';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to submit form";
+      console.error("Career error details:", error); // Debug log
       alert(`❌ ${errorMessage}`);
     } finally {
       // Reset button state
@@ -271,6 +381,51 @@ export default function MRSCoSite() {
       }
     }
   };
+
+  // const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+  //   const originalText = submitButton?.textContent || 'Submit';
+
+  //   try {
+  //     // Show loading state
+  //     if (submitButton) {
+  //       submitButton.textContent = 'Submitting...';
+  //       submitButton.disabled = true;
+  //     }
+
+  //     const formData = new FormData(e.currentTarget);
+  //     const data = {
+  //       name: formData.get('name') as string,
+  //       email: formData.get('email') as string,
+  //       phone: formData.get('phone') as string || '',
+  //       role: formData.get('role') as string || '',
+  //       experience: formData.get('experience') as string || '',
+  //       notes: formData.get('notes') as string || ''
+  //     };
+
+  //     const result = await submitForm('careers', data);
+
+  //     // Show success message
+  //     alert(`✅ ${result.message}`);
+
+  //     // Reset form safely
+  //     const form = e.currentTarget;
+  //     if (form) {
+  //       form.reset();
+  //     }
+
+  //   } catch (error) {
+  //     const errorMessage = error instanceof Error ? error.message : 'Failed to submit form';
+  //     alert(`❌ ${errorMessage}`);
+  //   } finally {
+  //     // Reset button state
+  //     if (submitButton) {
+  //       submitButton.textContent = originalText;
+  //       submitButton.disabled = false;
+  //     }
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
@@ -297,12 +452,12 @@ export default function MRSCoSite() {
                 x: [0, 90, 0],
                 y: [0, -8, 0],
                 opacity: [0.25, 0.5, 0.25],
-                scale: [1, 1.15, 1]
+                scale: [1, 1.15, 1],
               }}
               transition={{
                 duration: 12,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
               className="absolute top-3 right-24 w-12 h-12 bg-gradient-to-br from-blue-400/40 to-indigo-500/40 rounded-full shadow-md shadow-blue-400/20"
             />
@@ -311,13 +466,13 @@ export default function MRSCoSite() {
                 x: [0, -70, 0],
                 rotate: [0, 120, 240, 360],
                 opacity: [0.2, 0.45, 0.2],
-                scale: [1, 1.2, 1]
+                scale: [1, 1.2, 1],
               }}
               transition={{
                 duration: 16,
                 repeat: Infinity,
                 ease: "easeInOut",
-                delay: 3
+                delay: 3,
               }}
               className="absolute bottom-2 left-12 w-8 h-8 bg-gradient-to-br from-cyan-400/45 to-blue-500/45 rounded-lg shadow-sm shadow-cyan-300/25"
             />
@@ -326,13 +481,13 @@ export default function MRSCoSite() {
                 x: [0, 60, 0],
                 y: [0, 12, 0],
                 opacity: [0.15, 0.4, 0.15],
-                rotate: [0, -60, 0]
+                rotate: [0, -60, 0],
               }}
               transition={{
                 duration: 14,
                 repeat: Infinity,
                 ease: "easeInOut",
-                delay: 6
+                delay: 6,
               }}
               className="absolute top-1/2 left-1/3 w-6 h-6 bg-gradient-to-br from-indigo-300/50 to-purple-400/50 rounded-full shadow-sm shadow-indigo-300/30"
             />
@@ -341,13 +496,13 @@ export default function MRSCoSite() {
                 x: [0, -45, 0],
                 y: [0, -15, 0],
                 opacity: [0.2, 0.4, 0.2],
-                scale: [1, 1.08, 1]
+                scale: [1, 1.08, 1],
               }}
               transition={{
                 duration: 18,
                 repeat: Infinity,
                 ease: "easeInOut",
-                delay: 2
+                delay: 2,
               }}
               className="absolute top-4 right-1/2 w-4 h-4 bg-gradient-to-br from-slate-400/40 to-blue-400/40 rounded-lg shadow-sm shadow-slate-300/20"
             />
@@ -359,24 +514,30 @@ export default function MRSCoSite() {
                 {/* Logo */}
                 <button
                   onClick={() => {
-                    const homeSection = document.getElementById('home');
+                    const homeSection = document.getElementById("home");
                     if (homeSection) {
-                      homeSection.scrollIntoView({ behavior: 'smooth' });
+                      homeSection.scrollIntoView({ behavior: "smooth" });
                     }
                   }}
                   className="flex items-center gap-3 group hover:opacity-80 transition-opacity"
                 >
                   {/* Rectangular Logo */}
                   <div className="relative w-16 h-12 bg-gradient-to-br from-blue-700 via-indigo-700 to-cyan-500 shadow-2xl shadow-blue-500/40 grid place-items-center border-4 border-white rounded-xl group-hover:scale-105 transition-transform duration-300">
-                    <span className="text-white font-bold text-2xl tracking-tight drop-shadow-lg">MRS</span>
+                    <span className="text-white font-bold text-2xl tracking-tight drop-shadow-lg">
+                      MRS
+                    </span>
                     {/* Decorative Shine */}
                     <span className="absolute top-1 left-1 w-8 h-2 bg-white/30 rounded-full blur-sm opacity-70"></span>
                     {/* Decorative Dot
                     <span className="absolute bottom-2 right-2 w-2 h-2 bg-cyan-300 rounded-full shadow-lg"></span> */}
                   </div>
                   <div>
-                    <div className="text-base md:text-lg font-bold tracking-tight">MRS & Co.</div>
-                    <div className="text-[10px] md:text-xs text-blue-700 font-semibold -mt-0.5 tracking-wide">Chartered Accountants</div>
+                    <div className="text-base md:text-lg font-bold tracking-tight">
+                      MRS & Co.
+                    </div>
+                    <div className="text-[10px] md:text-xs text-blue-700 font-semibold -mt-0.5 tracking-wide">
+                      Chartered Accountants
+                    </div>
                   </div>
                 </button>
                 {/* Desktop Nav */}
@@ -390,11 +551,18 @@ export default function MRSCoSite() {
                     ["Startup Advisory", "startup-advisory"],
                     ["Contact", "contact"],
                   ].map(([label, id]) => (
-                    <a key={id} href={`#${id}`} className="px-3 py-2 rounded-xl hover:bg-white/60 hover:shadow-sm text-sm font-medium transition-all duration-500 hover:text-indigo-700">
+                    <a
+                      key={id}
+                      href={`#${id}`}
+                      className="px-3 py-2 rounded-xl hover:bg-white/60 hover:shadow-sm text-sm font-medium transition-all duration-500 hover:text-indigo-700"
+                    >
                       {label}
                     </a>
                   ))}
-                  <Button asChild className="rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:via-indigo-700 hover:to-blue-800 shadow-md hover:shadow-indigo-500/30 transform hover:scale-105 transition-all duration-500">
+                  <Button
+                    asChild
+                    className="rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:via-indigo-700 hover:to-blue-800 shadow-md hover:shadow-indigo-500/30 transform hover:scale-105 transition-all duration-500"
+                  >
                     <a href="#consult">Book a Call</a>
                   </Button>
                 </nav>
@@ -439,91 +607,11 @@ export default function MRSCoSite() {
           </div>
         </div>
       </div>
-
-      {/* HERO */}
-      {/* <section id="hero" className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium mb-6">
-                <Award className="w-4 h-4 mr-2" />
-                Trusted Since 1999
-              </div>
-
-              <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Your Trusted
-                <span className="text-blue-600 block">Financial Partners</span>
-              </h1>
-
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                We are a premier Chartered Accountant firm providing comprehensive audit, tax, compliance, and strategic finance solutions across India and beyond.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <button
-                  onClick={scrollToServices}
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center"
-                >
-                  Explore Services
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </button>
-                <button
-                  onClick={() => {
-                    const consultSection = document.getElementById('consult');
-                    if (consultSection) {
-                      consultSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  className="border-2 border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors font-medium"
-                >
-                  Book Consultation
-                </button>
-              </div>
-
-              <div className="flex items-center space-x-6 text-sm text-gray-600">
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                  ICAI Registered
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                  Pan India Services
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                  Startup Friendly
-                </div>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="relative z-10 bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl">
-                <div className="grid grid-cols-2 gap-6 text-center">
-                  <div>
-                    <div className="text-3xl font-bold text-blue-600">500+</div>
-                    <div className="text-gray-600">Happy Clients</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold text-blue-600">25+</div>
-                    <div className="text-gray-600">Years Experience</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold text-blue-600">40+</div>
-                    <div className="text-gray-600">Industries Served</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold text-blue-600">98%</div>
-                    <div className="text-gray-600">Client Satisfaction</div>
-                  </div>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl transform rotate-3"></div>
-            </div>
-          </div>
-        </div>
-      </section> */}
       {/* HERO with Live Background */}
-      <section id="home" className="relative pt-24 pb-16 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center">
+      <section
+        id="home"
+        className="relative pt-24 pb-16 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center"
+      >
         {/* Live Background Image with Parallax Effect */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-900/85 via-slate-800/75 to-indigo-900/80"></div>
@@ -540,25 +628,25 @@ export default function MRSCoSite() {
           <motion.div
             animate={{
               y: [0, -20, 0],
-              rotate: [0, 5, 0]
+              rotate: [0, 5, 0],
             }}
             transition={{
               duration: 6,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
             }}
             className="absolute top-20 right-10 w-16 h-16 bg-white/10 rounded-2xl backdrop-blur-sm"
           />
           <motion.div
             animate={{
               y: [0, -30, 0],
-              rotate: [0, -5, 0]
+              rotate: [0, -5, 0],
             }}
             transition={{
               duration: 8,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: 2
+              delay: 2,
             }}
             className="absolute top-40 left-10 w-12 h-12 bg-blue-400/15 rounded-full backdrop-blur-sm"
           />
@@ -578,11 +666,15 @@ export default function MRSCoSite() {
 
               <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight mb-6">
                 Your Trusted
-                <span className="block bg-gradient-to-r from-cyan-300 to-blue-200 bg-clip-text text-transparent">Financial Partners</span>
+                <span className="block bg-gradient-to-r from-cyan-300 to-blue-200 bg-clip-text text-transparent">
+                  Financial Partners
+                </span>
               </h1>
 
               <p className="text-xl text-gray-200 mb-8 leading-relaxed">
-                We are a premier Chartered Accountant firm providing comprehensive audit, tax, compliance, and strategic finance solutions across India and beyond.
+                We are a premier Chartered Accountant firm providing
+                comprehensive audit, tax, compliance, and strategic finance
+                solutions across India and beyond.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
@@ -594,9 +686,10 @@ export default function MRSCoSite() {
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
                 <Button
-                  onClick={() => scrollToSection('consult')}
+                  onClick={() => scrollToSection("consult")}
                   variant="outline"
-                  className="border-2 border-white/50 text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-xl backdrop-blur-md transition-all duration-300 font-medium hover:scale-105"
+                  className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-3 rounded-xl transition-all duration-300 font-medium flex items-center justify-center shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105"
+                  // className="border-2 border-white/50 text-white  hover:text-blue-600 px-8 py-3 rounded-xl backdrop-blur-md transition-all duration-300 font-medium hover:scale-105"
                 >
                   Book Consultation
                 </Button>
@@ -662,7 +755,6 @@ export default function MRSCoSite() {
         </div>
       </section>
 
-
       {/* ABOUT SECTION */}
       <section id="about" className="relative py-16 overflow-hidden">
         {/* Background Image */}
@@ -681,12 +773,12 @@ export default function MRSCoSite() {
             animate={{
               y: [0, -30, 0],
               rotate: [0, 180, 360],
-              scale: [1, 1.2, 1]
+              scale: [1, 1.2, 1],
             }}
             transition={{
               duration: 15,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
             }}
             className="absolute top-20 right-16 w-24 h-24 bg-gradient-to-br from-blue-200/20 to-indigo-200/20 rounded-full"
           />
@@ -694,26 +786,26 @@ export default function MRSCoSite() {
             animate={{
               x: [0, 50, 0],
               y: [0, -20, 0],
-              rotate: [0, -90, 0]
+              rotate: [0, -90, 0],
             }}
             transition={{
               duration: 12,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: 3
+              delay: 3,
             }}
             className="absolute bottom-32 left-20 w-20 h-20 bg-gradient-to-br from-green-200/20 to-emerald-200/20 rounded-2xl"
           />
           <motion.div
             animate={{
               scale: [1, 1.5, 1],
-              opacity: [0.3, 0.7, 0.3]
+              opacity: [0.3, 0.7, 0.3],
             }}
             transition={{
               duration: 8,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: 1
+              delay: 1,
             }}
             className="absolute top-1/2 left-1/3 w-32 h-32 bg-gradient-to-br from-purple-200/15 to-pink-200/15 rounded-full"
           />
@@ -735,7 +827,9 @@ export default function MRSCoSite() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
-              We are more than just Chartered Accountants — we are your trusted financial advisors, helping businesses thrive with clarity and confidence.
+              We are more than just Chartered Accountants — we are your trusted
+              financial advisors, helping businesses thrive with clarity and
+              confidence.
             </motion.p>
           </div>
 
@@ -750,9 +844,12 @@ export default function MRSCoSite() {
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Expertise & Experience</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Expertise & Experience
+              </h3>
               <p className="text-gray-600">
-                With over 12 years in the industry and a team of experienced CAs, we bring deep expertise across all financial domains.
+                With over 12 years in the industry and a team of experienced
+                CAs, we bring deep expertise across all financial domains.
               </p>
             </motion.div>
 
@@ -766,9 +863,12 @@ export default function MRSCoSite() {
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
                 <Target className="w-6 h-6 text-green-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Client-Centric Approach</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Client-Centric Approach
+              </h3>
               <p className="text-gray-600">
-                We prioritize understanding your unique needs and provide tailored solutions that drive real business value.
+                We prioritize understanding your unique needs and provide
+                tailored solutions that drive real business value.
               </p>
             </motion.div>
 
@@ -782,15 +882,17 @@ export default function MRSCoSite() {
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
                 <TrendingUp className="w-6 h-6 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Growth Partnership</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Growth Partnership
+              </h3>
               <p className="text-gray-600">
-                From startups to established enterprises, we partner with you at every stage of your business journey.
+                From startups to established enterprises, we partner with you at
+                every stage of your business journey.
               </p>
             </motion.div>
           </div>
         </div>
       </section>
-
 
       {/* SERVICES SLIDER */}
       <Section id="services" className="pt-2">
@@ -804,12 +906,22 @@ export default function MRSCoSite() {
 
           <div className="relative">
             <div className="absolute -left-2 top-1/2 -translate-y-1/2 z-10">
-              <Button variant="outline" size="icon" className="rounded-2xl" onClick={() => scrollByCards(-1)}>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-2xl"
+                onClick={() => scrollByCards(-1)}
+              >
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             </div>
             <div className="absolute -right-2 top-1/2 -translate-y-1/2 z-10">
-              <Button variant="outline" size="icon" className="rounded-2xl" onClick={() => scrollByCards(1)}>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-2xl"
+                onClick={() => scrollByCards(1)}
+              >
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </div>
@@ -819,23 +931,34 @@ export default function MRSCoSite() {
               className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 px-1 scrollbar-thin scrollbar-thumb-slate-300"
             >
               {services.map((s, i) => (
-                <div key={i} className="min-w-[85%] md:min-w-[45%] lg:min-w-[32%] snap-start">
+                <div
+                  key={i}
+                  className="min-w-[85%] md:min-w-[45%] lg:min-w-[32%] snap-start"
+                >
                   <Card className="rounded-3xl overflow-hidden h-full">
-                    <div className="relative w-full " style={{ height: "170px" }}>
-
+                    <div
+                      className="relative w-full "
+                      style={{ height: "170px" }}
+                    >
                       <Image
                         src={s.img}
                         alt={s.title}
                         fill
                         sizes="100vw"
                         className="object-cover w-full h-full"
-                        style={{ objectFit: "cover", borderTopLeftRadius: "1.5rem", borderTopRightRadius: "1.5rem" }}
+                        style={{
+                          objectFit: "cover",
+                          borderTopLeftRadius: "1.5rem",
+                          borderTopRightRadius: "1.5rem",
+                        }}
                       />
                     </div>
                     <CardHeader>
                       <CardTitle className="text-xl">{s.title}</CardTitle>
                     </CardHeader>
-                    <CardContent className="text-muted-foreground">{s.desc}</CardContent>
+                    <CardContent className="text-muted-foreground">
+                      {s.desc}
+                    </CardContent>
                   </Card>
                 </div>
               ))}
@@ -863,12 +986,12 @@ export default function MRSCoSite() {
             animate={{
               y: [0, -30, 0],
               rotate: [0, 10, 0],
-              scale: [1, 1.1, 1]
+              scale: [1, 1.1, 1],
             }}
             transition={{
               duration: 10,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
             }}
             className="absolute top-10 right-20 w-24 h-24 bg-gradient-to-br from-blue-400/15 to-slate-500/15 rounded-3xl backdrop-blur-sm"
           />
@@ -876,13 +999,13 @@ export default function MRSCoSite() {
             animate={{
               y: [0, -40, 0],
               rotate: [0, -15, 0],
-              scale: [1, 1.2, 1]
+              scale: [1, 1.2, 1],
             }}
             transition={{
               duration: 12,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: 3
+              delay: 3,
             }}
             className="absolute bottom-20 left-16 w-32 h-32 bg-gradient-to-br from-indigo-400/10 to-slate-600/10 rounded-full backdrop-blur-sm"
           />
@@ -969,7 +1092,6 @@ export default function MRSCoSite() {
         </div>
       </section>
 
-
       {/* TESTIMONIALS */}
       <section id="testimonials" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto text-center px-4 md:px-6">
@@ -987,12 +1109,12 @@ export default function MRSCoSite() {
                 text: "Their startup advisory service gave us confidence to scale without compliance worries.",
               },
               {
-                name: "Pravek Kelp Private Limited",
+                name: "Pravek Kalp Private Limited",
                 role: "Manufacturers and sells Ayurvedic Formulations",
                 text: "Professional, reliable, and truly client-focused — highly recommended for any business.",
               },
               {
-                name: "NxtMobility Energy Private Limited",
+                name: "Nxtmobility Energy Private Limited",
                 role: "Leading electric revolution company",
                 text: "MRS & Co. has been instrumental in our growth journey.",
               },
@@ -1005,14 +1127,16 @@ export default function MRSCoSite() {
                 name: "S A Enterprises",
                 role: "Design homespace and workspaces",
                 text: "Their expertise in tax and compliance is unmatched.",
-              }
+              },
             ].map((t, idx) => (
               <motion.div
                 key={idx}
                 className="bg-gray-50 p-6 rounded-2xl shadow hover:shadow-lg transition"
                 whileHover={{ scale: 1.03 }}
               >
-                <p className="text-gray-700 italic mb-4">&ldquo;{t.text}&rdquo;</p>
+                <p className="text-gray-700 italic mb-4">
+                  &ldquo;{t.text}&rdquo;
+                </p>
                 <h4 className="font-semibold text-blue-800">{t.name}</h4>
                 <span className="text-gray-500 text-sm">{t.role}</span>
               </motion.div>
@@ -1039,24 +1163,24 @@ export default function MRSCoSite() {
           <motion.div
             animate={{
               rotate: [0, 360],
-              scale: [1, 1.2, 1]
+              scale: [1, 1.2, 1],
             }}
             transition={{
               duration: 20,
               repeat: Infinity,
-              ease: "linear"
+              ease: "linear",
             }}
             className="absolute top-20 right-10 w-32 h-32 border-2 border-blue-400/15 rounded-full"
           />
           <motion.div
             animate={{
               y: [0, -50, 0],
-              x: [0, 30, 0]
+              x: [0, 30, 0],
             }}
             transition={{
               duration: 15,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
             }}
             className="absolute bottom-20 left-10 w-20 h-20 bg-gradient-to-br from-slate-400/15 to-blue-500/15 rounded-2xl backdrop-blur-sm"
           />
@@ -1078,7 +1202,8 @@ export default function MRSCoSite() {
                   Speak with a Chartered Accountant
                 </h2>
                 <p className="text-gray-200 mb-8 text-lg">
-                  Tell us a bit about your requirement and we&apos;ll get back promptly.
+                  Tell us a bit about your requirement and we&apos;ll get back
+                  promptly.
                 </p>
 
                 {/* Contact Benefits */}
@@ -1089,7 +1214,9 @@ export default function MRSCoSite() {
                     </div>
                     <div>
                       <div className="font-medium">Quick Response</div>
-                      <div className="text-sm text-gray-300">Reply within 24 hours</div>
+                      <div className="text-sm text-gray-300">
+                        Reply within 24 hours
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
@@ -1098,7 +1225,9 @@ export default function MRSCoSite() {
                     </div>
                     <div>
                       <div className="font-medium">Expert Team</div>
-                      <div className="text-sm text-gray-300">Certified CAs with 12+ years experience</div>
+                      <div className="text-sm text-gray-300">
+                        Certified CAs with 12+ years experience
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
@@ -1107,7 +1236,9 @@ export default function MRSCoSite() {
                     </div>
                     <div>
                       <div className="font-medium">Confidential</div>
-                      <div className="text-sm text-gray-300">Your information is secure</div>
+                      <div className="text-sm text-gray-300">
+                        Your information is secure
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1121,13 +1252,12 @@ export default function MRSCoSite() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="bg-white/10 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/20"
             >
-              <form
-                className="grid gap-4"
-                onSubmit={handleConsultationSubmit}
-              >
+              <form className="grid gap-4" onSubmit={handleConsultationSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-white text-sm font-medium">Full Name *</label>
+                    <label className="text-white text-sm font-medium">
+                      Full Name *
+                    </label>
                     <Input
                       name="name"
                       placeholder="Your name"
@@ -1136,7 +1266,9 @@ export default function MRSCoSite() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-white text-sm font-medium">Email *</label>
+                    <label className="text-white text-sm font-medium">
+                      Email *
+                    </label>
                     <Input
                       name="email"
                       type="email"
@@ -1149,7 +1281,9 @@ export default function MRSCoSite() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-white text-sm font-medium">Phone</label>
+                    <label className="text-white text-sm font-medium">
+                      Phone
+                    </label>
                     <Input
                       name="phone"
                       type="tel"
@@ -1158,7 +1292,9 @@ export default function MRSCoSite() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-white text-sm font-medium">Company</label>
+                    <label className="text-white text-sm font-medium">
+                      Company
+                    </label>
                     <Input
                       name="company"
                       placeholder="Company name"
@@ -1168,23 +1304,41 @@ export default function MRSCoSite() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-white text-sm font-medium">Service Required</label>
+                  <label className="text-white text-sm font-medium">
+                    Service Required
+                  </label>
                   <select
                     name="service"
                     className="w-full rounded-xl bg-white/20 border-white/30 text-white focus:border-blue-300 focus:ring-blue-300/20 p-3"
                   >
-                    <option value="" className="text-gray-800">Select a service</option>
-                    <option value="audit" className="text-gray-800">Audit & Assurance</option>
-                    <option value="tax" className="text-gray-800">Taxation</option>
-                    <option value="startup" className="text-gray-800">Startup Advisory</option>
-                    <option value="compliance" className="text-gray-800">Corporate Compliance</option>
-                    <option value="cfo" className="text-gray-800">Virtual CFO</option>
-                    <option value="other" className="text-gray-800">Other</option>
+                    <option value="" className="text-gray-800">
+                      Select a service
+                    </option>
+                    <option value="audit" className="text-gray-800">
+                      Audit & Assurance
+                    </option>
+                    <option value="tax" className="text-gray-800">
+                      Taxation
+                    </option>
+                    <option value="startup" className="text-gray-800">
+                      Startup Advisory
+                    </option>
+                    <option value="compliance" className="text-gray-800">
+                      Corporate Compliance
+                    </option>
+                    <option value="cfo" className="text-gray-800">
+                      Virtual CFO
+                    </option>
+                    <option value="other" className="text-gray-800">
+                      Other
+                    </option>
                   </select>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-white text-sm font-medium">Message *</label>
+                  <label className="text-white text-sm font-medium">
+                    Message *
+                  </label>
                   <Textarea
                     name="message"
                     placeholder="Briefly describe your requirement..."
@@ -1213,30 +1367,6 @@ export default function MRSCoSite() {
         </div>
       </section>
 
-      {/* <Section id="consult" className="bg-white">
-        <div className="max-w-3xl mx-auto px-4 md:px-6">
-          <SectionHeader
-            eyebrow="Book a consultation"
-            title="Speak with a Chartered Accountant"
-            subtitle="Tell us a bit about your requirement and we'll get back promptly."
-          />
-          <form
-            className="grid gap-4"
-            onSubmit={handleConsultationSubmit}
-          >
-            <Input name="name" placeholder="Your name" required className="rounded-2xl" />
-            <Input name="email" type="email" placeholder="Email" required className="rounded-2xl" />
-            <Input name="phone" type="tel" placeholder="Phone" className="rounded-2xl" />
-            <Input name="company" placeholder="Company (optional)" className="rounded-2xl" />
-            <Textarea name="message" placeholder="Briefly describe your requirement" required className="rounded-2xl" rows={5} />
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground flex items-center gap-2"><Calendar className="w-4 h-4" /> Typical reply within 1 business day</div>
-              <Button type="submit" className="rounded-2xl">Submit</Button>
-            </div>
-          </form>
-        </div>
-      </Section> */}
-
       {/* STARTUP ADVISORY - Separate Section */}
       <Section id="startup-advisory" className="bg-white">
         <div className="max-w-3xl mx-auto px-4 md:px-6">
@@ -1260,19 +1390,29 @@ export default function MRSCoSite() {
             ))}
           </div>
           <div className="flex gap-3">
-            <Button asChild className="rounded-2xl"><a href="#services">View Services</a></Button>
-            <Button asChild variant="outline" className="rounded-2xl"><a href="#contact">Contact us</a></Button>
+            <Button asChild className="rounded-2xl">
+              <a href="#services">View Services</a>
+            </Button>
+            <Button asChild variant="outline" className="rounded-2xl">
+              <a href="#contact">Contact us</a>
+            </Button>
           </div>
         </div>
       </Section>
 
       {/* CAREERS */}
-      <Section id="careers" className="bg-slate-900 text-white relative overflow-hidden">
+      <Section
+        id="careers"
+        className="bg-slate-900 text-white relative overflow-hidden"
+      >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            }}
+          />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
@@ -1294,9 +1434,13 @@ export default function MRSCoSite() {
               <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4">
                 <TrendingUp className="w-6 h-6 text-blue-300" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Growth Opportunities</h3>
+              <h3 className="text-xl font-semibold mb-3">
+                Growth Opportunities
+              </h3>
               <p className="text-gray-300 text-sm">
-                Accelerate your career with exposure to diverse industries, cutting-edge financial technologies, and mentorship from senior CAs.
+                Accelerate your career with exposure to diverse industries,
+                cutting-edge financial technologies, and mentorship from senior
+                CAs.
               </p>
             </motion.div>
 
@@ -1309,9 +1453,13 @@ export default function MRSCoSite() {
               <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4">
                 <Users className="w-5 h-5 text-green-300" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Collaborative Culture</h3>
+              <h3 className="text-xl font-semibold mb-3">
+                Collaborative Culture
+              </h3>
               <p className="text-gray-300 text-sm">
-                Work in a supportive environment where knowledge sharing, innovation, and professional development are encouraged and rewarded.
+                Work in a supportive environment where knowledge sharing,
+                innovation, and professional development are encouraged and
+                rewarded.
               </p>
             </motion.div>
 
@@ -1324,9 +1472,12 @@ export default function MRSCoSite() {
               <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-4">
                 <Award className="w-6 h-6 text-purple-300" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Recognition & Rewards</h3>
+              <h3 className="text-xl font-semibold mb-3">
+                Recognition & Rewards
+              </h3>
               <p className="text-gray-300 text-sm">
-                Competitive compensation, performance bonuses, professional development budget, and comprehensive benefits package.
+                Competitive compensation, performance bonuses, professional
+                development budget, and comprehensive benefits package.
               </p>
             </motion.div>
           </div>
@@ -1347,17 +1498,8 @@ export default function MRSCoSite() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
-                      <div>
-                        <div className="font-medium">Senior Associate – Audit</div>
-                        <div className="text-sm text-gray-300 flex items-center mt-1">
-                          <MapPin className="w-3 h-3 mr-1" />
-                          Mumbai · Hybrid · 2–4 yrs exp
-                        </div>
-                      </div>
-                      <Badge className="bg-green-500/20 text-green-300 border-green-500/30">Full-time</Badge>
-                    </div>
-
+                   
+                        
                     <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
                       <div>
                         <div className="font-medium">Tax Consultant</div>
@@ -1366,7 +1508,9 @@ export default function MRSCoSite() {
                           Delhi · Onsite · 1–3 yrs exp
                         </div>
                       </div>
-                      <Badge className="bg-green-500/20 text-green-300 border-green-500/30">Full-time</Badge>
+                      <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
+                        Full-time
+                      </Badge>
                     </div>
 
                     <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
@@ -1377,7 +1521,9 @@ export default function MRSCoSite() {
                           Multiple locations · IPCC cleared
                         </div>
                       </div>
-                      <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">Internship</Badge>
+                      <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+                        Internship
+                      </Badge>
                     </div>
 
                     <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
@@ -1385,10 +1531,12 @@ export default function MRSCoSite() {
                         <div className="font-medium">Financial Analyst</div>
                         <div className="text-sm text-gray-300 flex items-center mt-1">
                           <MapPin className="w-3 h-3 mr-1" />
-                          Bangalore · Remote · 0–2 yrs exp
+                          Ghaziabad· Remote · 0–2 yrs exp
                         </div>
                       </div>
-                      <Badge className="bg-green-500/20 text-green-300 border-green-500/30">Full-time</Badge>
+                      <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
+                        Full-time
+                      </Badge>
                     </div>
                   </div>
                 </CardContent>
@@ -1442,12 +1590,28 @@ export default function MRSCoSite() {
                         required
                         className="rounded-xl bg-white/20 border-white/30 text-white p-3"
                       >
-                        <option value="" className="text-gray-800">Select position</option>
+                        <option value="" className="text-gray-800">
+                          Select position
+                        </option>
                         {/* <option value="Tax-Consultant" className="text-gray-800">Senior Associate – Audit</option> */}
-                        <option value="tax-consultant" className="text-gray-800">Tax Consultant</option>
-                        <option value="Articleship" className="text-gray-800">CA Articleship</option>
-                        <option value="Financial-analyst" className="text-gray-800">Financial Analyst</option>
-                        <option value="other" className="text-gray-800">Other</option>
+                        <option
+                          value="tax-consultant"
+                          className="text-gray-800"
+                        >
+                          Tax Consultant
+                        </option>
+                        <option value="Articleship" className="text-gray-800">
+                          CA Articleship
+                        </option>
+                        <option
+                          value="Financial-analyst"
+                          className="text-gray-800"
+                        >
+                          Financial Analyst
+                        </option>
+                        <option value="other" className="text-gray-800">
+                          Other
+                        </option>
                       </select>
                     </div>
 
@@ -1466,7 +1630,9 @@ export default function MRSCoSite() {
 
                     {/* Resume Upload Field */}
                     <div className="space-y-2">
-                      <label className="text-white text-sm font-medium">Attach Resume (PDF/DOCX)</label>
+                      <label className="text-white text-sm font-medium">
+                        Attach Resume (PDF/DOCX)
+                      </label>
                       <input
                         type="file"
                         name="resume"
@@ -1491,69 +1657,11 @@ export default function MRSCoSite() {
         </div>
       </Section>
 
-      {/* <Section id="careers" className="bg-slate-50">
-        <div className="max-w-6xl mx-auto px-4 md:px-6">
-          <SectionHeader
-            eyebrow="Careers"
-            title="Join MRS & Co. – Jobs & Articleship"
-            subtitle="We are always looking for curious minds who love numbers and nuance."
-            center
-          />
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card className="rounded-2xl">
-              <CardHeader>
-                <CardTitle>Open Roles</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium text-slate-900">Senior Associate – Audit</div>
-                    <div>2–4 yrs | Mumbai · Hybrid</div>
-                  </div>
-                  <Badge>Full-time</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium text-slate-900">Analyst – Direct Tax</div>
-                    <div>0–2 yrs | New Delhi · Onsite</div>
-                  </div>
-                  <Badge>Full-time</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium text-slate-900">Articleship – GST</div>
-                    <div>IPCC/Inter cleared | Bengaluru</div>
-                  </div>
-                  <Badge variant="secondary">Internship</Badge>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-2xl">
-              <CardHeader>
-                <CardTitle>Apply Now</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form
-                  className="grid gap-3"
-                  onSubmit={handleCareerSubmit}
-                >
-                  <Input name="name" placeholder="Full name" required className="rounded-2xl" />
-                  <Input name="email" type="email" placeholder="Email" required className="rounded-2xl" />
-                  <Input name="phone" type="tel" placeholder="Phone" className="rounded-2xl" />
-                  <Input name="role" placeholder="Role applying for" className="rounded-2xl" />
-                  <Textarea name="notes" placeholder="Brief note / achievements" rows={4} className="rounded-2xl" />
-                  <Button type="submit" className="rounded-2xl">Submit Application</Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </Section> */}
-
       {/* Footer */}
-      <footer id="contact" className="bg-gray-800 text-white py-8 px-4 sm:px-6 lg:px-8">
+      <footer
+        id="contact"
+        className="bg-gray-800 text-white py-8 px-4 sm:px-6 lg:px-8"
+      >
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8">
             <div>
@@ -1567,17 +1675,46 @@ export default function MRSCoSite() {
                 </div>
               </div>
               <p className="text-gray-400">
-                Your trusted financial partners for growth, governance & compliance.
+                Your trusted financial partners for growth, governance &
+                compliance.
               </p>
             </div>
 
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#about" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#services" className="hover:text-white transition-colors">Services</a></li>
-                <li><a href="#testimonials" className="hover:text-white transition-colors">Testimonials</a></li>
-                <li><a href="#consult" className="hover:text-white transition-colors">Contact</a></li>
+                <li>
+                  <a
+                    href="#about"
+                    className="hover:text-white transition-colors"
+                  >
+                    About
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#services"
+                    className="hover:text-white transition-colors"
+                  >
+                    Services
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#testimonials"
+                    className="hover:text-white transition-colors"
+                  >
+                    Testimonials
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#consult"
+                    className="hover:text-white transition-colors"
+                  >
+                    Contact
+                  </a>
+                </li>
               </ul>
             </div>
 
@@ -1594,14 +1731,24 @@ export default function MRSCoSite() {
                 </div>
                 <div className="flex items-start">
                   <MapPin className="w-4 h-4 mr-2 mt-1" />
-                  <span>F 1/299,Shakti Apartment<br />Sector-4, vaishali -Ghaziabad-201010 </span>
+                  <span>
+                    F 1/299,Shakti Apartment
+                    <br />
+                    Sector-4, vaishali -Ghaziabad-201010{" "}
+                  </span>
                 </div>
               </div>
               <div className="flex space-x-4 mt-4">
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <a
+                  href="#"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   <Facebook className="w-5 h-5" />
                 </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <a
+                  href="#"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   <Linkedin className="w-5 h-5" />
                 </a>
               </div>
@@ -1609,7 +1756,10 @@ export default function MRSCoSite() {
           </div>
 
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; {year} MRS & Co. Chartered Accountants. All rights reserved.</p>
+            <p>
+              &copy; {year} MRS & Co. Chartered Accountants. All rights
+              reserved.
+            </p>
           </div>
         </div>
       </footer>
