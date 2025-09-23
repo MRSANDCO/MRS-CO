@@ -41,7 +41,7 @@ const API_BASE_URL =
 // Utility function to handle API calls
 const submitForm = async (endpoint: string, data: Record<string, unknown>) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/${endpoint}`, {
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
