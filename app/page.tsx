@@ -1,6 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 "use strict";
+import emailjs from "emailjs-com";
 import React, { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -33,36 +34,69 @@ import {
   GraduationCap,
 } from "lucide-react";
 
-// API Configuration
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://mrsbackend-production.up.railway.app";
+// EmailJS Configuration
+const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+const EMAILJS_CONSULTATION_TEMPLATE =
+  process.env.NEXT_PUBLIC_EMAILJS_CONSULTATION_TEMPLATE;
+const EMAILJS_CAREER_TEMPLATE = process.env.NEXT_PUBLIC_EMAILJS_CAREER_TEMPLATE;
 
-// Utility function to handle API calls
-const submitForm = async (endpoint: string, data: Record<string, unknown>) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/${endpoint}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+// Initialize EmailJS
+if (typeof window !== "undefined" && EMAILJS_PUBLIC_KEY) {
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+}
 
-    const result = await response.json();
+console.log("EmailJS Configuration:");
+console.log("Public Key:", EMAILJS_PUBLIC_KEY ? "Set" : "Not Set");
+console.log("Service ID:", EMAILJS_SERVICE_ID ? "Set" : "Not Set");
 
-    if (!response.ok) {
-      throw new Error(result.message || "Something went wrong");
-    }
+// // API Configuration
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://mrsbackend-production.up.railway.app";
 
-    return result;
-  } catch (error) {
-    console.error(`Error submitting ${endpoint} form:`, error);
-    throw error;
-  }
-};
+// console.log('API Configuration:');
+// console.log('NODE_ENV:', process.env.NODE_ENV);
+// console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+// console.log('Final API_BASE_URL:', API_BASE_URL);
 
-// ------------------------
+// // Utility function to handle API calls
+// const submitForm = async (endpoint:string, data, isFormData :boolean = false,) => {
+//   try {
+//     const url = `${API_BASE_URL}/api/${endpoint}`;
+//     console.log('Making API call to:', url);
+//     console.log('Data being sent:', data);
+
+//     const headers = isFormData ? {} : {
+//       "Content-Type": "application/json",
+//     };
+
+//     const body = isFormData ? data : JSON.stringify(data);
+
+//     const response = await fetch(url, {
+//       method: "POST",
+//       headers,
+//       body,
+//     });
+
+//     console.log('Response status:', response.status);
+//     console.log('Response headers:', response.headers);
+
+//     const result = await response.json();
+//     console.log('Response data:', result);
+
+//     if (!response.ok) {
+//       throw new Error(result.message || `HTTP error! status: ${response.status}`);
+//     }
+
+//     return result;
+//   } catch (error) {
+//     console.error(`Detailed error for ${endpoint}:`, {
+//       message: error.message,
+//       url: `${API_BASE_URL}/api/${endpoint}`,
+//       data: data
+//     });
+//     throw error;
+//   }
+// };// ------------------------
 // Helper Data
 // ------------------------
 const services = [
@@ -207,6 +241,14 @@ export default function MRSCoSite() {
 
   const year = useMemo(() => new Date().getFullYear(), []);
 
+  // Initialize EmailJS
+  useEffect(() => {
+    if (typeof window !== "undefined" && EMAILJS_PUBLIC_KEY) {
+      emailjs.init(EMAILJS_PUBLIC_KEY);
+      console.log("EmailJS initialized successfully");
+    }
+  }, []);
+
   const scrollToServices = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ): void => {
@@ -217,7 +259,6 @@ export default function MRSCoSite() {
     }
   };
 
-  // Helper to scroll to any section by id
   const scrollToSection = (id: string): void => {
     const section = document.getElementById(id);
     if (section) {
@@ -225,54 +266,76 @@ export default function MRSCoSite() {
     }
   };
 
-  // Form submission handlers
+  // EmailJS Form Handlers
   const handleConsultationSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    const submitButton = e.currentTarget.querySelector(
+    const form = e.currentTarget;
+    const submitButton = form.querySelector(
       'button[type="submit"]'
     ) as HTMLButtonElement;
     const originalText = submitButton?.textContent || "Submit";
 
+    // Check if EmailJS is properly configured
+    if (
+      !EMAILJS_PUBLIC_KEY ||
+      !EMAILJS_SERVICE_ID ||
+      !EMAILJS_CONSULTATION_TEMPLATE
+    ) {
+      alert(
+        "❌ EmailJS configuration is incomplete. Please check your environment variables."
+      );
+      return;
+    }
+
     try {
       // Show loading state
       if (submitButton) {
-        submitButton.textContent = "Submitting...";
+        submitButton.textContent = "Sending...";
         submitButton.disabled = true;
       }
 
-      const formData = new FormData(e.currentTarget);
+      const formData = new FormData(form);
       const service = formData.get("service") as string;
       const baseMessage = formData.get("message") as string;
 
-      const data = {
-        name: formData.get("name") as string,
-        email: formData.get("email") as string,
-        phone: (formData.get("phone") as string) || "",
-        company: (formData.get("company") as string) || "",
-        message: service
+      // Prepare email parameters
+      const templateParams = {
+        from_name: formData.get("name") as string,
+        from_email: formData.get("email") as string,
+        phone: (formData.get("phone") as string) || "Not provided",
+        company: (formData.get("company") as string) || "Not provided",
+        service: service || "Not specified",
+        message: baseMessage,
+        full_message: service
           ? `Service Requested: ${service}\n\n${baseMessage}`
           : baseMessage,
-        // Remove 'service' field - backend doesn't expect it
+        to_email: "camrsandco@gmail.com",
       };
 
-      console.log("Sending consultation data:", data); // Debug log
-      const result = await submitForm("consultation", data);
+      console.log("Sending consultation email with params:", templateParams);
 
-      // Show success message
-      alert(`✅ ${result.message}`);
+      const result = await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_CONSULTATION_TEMPLATE,
+        templateParams
+      );
 
-      // Reset form safely
-      const form = e.currentTarget;
-      if (form) {
+      if (result.status === 200) {
+        console.log("Email sent successfully:", result);
+        alert(
+          "✅ Thank you! Your consultation request has been sent successfully. We'll get back to you within 24 hours."
+        );
         form.reset();
+      } else {
+        throw new Error(`EmailJS returned status: ${result.status}`);
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to submit form";
-      console.error("Consultation error details:", error); // Debug log
-      alert(`❌ ${errorMessage}`);
+      console.error("Failed to send consultation email:", error);
+      alert(
+        "❌ Failed to send message. Please try again or contact us directly at camrsandco@gmail.com"
+      );
     } finally {
       // Reset button state
       if (submitButton) {
@@ -282,97 +345,100 @@ export default function MRSCoSite() {
     }
   };
 
-  // const handleConsultationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
-  //   const originalText = submitButton?.textContent || 'Submit';
-
-  //   try {
-  //     // Show loading state
-  //     if (submitButton) {
-  //       submitButton.textContent = 'Submitting...';
-  //       submitButton.disabled = true;
-  //     }
-
-  //     const formData = new FormData(e.currentTarget);
-  //     const data = {
-  //       name: formData.get('name') as string,
-  //       email: formData.get('email') as string,
-  //       phone: formData.get('phone') as string || '',
-  //       company: formData.get('company') as string || '',
-  //       message: formData.get('message') as string
-  //     };
-
-  //     const result = await submitForm('consultation', data);
-
-  //     // Show success message
-  //     alert(`✅ ${result.message}`);
-
-  //     // Reset form safely
-  //     const form = e.currentTarget;
-  //     if (form) {
-  //       form.reset();
-  //     }
-
-  //   } catch (error) {
-  //     const errorMessage = error instanceof Error ? error.message : 'Failed to submit form';
-  //     alert(`❌ ${errorMessage}`);
-  //   } finally {
-  //     // Reset button state
-  //     if (submitButton) {
-  //       submitButton.textContent = originalText;
-  //       submitButton.disabled = false;
-  //     }
-  //   }
-  // };
   const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const submitButton = e.currentTarget.querySelector(
+    const form = e.currentTarget;
+    const submitButton = form.querySelector(
       'button[type="submit"]'
     ) as HTMLButtonElement;
     const originalText = submitButton?.textContent || "Submit";
 
+    // Check if EmailJS is properly configured
+    if (
+      !EMAILJS_PUBLIC_KEY ||
+      !EMAILJS_SERVICE_ID ||
+      !EMAILJS_CAREER_TEMPLATE
+    ) {
+      alert(
+        "❌ EmailJS configuration is incomplete. Please check your environment variables."
+      );
+      return;
+    }
+
     try {
       // Show loading state
       if (submitButton) {
-        submitButton.textContent = "Submitting...";
+        submitButton.textContent = "Sending...";
         submitButton.disabled = true;
       }
 
-      const formData = new FormData(e.currentTarget);
-      const experience = (formData.get("experience") as string) || "";
+      const formData = new FormData(form);
+      const experience =
+        (formData.get("experience") as string) || "Not specified";
       const notes = (formData.get("notes") as string) || "";
 
-      // ⚠️ IMPORTANT: Your backend expects 'notes', not 'experience'
-      const data = {
-        name: formData.get("name") as string,
-        email: formData.get("email") as string,
-        phone: (formData.get("phone") as string) || "",
-        role: (formData.get("role") as string) || "",
-        // Backend expects 'notes' field, so put experience info there
-        notes: experience
-          ? `Experience: ${experience}${
-              notes ? `\n\nAdditional Notes: ${notes}` : ""
-            }`
-          : notes,
+      // Handle file upload for resume
+      const resumeFile = formData.get("resume") as File;
+      let resumeInfo = "No resume attached";
+
+      if (resumeFile && resumeFile.size > 0) {
+        resumeInfo = `Resume: ${resumeFile.name} (${(
+          resumeFile.size / 1024
+        ).toFixed(2)} KB)`;
+        // Note: EmailJS doesn't support file attachments directly in the browser
+        // The user will need to mention this in the email
+      }
+
+      // Prepare email parameters
+      const templateParams = {
+        from_name: formData.get("name") as string,
+        from_email: formData.get("email") as string,
+        phone: (formData.get("phone") as string) || "Not provided",
+        role: (formData.get("role") as string) || "Not specified",
+        experience: experience,
+        notes: notes || "No additional notes",
+        resume_info: resumeInfo,
+        full_details: `
+Role Applied: ${formData.get("role")}
+Experience: ${experience}
+${notes ? `Additional Notes: ${notes}` : ""}
+Resume: ${
+          resumeFile && resumeFile.size > 0
+            ? resumeFile.name
+            : "Not attached - candidate should send separately"
+        }
+        `,
+        to_email: "camrsandco@gmail.com",
       };
 
-      console.log("Sending career data:", data); // Debug log
-      const result = await submitForm("careers", data);
+      console.log("Sending career application with params:", templateParams);
 
-      // Show success message
-      alert(`✅ ${result.message}`);
+      const result = await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_CAREER_TEMPLATE,
+        templateParams
+      );
 
-      // Reset form safely
-      const form = e.currentTarget;
-      if (form) {
+      if (result.status === 200) {
+        console.log("Email sent successfully:", result);
+
+        let successMessage =
+          "✅ Thank you! Your application has been submitted successfully. We'll review it and get back to you soon.";
+        if (resumeFile && resumeFile.size > 0) {
+          successMessage +=
+            "\n\nNote: Please also email your resume directly to camrsandco@gmail.com since file attachments cannot be sent through the web form.";
+        }
+
+        alert(successMessage);
         form.reset();
+      } else {
+        throw new Error(`EmailJS returned status: ${result.status}`);
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to submit form";
-      console.error("Career error details:", error); // Debug log
-      alert(`❌ ${errorMessage}`);
+      console.error("Failed to send career application:", error);
+      alert(
+        "❌ Failed to submit application. Please try again or email us directly at camrsandco@gmail.com"
+      );
     } finally {
       // Reset button state
       if (submitButton) {
@@ -382,50 +448,155 @@ export default function MRSCoSite() {
     }
   };
 
-  // const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
-  //   const originalText = submitButton?.textContent || 'Submit';
+  // export default function MRSCoSite() {
+  //   const [menuOpen, setMenuOpen] = useState(false);
 
-  //   try {
-  //     // Show loading state
-  //     if (submitButton) {
-  //       submitButton.textContent = 'Submitting...';
-  //       submitButton.disabled = true;
+  //   useLockBody(menuOpen);
+
+  //   const sliderRef = useRef<HTMLDivElement | null>(null);
+  //   const [, force] = useState(0);
+
+  //   const scrollByCards = (dir = 1) => {
+  //     const el = sliderRef.current;
+  //     if (!el) return;
+  //     const width = el.clientWidth;
+  //     el.scrollBy({ left: dir * Math.floor(width * 0.85), behavior: "smooth" });
+  //     force((x) => x + 1);
+  //   };
+
+  //   const year = useMemo(() => new Date().getFullYear(), []);
+
+  //   const scrollToServices = (
+  //     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  //   ): void => {
+  //     event.preventDefault();
+  //     const servicesSection = document.getElementById("services");
+  //     if (servicesSection) {
+  //       servicesSection.scrollIntoView({ behavior: "smooth" });
   //     }
+  //   };
 
-  //     const formData = new FormData(e.currentTarget);
-  //     const data = {
-  //       name: formData.get('name') as string,
-  //       email: formData.get('email') as string,
-  //       phone: formData.get('phone') as string || '',
-  //       role: formData.get('role') as string || '',
-  //       experience: formData.get('experience') as string || '',
-  //       notes: formData.get('notes') as string || ''
-  //     };
-
-  //     const result = await submitForm('careers', data);
-
-  //     // Show success message
-  //     alert(`✅ ${result.message}`);
-
-  //     // Reset form safely
-  //     const form = e.currentTarget;
-  //     if (form) {
-  //       form.reset();
+  //   // Helper to scroll to any section by id
+  //   const scrollToSection = (id: string): void => {
+  //     const section = document.getElementById(id);
+  //     if (section) {
+  //       section.scrollIntoView({ behavior: "smooth" });
   //     }
+  //   };
 
-  //   } catch (error) {
-  //     const errorMessage = error instanceof Error ? error.message : 'Failed to submit form';
-  //     alert(`❌ ${errorMessage}`);
-  //   } finally {
-  //     // Reset button state
-  //     if (submitButton) {
-  //       submitButton.textContent = originalText;
-  //       submitButton.disabled = false;
+  //   // Form submission handlers
+  //   const handleConsultationSubmit = async (
+  //     e: React.FormEvent<HTMLFormElement>
+  //   ) => {
+  //     e.preventDefault();
+  //     const submitButton = e.currentTarget.querySelector(
+  //       'button[type="submit"]'
+  //     ) as HTMLButtonElement;
+  //     const originalText = submitButton?.textContent || "Submit";
+
+  //     try {
+  //       // Show loading state
+  //       if (submitButton) {
+  //         submitButton.textContent = "Submitting...";
+  //         submitButton.disabled = true;
+  //       }
+
+  //       const formData = new FormData(e.currentTarget);
+  //       const service = formData.get("service") as string;
+  //       const baseMessage = formData.get("message") as string;
+
+  //       const data = {
+  //         name: formData.get("name") as string,
+  //         email: formData.get("email") as string,
+  //         phone: (formData.get("phone") as string) || "",
+  //         company: (formData.get("company") as string) || "",
+  //         message: service
+  //           ? `Service Requested: ${service}\n\n${baseMessage}`
+  //           : baseMessage,
+  //         // Remove 'service' field - backend doesn't expect it
+  //       };
+
+  //       console.log("Sending consultation data:", data); // Debug log
+  //       const result = await submitForm("consultation", data);
+
+  //       // Show success message
+  //       alert(`✅ ${result.message}`);
+
+  //       // Reset form safely
+  //       const form = e.currentTarget;
+  //       if (form) {
+  //         form.reset();
+  //       }
+  //     } catch (error) {
+  //       const errorMessage =
+  //         error instanceof Error ? error.message : "Failed to submit form";
+  //       console.error("Consultation error details:", error); // Debug log
+  //       alert(`❌ ${errorMessage}`);
+  //     } finally {
+  //       // Reset button state
+  //       if (submitButton) {
+  //         submitButton.textContent = originalText;
+  //         submitButton.disabled = false;
+  //       }
   //     }
-  //   }
-  // };
+  //   };
+
+  //   const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //     e.preventDefault();
+  //     const submitButton = e.currentTarget.querySelector(
+  //       'button[type="submit"]'
+  //     ) as HTMLButtonElement;
+  //     const originalText = submitButton?.textContent || "Submit";
+
+  //     try {
+  //       // Show loading state
+  //       if (submitButton) {
+  //         submitButton.textContent = "Submitting...";
+  //         submitButton.disabled = true;
+  //       }
+
+  //       const formData = new FormData(e.currentTarget);
+  //       const experience = (formData.get("experience") as string) || "";
+  //       const notes = (formData.get("notes") as string) || "";
+
+  //       // ⚠️ IMPORTANT: Your backend expects 'notes', not 'experience'
+  //       const data = {
+  //         name: formData.get("name") as string,
+  //         email: formData.get("email") as string,
+  //         phone: (formData.get("phone") as string) || "",
+  //         role: (formData.get("role") as string) || "",
+  //         // Backend expects 'notes' field, so put experience info there
+  //         notes: experience
+  //           ? `Experience: ${experience}${
+  //               notes ? `\n\nAdditional Notes: ${notes}` : ""
+  //             }`
+  //           : notes,
+  //       };
+
+  //       console.log("Sending career data:", data); // Debug log
+  //       const result = await submitForm("careers", data);
+
+  //       // Show success message
+  //       alert(`✅ ${result.message}`);
+
+  //       // Reset form safely
+  //       const form = e.currentTarget;
+  //       if (form) {
+  //         form.reset();
+  //       }
+  //     } catch (error) {
+  //       const errorMessage =
+  //         error instanceof Error ? error.message : "Failed to submit form";
+  //       console.error("Career error details:", error); // Debug log
+  //       alert(`❌ ${errorMessage}`);
+  //     } finally {
+  //       // Reset button state
+  //       if (submitButton) {
+  //         submitButton.textContent = originalText;
+  //         submitButton.disabled = false;
+  //       }
+  //     }
+  //   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
@@ -1498,8 +1669,6 @@ export default function MRSCoSite() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-4">
-                   
-                        
                     <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
                       <div>
                         <div className="font-medium">Tax Consultant</div>
@@ -1621,12 +1790,12 @@ export default function MRSCoSite() {
                       className="rounded-xl bg-white/20 border-white/30 text-white placeholder:text-gray-300"
                     />
 
-                    {/* <Textarea
+                    <Textarea
                       name="notes"
                       placeholder="Brief note about yourself, qualifications & achievements..."
                       rows={4}
                       className="rounded-xl bg-white/20 border-white/30 text-white placeholder:text-gray-300"
-                    /> */}
+                    />
 
                     {/* Resume Upload Field */}
                     <div className="space-y-2">
