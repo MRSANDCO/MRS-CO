@@ -1073,6 +1073,19 @@ Resume: ${
                 role: "Acquired the BBC World Service Language Business and provide content for BBC's Indian Language platforms",
                 text: "MRS & Co. helped us streamline our taxation and provided invaluable financial clarity.",
               },
+               {
+                name: "State Bank of India,Main Branch, Ghaziabad",
+                role: "Provide Centralised Administrative Support",
+                text: "MRS & Co. conducted audit with utmost accuracy and their expertise added the great value to the process.",
+
+              },
+             
+               {
+                name: "Punjab National bank, Branch Vaishali , Ghaziabad",
+                role: "Nationalised Bank of India",
+                text: "MRS & Co. executed the audit with remarkable diligence and professionalism.",
+              },
+
               {
                 name: "Vision India  Private Limited",
                 role: "Human Resource and Technology Solutions",
@@ -1098,6 +1111,13 @@ Resume: ${
                 role: "Design homespace and workspaces",
                 text: "Their expertise in tax and compliance is unmatched.",
               },
+              {
+                name: "Mahameda Urban Cooperative Bank Ltd.",
+                role: "Reputable High-Quality Financial Service Providance",
+                text: "MRS & Co. performed the forensic audit of our bank with utmost professionalism.",
+              },
+             
+              
             ].map((t, idx) => (
               <motion.div
                 key={idx}
@@ -1299,9 +1319,16 @@ Resume: ${
                     <option value="cfo" className="text-gray-800">
                       Virtual CFO
                     </option>
-                    <option value="other" className="text-gray-800">
-                      Other
+                    <option value="forensic" className="text-gray-800">
+                      Forensic Audit
                     </option>
+                     <option value="financing" className="text-gray-800">
+                      Financing & Fundraising
+                    </option>
+                     <option value="accounting" className="text-gray-800">
+                      Accounting & Bookkeeping
+                    </option>
+
                   </select>
                 </div>
 
