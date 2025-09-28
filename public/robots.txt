@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://mrsandco.in
+
+# Sitemaps
+Sitemap: https://mrsandco.in/sitemap.xml
