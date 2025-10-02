@@ -1038,6 +1038,24 @@ Resume: ${
                 icon: "🏦",
                 color: "indigo",
               },
+               {
+                title: "FOrensic Audit",
+                desc: "Customized solutions to achieve long-term stability and growth.",
+                icon: "🏦",
+                color: "indigo",
+              },
+               {
+                title: "Accounting and Bookkeeping",
+                desc: "Customized solutions to achieve long-term stability and growth.",
+                icon: "🏦",
+                color: "indigo",
+              },
+               {
+                title: "Financing and Fund Raising",
+                desc: "Customized solutions to achieve long-term stability and growth.",
+                icon: "🏦",
+                color: "indigo",
+              },
             ].map((service, idx) => (
               <motion.div
                 key={idx}
