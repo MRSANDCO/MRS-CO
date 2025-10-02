@@ -34,6 +34,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 
+
 // EmailJS Configuration
 const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
