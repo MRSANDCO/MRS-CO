@@ -541,7 +541,7 @@ Resume: ${
                 {/* Mobile */}
                 <button
                   className="md:hidden p-2 rounded-xl hover:bg-white/60 hover:shadow-sm transition-all duration-500 hover:text-indigo-600"
-                  aria-label="Toggle Menu"
+                  aria-label={menuOpen ? "Close menu" : "Open menu"}
                   onClick={() => setMenuOpen((s) => !s)}
                 >
                   {menuOpen ? <X /> : <Menu />}
@@ -882,6 +882,7 @@ Resume: ${
                 size="icon"
                 className="rounded-2xl"
                 onClick={() => scrollByCards(-1)}
+                aria-label="Scroll to previous services"
               >
                 <ArrowLeft className="w-4 h-4" />
               </Button>
@@ -892,6 +893,7 @@ Resume: ${
                 size="icon"
                 className="rounded-2xl"
                 onClick={() => scrollByCards(1)}
+                aria-label="Scroll to next services"
               >
                 <ArrowRight className="w-4 h-4" />
               </Button>
