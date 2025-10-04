@@ -34,7 +34,6 @@ import {
   GraduationCap,
 } from "lucide-react";
 
-
 // EmailJS Configuration
 const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
@@ -49,6 +48,17 @@ if (typeof window !== "undefined" && EMAILJS_PUBLIC_KEY) {
 
 // Helper Data
 // ------------------------
+// Add this NEW array before the services array
+const newsItems = [
+  "🔔 New GST Amendment Bill 2025 - Important updates for compliance",
+  "💼 MRS & Co. recognized as Top 50 CA Firms in North India",
+  "📊 Income Tax Return filing deadline extended to July 31, 2025",
+  "🚀 We're hiring! Senior Tax Consultants and CA Articleship positions open",
+  "⚖️ Recent Supreme Court ruling on Transfer Pricing - Impact analysis available",
+  "💡 Free webinar: Startup Financial Planning - Register now",
+  "📈 New corporate tax rates announced in Budget 2025",
+  "🎯 Successfully helped 50+ startups with fundraising in Q1 2025",
+];
 const services = [
   {
     title: "Audit & Assurance",
@@ -68,7 +78,7 @@ const services = [
   {
     title: "Corporate & ROC Compliance",
     desc: "Company/LLP formation, secretarial, XBRL, and event-based filings.",
-    img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop", // <-- replaced broken URL
+    img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop",
   },
 
   {
@@ -517,6 +527,7 @@ Resume: ${
                     ["Home", "home"],
                     ["About", "about"],
                     ["Services", "services"],
+                    ["News", "news"],
                     ["Testimonials", "testimonials"],
                     ["Careers", "careers"],
                     ["Startup Advisory", "startup-advisory"],
@@ -557,6 +568,7 @@ Resume: ${
                     ["Home", "home"],
                     ["About", "about"],
                     ["Services", "services"],
+                    ["News", "news"],
                     ["Testimonials", "testimonials"],
                     ["Careers", "careers"],
                     ["Startup Advisory", "startup-advisory"],
@@ -578,10 +590,75 @@ Resume: ${
           </div>
         </div>
       </div>
+      {/* NEWS TICKER */}
+      <section className="relative py-4 overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
+            alt="Modern business background"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-700/95 via-indigo-700/95 to-blue-800/95"></div>
+        </div>
+
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{ x: [0, 100, 0], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-0 right-10 w-16 h-16 bg-cyan-400/20 rounded-full blur-xl"
+          />
+          <motion.div
+            animate={{ x: [0, -80, 0], opacity: [0.2, 0.5, 0.2] }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2,
+            }}
+            className="absolute top-0 left-20 w-12 h-12 bg-blue-300/20 rounded-full blur-lg"
+          />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 z-10">
+          <div className="relative flex items-center z-10">
+            <div className="bg-white text-blue-700 px-5 py-2.5 font-bold text-sm uppercase tracking-wider flex-shrink-0 shadow-lg rounded-lg flex items-center gap-2">
+              <span className="text-lg">📢</span>
+              <span className="hidden sm:inline">Latest Updates</span>
+              <span className="sm:hidden">News</span>
+            </div>
+
+            <div className="flex-1 overflow-hidden relative max-w-5xl">
+              <motion.div
+                className="flex gap-12 whitespace-nowrap"
+                animate={{ x: [0, -2000] }}
+                transition={{
+                  x: {
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    duration: 40,
+                    ease: "linear",
+                  },
+                }}
+              >
+                {[...newsItems, ...newsItems].map((news, idx) => (
+                  <span
+                    key={idx}
+                    className="text-white font-medium text-sm flex items-center gap-2"
+                  >
+                    {news}
+                    <span className="text-cyan-300 font-bold">•</span>
+                  </span>
+                ))}
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* HERO with Live Background */}
       <section
         id="home"
-        className="relative pt-24 pb-16 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center"
+        className="relative pb-16 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center"
       >
         {/* Live Background Image with Parallax Effect */}
         <div className="absolute inset-0 z-0">
@@ -865,6 +942,255 @@ Resume: ${
         </div>
       </section>
 
+    {/* NEWS SECTION - THEMED TO MATCH WEBSITE */}
+<section id="news" className="relative py-16 overflow-hidden">
+  {/* Background Image - Matching Umbrella Services Style */}
+  <div className="absolute inset-0">
+    <img
+      src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2069&auto=format&fit=crop"
+      alt="Professional business meeting in modern office"
+      className="w-full h-full object-cover"
+    />
+    <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-blue-900/85 to-indigo-900/80"></div>
+    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
+  </div>
+  {/* Floating Elements - Subtle Like Your Site */}
+  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <motion.div
+      animate={{
+        x: [0, 90, 0],
+        y: [0, -30, 0],
+        opacity: [0.2, 0.4, 0.2],
+        scale: [1, 1.2, 1],
+      }}
+      transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+      className="absolute top-20 right-20 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl"
+    />
+    <motion.div
+      animate={{
+        x: [0, -80, 0],
+        y: [0, 40, 0],
+        opacity: [0.15, 0.35, 0.15],
+        scale: [1, 1.3, 1],
+      }}
+      transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+      className="absolute bottom-20 left-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl"
+    />
+  </div>
+
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    {/* Header - Matching Your Section Headers */}
+    <div className="text-center mb-12">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+      >
+        {/* Badge - Style from Your News Ticker */}
+        <motion.div
+          className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-600/90 via-indigo-600/90 to-blue-600/90 text-white text-sm font-bold uppercase tracking-wider mb-6 shadow-xl backdrop-blur-sm border border-white/20"
+          animate={{
+            boxShadow: [
+              "0 0 20px rgba(59, 130, 246, 0.3)",
+              "0 0 40px rgba(99, 102, 241, 0.4)",
+              "0 0 20px rgba(59, 130, 246, 0.3)",
+            ],
+          }}
+          transition={{ duration: 3, repeat: Infinity }}
+          whileHover={{ scale: 1.05 }}
+        >
+          <span className="mr-2 text-lg">📰</span>
+          Stay Informed
+        </motion.div>
+
+        {/* Heading - Matching Your Typography */}
+        <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+          Latest News & Updates
+        </h2>
+        <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          Stay updated with the latest circulars, notifications, and
+          announcements from ICAI and MRS & Co.
+        </p>
+      </motion.div>
+    </div>
+
+    {/* News Cards Grid */}
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {[
+        {
+          title: "GST Amendment Bill 2025",
+          desc: "Important updates for compliance - New GST regulations effective from April 2025",
+          badge: "New",
+          icon: "📄",
+          gradient: "from-blue-500 to-blue-600",
+          iconBg: "from-blue-400 to-blue-600",
+        },
+        {
+          title: "Income Tax Return Filing",
+          desc: "ITR filing deadline extended to July 31, 2025 - Check revised guidelines",
+          badge: "Updated",
+          icon: "📊",
+          gradient: "from-green-500 to-green-600",
+          iconBg: "from-green-400 to-green-600",
+        },
+        {
+          title: "Supreme Court Ruling",
+          desc: "Transfer Pricing impact analysis - Recent Supreme Court judgment details",
+          badge: "Important",
+          icon: "⚖️",
+          gradient: "from-purple-500 to-purple-600",
+          iconBg: "from-purple-400 to-purple-600",
+        },
+        {
+          title: "Budget 2025 Highlights",
+          desc: "New corporate tax rates and compliance requirements announced",
+          badge: "Latest",
+          icon: "📈",
+          gradient: "from-orange-500 to-orange-600",
+          iconBg: "from-orange-400 to-orange-600",
+        },
+        {
+          title: "Startup Financial Planning",
+          desc: "Free webinar registration - Learn essential financial strategies",
+          badge: "Event",
+          icon: "💡",
+          gradient: "from-cyan-500 to-cyan-600",
+          iconBg: "from-cyan-400 to-cyan-600",
+        },
+        {
+          title: "ICAI Latest Circular",
+          desc: "Important notifications and updates for practicing Chartered Accountants",
+          badge: "Circular",
+          icon: "🔔",
+          gradient: "from-indigo-500 to-indigo-600",
+          iconBg: "from-indigo-400 to-indigo-600",
+        },
+      ].map((item, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: i * 0.1 }}
+          viewport={{ once: true }}
+          className="group"
+        >
+          {/* Card with Your Glass Morphism Style */}
+          <motion.div
+            whileHover={{ scale: 1.05, y: -10 }}
+            transition={{ type: "spring", stiffness: 300 }}
+            className="relative h-full bg-white/10 backdrop-blur-lg p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/20 group-hover:border-white/40 overflow-hidden"
+          >
+            {/* Glow Effect on Hover */}
+            <div
+              className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500`}
+            />
+
+            {/* Shine Effect - Like Your Consultation Form */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 group-hover:translate-x-full transition-transform duration-1000" />
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-6">
+                {/* Icon - Matching Your Service Cards Style */}
+                <motion.div
+                  whileHover={{ rotate: 360, scale: 1.2 }}
+                  transition={{ duration: 0.6 }}
+                  className={`w-16 h-16 bg-gradient-to-br ${item.iconBg} rounded-2xl flex items-center justify-center text-3xl shadow-lg`}
+                >
+                  {item.icon}
+                </motion.div>
+
+                {/* Badge - Your Badge Style */}
+                <span
+                  className={`px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r ${item.gradient} text-white shadow-lg uppercase tracking-wider`}
+                >
+                  {item.badge}
+                </span>
+              </div>
+
+              {/* Title */}
+              <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors duration-300">
+                {item.title}
+              </h3>
+
+              {/* Description */}
+              <p className="text-gray-300 text-sm mb-6 leading-relaxed line-clamp-3 group-hover:text-white transition-colors duration-300">
+                {item.desc}
+              </p>
+
+              {/* Date - Matching Your Career Section Style */}
+              <div className="flex items-center text-xs text-gray-400 mb-4 group-hover:text-gray-300 transition-colors">
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {i < 2 ? "2 days ago" : i < 4 ? "1 week ago" : "Today"}
+              </div>
+
+              {/* CTA Link */}
+              <a
+                href="https://www.icai.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center font-bold text-sm text-cyan-400 hover:text-cyan-300 group-hover:translate-x-2 transition-all duration-300"
+              >
+                View Details
+                <span className="ml-2 text-lg">→</span>
+              </a>
+            </div>
+
+            {/* Corner Accent - Subtle */}
+            <div
+              className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${item.gradient} opacity-10 group-hover:opacity-20 rounded-tr-3xl transition-opacity duration-500`}
+            />
+          </motion.div>
+        </motion.div>
+      ))}
+    </div>
+
+    {/* Bottom CTA - Matching Your Button Style */}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3, duration: 0.6 }}
+      viewport={{ once: true }}
+      className="text-center mt-12"
+    >
+      <motion.a
+        href="https://www.icai.org"
+        target="_blank"
+        rel="noopener noreferrer"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="relative inline-flex items-center px-12 py-5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-700 hover:via-indigo-700 hover:to-blue-700 text-white font-bold text-lg shadow-2xl transition-all duration-300 overflow-hidden group"
+      >
+        {/* Animated Background - Like Your Navbar Buttons */}
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+        {/* Shine Effect */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 group-hover:translate-x-full transition-transform duration-700" />
+        </div>
+
+        <span className="relative z-10 flex items-center">
+          View All ICAI Updates
+          <span className="ml-3 text-xl">→</span>
+        </span>
+      </motion.a>
+    </motion.div>
+  </div>
+</section>
       {/* SERVICES SLIDER */}
       <Section id="services" className="pt-2">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
@@ -1041,19 +1367,19 @@ Resume: ${
                 icon: "🏦",
                 color: "indigo",
               },
-               {
+              {
                 title: "Forensic Audit",
                 desc: "Specialized investigation of financial record to detect fraud and ensure transparency.",
                 icon: "🔍",
                 color: "indigo",
               },
-               {
+              {
                 title: "Accounting & Bookkeeping",
                 desc: "Stay compliant, reduce errors, and gain clarity into your business finances.",
                 icon: "📚",
                 color: "indigo",
               },
-               {
+              {
                 title: "Financing & FundRaising",
                 desc: "Strategic financing and fundraising solutions to secure capital and accelerate growth.",
                 icon: "💸",
@@ -1083,6 +1409,7 @@ Resume: ${
         </div>
       </section>
 
+      {/* 
       {/* TESTIMONIALS */}
       <section id="testimonials" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto text-center px-4 md:px-6">
@@ -1094,14 +1421,13 @@ Resume: ${
                 role: "Acquired the BBC World Service Language Business and provide content for BBC's Indian Language platforms",
                 text: "MRS & Co. helped us streamline our taxation and provided invaluable financial clarity.",
               },
-               {
+              {
                 name: "State Bank of India,Main Branch, Ghaziabad",
                 role: "Provide Centralised Administrative Support",
                 text: "MRS & Co. conducted audit with utmost accuracy and their expertise added the great value to the process.",
-
               },
-             
-               {
+
+              {
                 name: "Punjab National bank, Branch Vaishali , Ghaziabad",
                 role: "Nationalised Bank of India",
                 text: "MRS & Co. executed the audit with remarkable diligence and professionalism.",
@@ -1137,8 +1463,6 @@ Resume: ${
                 role: "Reputable High-Quality Financial Service Providance",
                 text: "MRS & Co. performed the forensic audit of our bank with utmost professionalism.",
               },
-             
-              
             ].map((t, idx) => (
               <motion.div
                 key={idx}
@@ -1343,13 +1667,12 @@ Resume: ${
                     <option value="forensic" className="text-gray-800">
                       Forensic Audit
                     </option>
-                     <option value="financing" className="text-gray-800">
+                    <option value="financing" className="text-gray-800">
                       Financing & Fundraising
                     </option>
-                     <option value="accounting" className="text-gray-800">
+                    <option value="accounting" className="text-gray-800">
                       Accounting & Bookkeeping
                     </option>
-
                   </select>
                 </div>
 
