@@ -494,6 +494,7 @@ Resume: ${
               <div className="flex items-center justify-between h-16">
                 {/* Logo */}
                 <button
+                  suppressHydrationWarning
                   onClick={() => {
                     const homeSection = document.getElementById("home");
                     if (homeSection) {
@@ -549,6 +550,7 @@ Resume: ${
 
                 {/* Mobile */}
                 <button
+                  suppressHydrationWarning
                   className="md:hidden p-2 rounded-xl hover:bg-white/60 hover:shadow-sm transition-all duration-500 hover:text-indigo-600"
                   aria-label={menuOpen ? "Close menu" : "Open menu"}
                   onClick={() => setMenuOpen((s) => !s)}
@@ -725,6 +727,7 @@ Resume: ${
 
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <Button
+                  suppressHydrationWarning
                   onClick={scrollToServices}
                   className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-3 rounded-xl transition-all duration-300 font-medium flex items-center justify-center shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105"
                 >
@@ -732,10 +735,10 @@ Resume: ${
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
                 <Button
+                  suppressHydrationWarning
                   onClick={() => scrollToSection("consult")}
                   variant="outline"
                   className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-3 rounded-xl transition-all duration-300 font-medium flex items-center justify-center shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105"
-                  // className="border-2 border-white/50 text-white  hover:text-blue-600 px-8 py-3 rounded-xl backdrop-blur-md transition-all duration-300 font-medium hover:scale-105"
                 >
                   Book Consultation
                 </Button>
@@ -1221,6 +1224,7 @@ Resume: ${
           <div className="relative">
             <div className="absolute -left-2 top-1/2 -translate-y-1/2 z-10">
               <Button
+                suppressHydrationWarning
                 variant="outline"
                 size="icon"
                 className="rounded-2xl"
@@ -1232,6 +1236,7 @@ Resume: ${
             </div>
             <div className="absolute -right-2 top-1/2 -translate-y-1/2 z-10">
               <Button
+                suppressHydrationWarning
                 variant="outline"
                 size="icon"
                 className="rounded-2xl"
@@ -1426,7 +1431,6 @@ Resume: ${
         </div>
       </section>
 
-      {/* 
       {/* TESTIMONIALS */}
       <section id="testimonials" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto text-center px-4 md:px-6">
@@ -1611,6 +1615,7 @@ Resume: ${
                       Full Name *
                     </label>
                     <Input
+                      suppressHydrationWarning
                       name="name"
                       placeholder="Your name"
                       required
@@ -1622,6 +1627,7 @@ Resume: ${
                       Email *
                     </label>
                     <Input
+                      suppressHydrationWarning
                       name="email"
                       type="email"
                       placeholder="your@email.com"
@@ -1637,6 +1643,7 @@ Resume: ${
                       Phone
                     </label>
                     <Input
+                      suppressHydrationWarning
                       name="phone"
                       type="tel"
                       placeholder="+91 XXXXX XXXXX"
@@ -1648,6 +1655,7 @@ Resume: ${
                       Company
                     </label>
                     <Input
+                      suppressHydrationWarning
                       name="company"
                       placeholder="Company name"
                       className="rounded-xl bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-blue-300 focus:ring-blue-300/20"
@@ -1660,6 +1668,7 @@ Resume: ${
                     Service Required
                   </label>
                   <select
+                    suppressHydrationWarning
                     name="service"
                     className="w-full rounded-xl bg-white/20 border-white/30 text-white focus:border-blue-300 focus:ring-blue-300/20 p-3"
                   >
@@ -1698,6 +1707,7 @@ Resume: ${
                     Message *
                   </label>
                   <Textarea
+                    suppressHydrationWarning
                     name="message"
                     placeholder="Briefly describe your requirement..."
                     required
@@ -1712,6 +1722,7 @@ Resume: ${
                     Reply within 1 business day
                   </div>
                   <Button
+                    suppressHydrationWarning
                     type="submit"
                     className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25 hover:scale-105"
                   >
@@ -1920,12 +1931,14 @@ Resume: ${
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <Input
+                        suppressHydrationWarning
                         name="name"
                         placeholder="Full name"
                         required
                         className="rounded-xl bg-white/20 border-white/30 text-white placeholder:text-gray-300"
                       />
                       <Input
+                        suppressHydrationWarning
                         name="email"
                         type="email"
                         placeholder="Email address"
@@ -1936,12 +1949,14 @@ Resume: ${
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <Input
+                        suppressHydrationWarning
                         name="phone"
                         type="tel"
                         placeholder="Phone number"
                         className="rounded-xl bg-white/20 border-white/30 text-white placeholder:text-gray-300"
                       />
                       <select
+                        suppressHydrationWarning
                         name="role"
                         required
                         className="rounded-xl bg-white/20 border-white/30 text-white p-3"
@@ -1949,7 +1964,6 @@ Resume: ${
                         <option value="" className="text-gray-800">
                           Select position
                         </option>
-                        {/* <option value="Tax-Consultant" className="text-gray-800">Senior Associate – Audit</option> */}
                         <option
                           value="tax-consultant"
                           className="text-gray-800"
@@ -1972,12 +1986,14 @@ Resume: ${
                     </div>
 
                     <Input
+                      suppressHydrationWarning
                       name="experience"
                       placeholder="Years of experience"
                       className="rounded-xl bg-white/20 border-white/30 text-white placeholder:text-gray-300"
                     />
 
                     <Textarea
+                      suppressHydrationWarning
                       name="notes"
                       placeholder="Brief note about yourself, qualifications & achievements..."
                       rows={4}
@@ -1990,6 +2006,7 @@ Resume: ${
                         Attach Resume (PDF/DOCX)
                       </label>
                       <input
+                        suppressHydrationWarning
                         type="file"
                         name="resume"
                         accept=".pdf,.doc,.docx"
@@ -1999,6 +2016,7 @@ Resume: ${
                     </div>
 
                     <Button
+                      suppressHydrationWarning
                       type="submit"
                       className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-xl py-3 font-medium transition-all duration-300 hover:scale-105"
                     >
