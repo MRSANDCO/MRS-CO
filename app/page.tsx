@@ -52,29 +52,36 @@ if (typeof window !== "undefined" && EMAILJS_PUBLIC_KEY) {
 const newsItems = [
   "🔔 New GST Amendment Bill 2025 - Important updates for compliance",
   "💼 MRS & Co. recognized as Top 50 CA Firms in North India",
-  "📊 Income Tax Return filing deadline extended to July 31, 2025",
+  "📊 Income Tax Return filing and Tax Audit Report due date extended to 10th November 2025",
   "🚀 We're hiring! Senior Tax Consultants and CA Articleship positions open",
   "⚖️ Recent Supreme Court ruling on Transfer Pricing - Impact analysis available",
-  "💡 Free webinar: Startup Financial Planning - Register now",
+  "💡 MCA Extends Deadline for filling forms AOC-4 and MGT-7/7A to December 31,2025",
   "📈 New corporate tax rates announced in Budget 2025",
   "🎯 Successfully helped 50+ startups with fundraising in Q1 2025",
 ];
 const services = [
   {
-    title: "Audit & Assurance",
-    desc: "Statutory, internal and management audits to build trust and strengthen controls.",
-    img: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1600&auto=format&fit=crop",
+    title: "Startup Advisory",
+    desc: "Incorporation to scale: ESOPs, cap tables, funding readiness and policy drafting.",
+    img: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1600&auto=format&fit=crop",
   },
   {
     title: "Direct & International Tax",
     desc: "Tax planning, return filing, assessments, remittances, DTAA and FEMA advisory.",
     img: "https://images.unsplash.com/photo-1565514158740-064f34bd6cfd?q=80&w=1600&auto=format&fit=crop",
   },
+
   {
     title: "GST & Indirect Tax",
     desc: "Registrations, compliance, health-checks, audits, refunds and litigation support.",
     img: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=1600&auto=format&fit=crop",
   },
+  {
+    title: "Audit & Assurance",
+    desc: "Statutory, internal and management audits to build trust and strengthen controls.",
+    img: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1600&auto=format&fit=crop",
+  },
+
   {
     title: "Corporate & ROC Compliance",
     desc: "Company/LLP formation, secretarial, XBRL, and event-based filings.",
@@ -86,11 +93,7 @@ const services = [
     desc: "Board-ready MIS, financial modelling, KPIs and cash flow stewardship.",
     img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1600&auto=format&fit=crop",
   },
-  {
-    title: "Startup Advisory",
-    desc: "Incorporation to scale: ESOPs, cap tables, funding readiness and policy drafting.",
-    img: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1600&auto=format&fit=crop",
-  },
+
   {
     title: "Business Valuation",
     desc: "Valuations for fundraising, buy/sell, ESOPs and regulatory purposes.",
