@@ -52,9 +52,9 @@ if (typeof window !== "undefined" && EMAILJS_PUBLIC_KEY) {
 const newsItems = [
   "🔔 New GST Amendment Bill 2025 - Important updates for compliance",
   "💼 MRS & Co. recognized as Top 50 CA Firms in North India",
-  "📊 Income Tax Return filing and Tax Audit Report due date extended to 10th November 2025",
-  "🚀 We're hiring! Senior Tax Consultants and CA Articleship positions open",
-  "⚖️ Recent Supreme Court ruling on Transfer Pricing - Impact analysis available",
+  "📊 Income Tax Audit Report due date extended to 10th November 2025",
+  "🚀 Income Tax Filling due date extended to 10th December 2025 ",
+  "⚖️ We're hiring! Senior Tax Consultants and CA Articleship positions open",
   "💡 MCA Extends Deadline for filling forms AOC-4 and MGT-7/7A to December 31,2025",
   "📈 New corporate tax rates announced in Budget 2025",
   "🎯 Successfully helped 50+ startups with fundraising in Q1 2025",
