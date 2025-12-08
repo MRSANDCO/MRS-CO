@@ -1142,8 +1142,8 @@ Resume: ${
                 name: "CA Ram Kumar Dhiman",
                 role: "Founder & Managing Partner",
                 image: "/assets/team/member1.jpg",
-                qualification: "FCA, B.Com",
-                experience: "15+",
+                qualification: "FCA, FAFD ,M.Com",
+                experience: "25+",
                 specialization: "Audit & Taxation"
               },
               {
@@ -1152,7 +1152,7 @@ Resume: ${
                 image: "/assets/team/member2.jpg",
                 imagePosition: "object-top",
                 qualification: "FCA, MBA",
-                experience: "12+",
+                experience: "20+",
                 specialization: "Corporate Advisory"
               },
               {
@@ -1160,8 +1160,9 @@ Resume: ${
                 role: "Partner", 
                 image: "/assets/team/member3.jpg",
                 imagePosition: "object-top",
-                qualification: "ACA, B.Com",
-                experience: "10+",
+                qualification: "FCA, M.Com",
+                experience: "15+",
+
                 specialization: "GST & Compliance"
               },
               {
@@ -1170,7 +1171,7 @@ Resume: ${
                 image: "/assets/team/member4.jpg",
                 imagePosition: "object-top",
                 qualification: "FCA, DISA",
-                experience: "8+",
+                experience: "15+",
                 specialization: "Risk Advisory"
               },
               {
@@ -1179,7 +1180,7 @@ Resume: ${
                 image: "/assets/team/member5.jpg",
                 imagePosition: "object-top",
                 qualification: "ACA, LLB",
-                experience: "6+",
+                experience: "15+",
                 specialization: "Direct Taxation"
               }
             ].map((member, idx) => (
@@ -1198,7 +1199,7 @@ Resume: ${
                   className="relative h-full bg-white rounded-3xl shadow-2xl p-8 border-2 border-blue-100 overflow-hidden group-hover:border-blue-300 group-hover:shadow-blue-200/50 transition-all duration-500"
                 >
                   {/* Colorful Gradient Glow Effect */}
-                  <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 rounded-3xl blur-2xl opacity-0 group-hover:opacity-30 transition-opacity duration-700" />
+                  <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 rounded-3xl blur-2xl opacity-30 transition-opacity duration-700" />
                   
                   {/* Shine Effect - Like Your Buttons */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
