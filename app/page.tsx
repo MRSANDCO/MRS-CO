@@ -530,6 +530,7 @@ Resume: ${
                     ["About", "about"],
                     ["Services", "services"],
                     ["News", "news"],
+                    ["Team", "team"],
                     ["Testimonials", "testimonials"],
                     ["Careers", "careers"],
                     ["Startup Advisory", "startup-advisory"],
@@ -572,6 +573,7 @@ Resume: ${
                     ["About", "about"],
                     ["Services", "services"],
                     ["News", "news"],
+                    ["Team", "team"],
                     ["Testimonials", "testimonials"],
                     ["Careers", "careers"],
                     ["Startup Advisory", "startup-advisory"],
@@ -2540,7 +2542,7 @@ Resume: ${
                 </h3>
                 <div className="space-y-4 text-slate-600">
                   <p className="font-medium text-slate-800">Noida</p>
-                  <p className="text-sm leading-relaxed italic text-slate-400">
+                  <p className="text-sm leading-relaxed ">
                     D, 89 Sector 2, Floor no. 1
                     <br />
                     Gautam Budh Nagar
@@ -2574,7 +2576,7 @@ Resume: ${
                 </h3>
                 <div className="space-y-4 text-slate-600">
                   <p className="font-medium text-slate-800">Mumbai</p>
-                  <p className="text-sm leading-relaxed italic text-slate-400">
+                  <p className="text-sm leading-relaxed ">
                     [Address Coming Soon]
                     <br />
                     Sector 62
