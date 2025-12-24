@@ -1144,7 +1144,7 @@ Resume: ${
                 image: "/assets/team/member1.jpg",
                 qualification: "FCA, FAFD ,M.Com",
                 experience: "25+",
-                specialization: "Audit & Taxation"
+                specialization: "Forensic Auditing & Taxation"
               },
               {
                 name: "CA Rajeev Kumar", 
@@ -1153,7 +1153,7 @@ Resume: ${
                 imagePosition: "object-top",
                 qualification: "FCA, MBA",
                 experience: "20+",
-                specialization: "Corporate Advisory"
+                specialization: "Corporate Advisory & Taxation"
               },
               {
                 name: "CA Shruti Dang",
@@ -1172,7 +1172,7 @@ Resume: ${
                 imagePosition: "object-top",
                 qualification: "FCA, DISA",
                 experience: "15+",
-                specialization: "Risk Advisory"
+                specialization: "Risk Advisory and Assurance"
               },
               {
                 name: "CA Yash Pal Sharma",
@@ -1181,7 +1181,16 @@ Resume: ${
                 imagePosition: "object-top",
                 qualification: "ACA, LLB",
                 experience: "15+",
-                specialization: "Direct Taxation"
+                specialization: "Direct Taxation & Compliance"
+              },
+              {
+                name: "CA Rinky Vishwakarma",
+                role: "Associate Partner",
+                image: "/assets/team/member6.jpg",
+                imagePosition: "object-top",
+                qualification: "Diploma in Financial Management",
+                experience: "15+",
+                specialization: "Accounting and Financial Management"
               }
             ].map((member, idx) => (
               <motion.div
@@ -2424,6 +2433,167 @@ Resume: ${
         </div>
       </Section>
 
+
+      {/* OFFICES SECTION */}
+      <section id="offices" className="relative py-20 overflow-hidden bg-white">
+        {/* Background Elements */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-50/50 via-white to-white" />
+          <motion.div
+            animate={{
+              y: [0, -20, 0],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-20 right-10 w-64 h-64 bg-blue-100 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              y: [0, 20, 0],
+              opacity: [0.2, 0.5, 0.2],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2,
+            }}
+            className="absolute bottom-20 left-10 w-72 h-72 bg-indigo-50 rounded-full blur-3xl"
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 text-blue-700 text-sm font-bold uppercase tracking-wider mb-4 border border-blue-100">
+                <MapPin className="w-4 h-4 mr-2" />
+                Our Presence
+              </div>
+              <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">
+                Visit Our Offices
+              </h2>
+              <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+                With a strong presence across key locations, we are always within
+                reach to serve your financial needs.
+              </p>
+            </motion.div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Office 1: Head Office (Ghaziabad) */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+              className="group"
+            >
+              <div className="relative h-full bg-white rounded-2xl shadow-lg border border-slate-100 p-8 hover:shadow-xl hover:border-blue-200 transition-all duration-300">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600 group-hover:scale-110 transition-transform duration-300">
+                  <MapPin className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                  Head Office
+                </h3>
+                <div className="space-y-4 text-slate-600">
+                  <p className="font-medium text-slate-800">Ghaziabad</p>
+                  <p className="text-sm leading-relaxed">
+                    F 1/299, Shakti Apartment
+                    <br />
+                    Sector-4, Vaishali
+                    <br />
+                    Ghaziabad - 201010
+                  </p>
+                  <div className="pt-4 border-t border-slate-100">
+                    <div className="flex items-center text-sm text-slate-500 mb-2">
+                      <Phone className="w-4 h-4 mr-2 text-blue-500" />
+                      +91 9999622662
+                    </div>
+                    <div className="flex items-center text-sm text-slate-500">
+                      <Mail className="w-4 h-4 mr-2 text-blue-500" />
+                      camrsandco@gmail.com
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Office 2: Placeholder */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="group"
+            >
+              <div className="relative h-full bg-white rounded-2xl shadow-lg border border-slate-100 p-8 hover:shadow-xl hover:border-blue-200 transition-all duration-300">
+                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 text-indigo-600 group-hover:scale-110 transition-transform duration-300">
+                  <MapPin className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                  Branch Office
+                </h3>
+                <div className="space-y-4 text-slate-600">
+                  <p className="font-medium text-slate-800">Noida</p>
+                  <p className="text-sm leading-relaxed italic text-slate-400">
+                    D, 89 Sector 2, Floor no. 1
+                    <br />
+                    Gautam Budh Nagar
+                    <br />
+                    Noida - 201301
+                  </p>
+                  <div className="pt-4 border-t border-slate-100">
+                    <div className="flex items-center text-sm text-slate-500 mb-2">
+                      <Phone className="w-4 h-4 mr-2 text-indigo-500" />
+                      +91 9999622662
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Office 3: Placeholder */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="group"
+            >
+              <div className="relative h-full bg-white rounded-2xl shadow-lg border border-slate-100 p-8 hover:shadow-xl hover:border-blue-200 transition-all duration-300">
+                <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center mb-6 text-cyan-600 group-hover:scale-110 transition-transform duration-300">
+                  <MapPin className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                  Branch Office
+                </h3>
+                <div className="space-y-4 text-slate-600">
+                  <p className="font-medium text-slate-800">Mumbai</p>
+                  <p className="text-sm leading-relaxed italic text-slate-400">
+                    [Address Coming Soon]
+                    <br />
+                    Sector 62
+                    <br />
+                    Mumbai - 400001
+                  </p>
+                  <div className="pt-4 border-t border-slate-100">
+                    <div className="flex items-center text-sm text-slate-500 mb-2">
+                      <Phone className="w-4 h-4 mr-2 text-cyan-500" />
+                      +91 9999622662
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer
         id="contact"
@@ -2498,11 +2668,16 @@ Resume: ${
                 </div>
                 <div className="flex items-start">
                   <MapPin className="w-4 h-4 mr-2 mt-1" />
-                  <span>
-                    F 1/299,Shakti Apartment
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=F+1/299,+Shakti+Apartment,+Sector-4,+Vaishali,+Ghaziabad+-+201010"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-blue-400 transition-colors text-left"
+                  >
+                    F 1/299, Shakti Apartment
                     <br />
-                    Sector-4, vaishali -Ghaziabad-201010{" "}
-                  </span>
+                    Sector-4, Vaishali - Ghaziabad-201010
+                  </a>
                 </div>
               </div>
               <div className="flex space-x-4 mt-4">
