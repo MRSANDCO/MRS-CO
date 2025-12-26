@@ -2577,9 +2577,9 @@ Resume: ${
                 <div className="space-y-4 text-slate-600">
                   <p className="font-medium text-slate-800">Mumbai</p>
                   <p className="text-sm leading-relaxed ">
-                    [Address Coming Soon]
+                     Shop no. 5 , topiwala centre , Kakaji Nagar
                     <br />
-                    Sector 62
+                    Goregaon, West
                     <br />
                     Mumbai - 400001
                   </p>
