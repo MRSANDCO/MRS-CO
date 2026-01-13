@@ -1,9 +1,10 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 "use strict";
-import emailjs from "emailjs-com";
+// import emailjs from "emailjs-com";
 import React, { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import AchievementSection from "@/components/AchievementSection";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,16 +36,16 @@ import {
 } from "lucide-react";
 
 // EmailJS Configuration
-const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
-const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-const EMAILJS_CONSULTATION_TEMPLATE =
-  process.env.NEXT_PUBLIC_EMAILJS_CONSULTATION_TEMPLATE;
-const EMAILJS_CAREER_TEMPLATE = process.env.NEXT_PUBLIC_EMAILJS_CAREER_TEMPLATE;
+// const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+// const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+// const EMAILJS_CONSULTATION_TEMPLATE =
+//   process.env.NEXT_PUBLIC_EMAILJS_CONSULTATION_TEMPLATE;
+// const EMAILJS_CAREER_TEMPLATE = process.env.NEXT_PUBLIC_EMAILJS_CAREER_TEMPLATE;
 
 // Initialize EmailJS
-if (typeof window !== "undefined" && EMAILJS_PUBLIC_KEY) {
-  emailjs.init(EMAILJS_PUBLIC_KEY);
-}
+// if (typeof window !== "undefined" && EMAILJS_PUBLIC_KEY) {
+//   emailjs.init(EMAILJS_PUBLIC_KEY);
+// }
 
 // Helper Data
 // ------------------------
@@ -205,12 +206,12 @@ export default function MRSCoSite() {
   const year = useMemo(() => new Date().getFullYear(), []);
 
   // Initialize EmailJS
-  useEffect(() => {
-    if (typeof window !== "undefined" && EMAILJS_PUBLIC_KEY) {
-      emailjs.init(EMAILJS_PUBLIC_KEY);
-      console.log("EmailJS initialized successfully");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (typeof window !== "undefined" && EMAILJS_PUBLIC_KEY) {
+  //     emailjs.init(EMAILJS_PUBLIC_KEY);
+  //     console.log("EmailJS initialized successfully");
+  //   }
+  // }, []);
 
   const scrollToServices = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -230,187 +231,388 @@ export default function MRSCoSite() {
   };
 
   // EmailJS Form Handlers
-  const handleConsultationSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const submitButton = form.querySelector(
-      'button[type="submit"]'
-    ) as HTMLButtonElement;
-    const originalText = submitButton?.textContent || "Submit";
-
+  // const handleConsultationSubmit = async (
+  //   e: React.FormEvent<HTMLFormElement>
+  // ) => {
+  //   e.preventDefault();
+  //   const form = e.currentTarget;
+  //   const submitButton = form.querySelector(
+  //     'button[type="submit"]'
+  //   ) as HTMLButtonElement;
+  //   const originalText = submitButton?.textContent || "Submit";
     // Check if EmailJS is properly configured
-    if (
-      !EMAILJS_PUBLIC_KEY ||
-      !EMAILJS_SERVICE_ID ||
-      !EMAILJS_CONSULTATION_TEMPLATE
-    ) {
-      alert(
-        "❌ EmailJS configuration is incomplete. Please check your environment variables."
-      );
-      return;
-    }
+    // if (
+    //   !EMAILJS_PUBLIC_KEY ||
+    //   !EMAILJS_SERVICE_ID ||
+    //   !EMAILJS_CONSULTATION_TEMPLATE
+    // ) {
+    //   alert(
+    //     "❌ EmailJS configuration is incomplete. Please check your environment variables."
+    //   );
+    //   return;
+    // }
 
-    try {
+    // try {
       // Show loading state
-      if (submitButton) {
-        submitButton.textContent = "Sending...";
-        submitButton.disabled = true;
-      }
+      // if (submitButton) {
+      //   submitButton.textContent = "Sending...";
+      //   submitButton.disabled = true;
+      // }
 
-      const formData = new FormData(form);
-      const service = formData.get("service") as string;
-      const baseMessage = formData.get("message") as string;
+      // const formData = new FormData(form);
+      // const service = formData.get("service") as string;
+      // const baseMessage = formData.get("message") as string;
 
       // Prepare email parameters
-      const templateParams = {
-        from_name: formData.get("name") as string,
-        from_email: formData.get("email") as string,
-        phone: (formData.get("phone") as string) || "Not provided",
-        company: (formData.get("company") as string) || "Not provided",
-        service: service || "Not specified",
-        message: baseMessage,
-        full_message: service
-          ? `Service Requested: ${service}\n\n${baseMessage}`
-          : baseMessage,
-        to_email: "camrsandco@gmail.com",
-      };
+      // const templateParams = {
+      //   from_name: formData.get("name") as string,
+      //   from_email: formData.get("email") as string,
+      //   phone: (formData.get("phone") as string) || "Not provided",
+      //   company: (formData.get("company") as string) || "Not provided",
+      //   service: service || "Not specified",
+      //   message: baseMessage,
+      //   full_message: service
+      //     ? `Service Requested: ${service}\n\n${baseMessage}`
+      //     : baseMessage,
+      //   to_email: "camrsandco@gmail.com",
+      // };
 
-      console.log("Sending consultation email with params:", templateParams);
+      // console.log("Sending consultation email with params:", templateParams);
 
-      const result = await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_CONSULTATION_TEMPLATE,
-        templateParams
-      );
-
-      if (result.status === 200) {
-        console.log("Email sent successfully:", result);
-        alert(
-          "✅ Thank you! Your consultation request has been sent successfully. We'll get back to you within 24 hours."
-        );
-        form.reset();
-      } else {
-        throw new Error(`EmailJS returned status: ${result.status}`);
-      }
-    } catch (error) {
-      console.error("Failed to send consultation email:", error);
-      alert(
-        "❌ Failed to send message. Please try again or contact us directly at camrsandco@gmail.com"
-      );
-    } finally {
+    //   const result = await emailjs.send(
+    //   EMAILJS_SERVICE_ID,
+    //   EMAILJS_CONSULTATION_TEMPLATE,
+    //   templateParams,
+    //   EMAILJS_PUBLIC_KEY
+    // );
+    //   if (result.status === 200) {
+    //     console.log("Email sent successfully:", result);
+    //     alert(
+    //       "✅ Thank you! Your consultation request has been sent successfully. We'll get back to you within 24 hours."
+    //     );
+    //     form.reset();
+    //   } else {
+    //     throw new Error(`EmailJS returned status: ${result.status}`);
+    //   }
+    // } catch (error) {
+    //   console.error("Failed to send consultation email:", error);
+    //   alert(
+    //     "❌ Failed to send message. Please try again or contact us directly at camrsandco@gmail.com"
+    //   );
+    // } finally {
       // Reset button state
-      if (submitButton) {
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
-      }
-    }
-  };
+  //     if (submitButton) {
+  //       submitButton.textContent = originalText;
+  //       submitButton.disabled = false;
+  //     }
+  //   }
+  // };
 
-  const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const submitButton = form.querySelector(
-      'button[type="submit"]'
-    ) as HTMLButtonElement;
-    const originalText = submitButton?.textContent || "Submit";
+  // const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   const form = e.currentTarget;
+  //   const submitButton = form.querySelector(
+  //     'button[type="submit"]'
+  //   ) as HTMLButtonElement;
+  //   const originalText = submitButton?.textContent || "Submit";
 
     // Check if EmailJS is properly configured
-    if (
-      !EMAILJS_PUBLIC_KEY ||
-      !EMAILJS_SERVICE_ID ||
-      !EMAILJS_CAREER_TEMPLATE
-    ) {
-      alert(
-        "❌ EmailJS configuration is incomplete. Please check your environment variables."
-      );
-      return;
-    }
+    // if (
+    //   !EMAILJS_PUBLIC_KEY ||
+    //   !EMAILJS_SERVICE_ID ||
+    //   !EMAILJS_CAREER_TEMPLATE
+    // ) {
+    //   alert(
+    //     "❌ EmailJS configuration is incomplete. Please check your environment variables."
+    //   );
+    //   return;
+    // }
 
-    try {
+    // try {
       // Show loading state
-      if (submitButton) {
-        submitButton.textContent = "Sending...";
-        submitButton.disabled = true;
-      }
+      // if (submitButton) {
+      //   submitButton.textContent = "Sending...";
+      //   submitButton.disabled = true;
+      // }
 
-      const formData = new FormData(form);
-      const experience =
-        (formData.get("experience") as string) || "Not specified";
-      const notes = (formData.get("notes") as string) || "";
+      // const formData = new FormData(form);
+      // const experience =
+      //   (formData.get("experience") as string) || "Not specified";
+      // const notes = (formData.get("notes") as string) || "";
 
       // Handle file upload for resume
-      const resumeFile = formData.get("resume") as File;
-      let resumeInfo = "No resume attached";
+      // const resumeFile = formData.get("resume") as File;
+      // let resumeInfo = "No resume attached";
 
-      if (resumeFile && resumeFile.size > 0) {
-        resumeInfo = `Resume: ${resumeFile.name} (${(
-          resumeFile.size / 1024
-        ).toFixed(2)} KB)`;
+      // if (resumeFile && resumeFile.size > 0) {
+      //   resumeInfo = `Resume: ${resumeFile.name} (${(
+      //     resumeFile.size / 1024
+      //   ).toFixed(2)} KB)`;
         // Note: EmailJS doesn't support file attachments directly in the browser
         // The user will need to mention this in the email
-      }
+      // }
 
       // Prepare email parameters
-      const templateParams = {
-        from_name: formData.get("name") as string,
-        from_email: formData.get("email") as string,
-        phone: (formData.get("phone") as string) || "Not provided",
-        role: (formData.get("role") as string) || "Not specified",
-        experience: experience,
-        notes: notes || "No additional notes",
-        resume_info: resumeInfo,
-        full_details: `
-Role Applied: ${formData.get("role")}
-Experience: ${experience}
-${notes ? `Additional Notes: ${notes}` : ""}
-Resume: ${
-          resumeFile && resumeFile.size > 0
-            ? resumeFile.name
-            : "Not attached - candidate should send separately"
-        }
-        `,
-        to_email: "camrsandco@gmail.com",
-      };
+//       const templateParams = {
+//         from_name: formData.get("name") as string,
+//         from_email: formData.get("email") as string,
+//         phone: (formData.get("phone") as string) || "Not provided",
+//         role: (formData.get("role") as string) || "Not specified",
+//         experience: experience,
+//         notes: notes || "No additional notes",
+//         resume_info: resumeInfo,
+//         full_details: `
+// Role Applied: ${formData.get("role")}
+// Experience: ${experience}
+// ${notes ? `Additional Notes: ${notes}` : ""}
+// Resume: ${
+//           resumeFile && resumeFile.size > 0
+//             ? resumeFile.name
+//             : "Not attached - candidate should send separately"
+//         }
+//         `,
+//         to_email: "camrsandco@gmail.com",
+//       };
 
-      console.log("Sending career application with params:", templateParams);
+//       console.log("Sending career application with params:", templateParams);
 
-      const result = await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_CAREER_TEMPLATE,
-        templateParams
-      );
+//       const result = await emailjs.send(
+//         EMAILJS_SERVICE_ID,
+//         EMAILJS_CAREER_TEMPLATE,
+//         templateParams
+//       );
 
-      if (result.status === 200) {
-        console.log("Email sent successfully:", result);
+//       if (result.status === 200) {
+//         console.log("Email sent successfully:", result);
 
-        let successMessage =
-          "✅ Thank you! Your application has been submitted successfully. We'll review it and get back to you soon.";
-        if (resumeFile && resumeFile.size > 0) {
-          successMessage +=
-            "\n\nNote: Please also email your resume directly to camrsandco@gmail.com since file attachments cannot be sent through the web form.";
-        }
+//         let successMessage =
+//           "✅ Thank you! Your application has been submitted successfully. We'll review it and get back to you soon.";
+//         if (resumeFile && resumeFile.size > 0) {
+//           successMessage +=
+//             "\n\nNote: Please also email your resume directly to camrsandco@gmail.com since file attachments cannot be sent through the web form.";
+//         }
 
-        alert(successMessage);
-        form.reset();
-      } else {
-        throw new Error(`EmailJS returned status: ${result.status}`);
-      }
-    } catch (error) {
-      console.error("Failed to send career application:", error);
-      alert(
-        "❌ Failed to submit application. Please try again or email us directly at camrsandco@gmail.com"
-      );
-    } finally {
-      // Reset button state
-      if (submitButton) {
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
-      }
+//         alert(successMessage);
+//         form.reset();
+//       } else {
+//         throw new Error(`EmailJS returned status: ${result.status}`);
+//       }
+//     } catch (error) {
+//       console.error("Failed to send career application:", error);
+//       alert(
+//         "❌ Failed to submit application. Please try again or email us directly at camrsandco@gmail.com"
+//       );
+//     } finally {
+//       // Reset button state
+//       if (submitButton) {
+//         submitButton.textContent = originalText;
+//         submitButton.disabled = false;
+//       }
+//     }
+//   };
+// const handleConsultationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+//   e.preventDefault();
+//   const form = e.currentTarget;
+//   const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+//   const originalText = submitButton?.textContent || "Submit";
+
+//   try {
+//     // Show loading state
+//     if (submitButton) {
+//       submitButton.textContent = "Sending...";
+//       submitButton.disabled = true;
+//     }
+
+//     const formData = new FormData(form);
+    
+    // Prepare data object
+//     const data = {
+//       name: formData.get("name") as string,
+//       email: formData.get("email") as string,
+//       phone: formData.get("phone") as string || "",
+//       company: formData.get("company") as string || "",
+//       service: formData.get("service") as string || "",
+//       message: formData.get("message") as string,
+//     };
+
+//     const response = await fetch("/api/consultation", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify(data),
+//     });
+
+//     const result = await response.json();
+
+//     if (!response.ok) {
+//       throw new Error(result.error || "Failed to send message");
+//     }
+
+//     alert(
+//       "✅ Thank you! Your consultation request has been sent successfully. We'll get back to you within 24 hours."
+//     );
+//     form.reset();
+//   } catch (error) {
+//     console.error("Failed to send consultation email:", error);
+//     alert(
+//       "❌ Failed to send message. Please try again or contact us directly at camrsandco@gmail.com"
+//     );
+//   } finally {
+//     // Reset button state
+//     if (submitButton) {
+//       submitButton.textContent = originalText;
+//       submitButton.disabled = false;
+//     }
+//   }
+// };
+
+// Replace handleCareerSubmit with this:
+// const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+//   e.preventDefault();
+//   const form = e.currentTarget;
+//   const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+//   const originalText = submitButton?.textContent || "Submit";
+
+//   try {
+//     // Show loading state
+  //   if (submitButton) {
+  //     submitButton.textContent = "Sending...";
+  //     submitButton.disabled = true;
+  //   }
+
+  //   const formData = new FormData(form);
+
+  //   const response = await fetch("/api/career", {
+  //     method: "POST",
+  //     body: formData, // Send FormData directly for file upload
+  //   });
+
+  //   const result = await response.json();
+
+  //   if (!response.ok) {
+  //     throw new Error(result.error || "Failed to submit application");
+  //   }
+
+  //   alert(
+  //     "✅ Thank you! Your application has been submitted successfully. We'll review it and get back to you soon."
+  //   );
+  //   form.reset();
+  // } catch (error) {
+  //   console.error("Failed to send career application:", error);
+  //   alert(
+  //     "❌ Failed to submit application. Please try again or email us directly at camrsandco@gmail.com"
+  //   );
+  // } finally {
+    // Reset button state
+//     if (submitButton) {
+//       submitButton.textContent = originalText;
+//       submitButton.disabled = false;
+//     }
+//   }
+// };
+
+const handleConsultationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  const form = e.currentTarget;
+  const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+  const originalText = submitButton?.textContent || "Submit";
+
+  try {
+    // Show loading state
+    if (submitButton) {
+      submitButton.textContent = "Sending...";
+      submitButton.disabled = true;
     }
-  };
 
+    const formData = new FormData(form);
+    
+    // Prepare data object
+    const data = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      phone: formData.get("phone") as string || "",
+      company: formData.get("company") as string || "",
+      service: formData.get("service") as string || "",
+      message: formData.get("message") as string,
+    };
+
+    const response = await fetch("/api/consultation", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Failed to send message");
+    }
+
+    alert(
+      "✅ Thank you! Your consultation request has been sent successfully. We'll get back to you within 24 hours."
+    );
+    form.reset();
+  } catch (error) {
+    console.error("Failed to send consultation email:", error);
+    alert(
+      "❌ Failed to send message. Please try again or contact us directly at camrsandco@gmail.com"
+    );
+  } finally {
+    // Reset button state
+    if (submitButton) {
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
+    }
+  }
+};
+
+// Replace handleCareerSubmit with this:
+const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  const form = e.currentTarget;
+  const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+  const originalText = submitButton?.textContent || "Submit";
+
+  try {
+    // Show loading state
+    if (submitButton) {
+      submitButton.textContent = "Sending...";
+      submitButton.disabled = true;
+    }
+
+    const formData = new FormData(form);
+
+    const response = await fetch("/api/career", {
+      method: "POST",
+      body: formData, // Send FormData directly for file upload
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Failed to submit application");
+    }
+
+    alert(
+      "✅ Thank you! Your application has been submitted successfully. We'll review it and get back to you soon."
+    );
+    form.reset();
+  } catch (error) {
+    console.error("Failed to send career application:", error);
+    alert(
+      "❌ Failed to submit application. Please try again or email us directly at camrsandco@gmail.com"
+    );
+  } finally {
+    // Reset button state
+    if (submitButton) {
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
+    }
+  }
+};
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
       {/* ENHANCED NAVBAR WITH COLORFUL BACKGROUND */}
@@ -1164,8 +1366,16 @@ Resume: ${
                 imagePosition: "object-top",
                 qualification: "FCA, M.Com",
                 experience: "15+",
-
                 specialization: "GST & Compliance"
+              },
+              {
+                name: "CA Mukesh Thakur",
+                role: "Director & Partner",
+                image: "/assets/team/mukesh-thakur.jpg",
+                imagePosition: "object-top",
+                qualification: "FCA, FAFD, M.Com",
+                experience: "30+",
+                specialization: "FEMA, IndAS, Taxation"
               },
               {
                 name: "CA Neha Sharma",
@@ -1193,6 +1403,15 @@ Resume: ${
                 qualification: "Diploma in Financial Management",
                 experience: "15+",
                 specialization: "Accounting and Financial Management"
+              },
+              {
+                name: "Advocate Prashant Shukla",
+                role: "Legal Advisor",
+                image: "/assets/team/prashant-shukla.png",
+                imagePosition: "object-top",
+                qualification: "LLB",
+                experience: "15+",
+                specialization: "Corporate Law & Direct and Indirect taxes specialisation"
               }
             ].map((member, idx) => (
               <motion.div
@@ -1234,7 +1453,7 @@ Resume: ${
                         transition={{ type: "spring", stiffness: 400 }}
                         className="relative"
                       >
-                        <div className="w-36 h-36 mx-auto relative">
+                        <div className={`${(member as any).imageContainerClass || "w-36 h-36"} mx-auto relative`}>
                           <img
                             src={member.image}
                             alt={member.name}
@@ -1347,351 +1566,9 @@ Resume: ${
           </motion.div>
         </div>
       </section>
-      {/* NEWS SECTION - THEMED TO MATCH WEBSITE */}
-      <section id="news" className="relative py-16 overflow-hidden">
-        {/* Background Image - Matching Umbrella Services Style */}
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2069&auto=format&fit=crop"
-            alt="Professional business meeting in modern office"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-blue-900/85 to-indigo-900/80"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
-        </div>
+     
 
-        {/* Floating Elements - Subtle Like Your Site */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            animate={{
-              x: [0, 90, 0],
-              y: [0, -30, 0],
-              opacity: [0.2, 0.4, 0.2],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-20 right-20 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{
-              x: [0, -80, 0],
-              y: [0, 40, 0],
-              opacity: [0.15, 0.35, 0.15],
-              scale: [1, 1.3, 1],
-            }}
-            transition={{
-              duration: 18,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 3,
-            }}
-            className="absolute bottom-20 left-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl"
-          />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Header - Matching Your Section Headers */}
-          <div className="text-center mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              {/* Badge - Style from Your News Ticker */}
-              <motion.div
-                className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-600/90 via-indigo-600/90 to-blue-600/90 text-white text-sm font-bold uppercase tracking-wider mb-6 shadow-xl backdrop-blur-sm border border-white/20"
-                animate={{
-                  boxShadow: [
-                    "0 0 20px rgba(59, 130, 246, 0.3)",
-                    "0 0 40px rgba(99, 102, 241, 0.4)",
-                    "0 0 20px rgba(59, 130, 246, 0.3)",
-                  ],
-                }}
-                transition={{ duration: 3, repeat: Infinity }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <span className="mr-2 text-lg">📰</span>
-                Stay Informed
-              </motion.div>
-
-              {/* Heading - Matching Your Typography */}
-              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-                Latest News & Updates
-              </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Stay updated with the latest circulars, notifications, and
-                announcements from ICAI and regulatory bodies
-              </p>
-            </motion.div>
-          </div>
-
-          {/* News Cards Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                title: "📌 All About GST ",
-                desc: "Important updates for compliance - New GST regulations effective from April 2025",
-                badge: "New",
-                icon: "📄",
-                gradient: "from-blue-500 to-blue-600",
-                iconBg: "from-blue-400 to-blue-600",
-                link: "https://www.cbic.gov.in/entities/gst",
-                date: "2 days ago",
-              },
-              {
-                title: "💡Income Tax Latest Amendments",
-                desc: "ITR filing deadline extended to July 31, 2025 - Check revised guidelines",
-                badge: "Updated",
-                icon: "📊",
-                gradient: "from-green-500 to-green-600",
-                iconBg: "from-green-400 to-green-600",
-                link: "https://www.incometax.gov.in/iec/foportal/latest-news",
-                date: "2 days ago",
-              },
-              {
-                title: "🏛️ All About MCA – Latest Rules & Alerts",
-                desc: "Transfer Pricing impact analysis - Recent Supreme Court judgment details",
-                badge: "Important",
-                icon: "⚖️",
-                gradient: "from-purple-500 to-purple-600",
-                iconBg: "from-purple-400 to-purple-600",
-                link: "https://www.mca.gov.in/content/mca/global/en/notifications-tender/news-updates/latest-news.html",
-                date: "1 day ago",
-              },
-              {
-                title: "Budget 2025 Highlights",
-                desc: "New corporate tax rates and compliance requirements announced",
-                badge: "Latest",
-                icon: "📈",
-                gradient: "from-orange-500 to-orange-600",
-                iconBg: "from-orange-400 to-orange-600",
-                link: "https://www.indiabudget.gov.in/doc/Key_to_Budget_Document_2025.pdf",
-                date: "1 week ago",
-              },
-              {
-                title: "📝 New Income Tax Act",
-                desc: "Free webinar registration - Learn essential financial strategies",
-                badge: "Event",
-                icon: "💡",
-                gradient: "from-cyan-500 to-cyan-600",
-                iconBg: "from-cyan-400 to-cyan-600",
-                link: "https://resource.cdn.icai.org/88381dtc-aps2500.pdf",
-                date: "Today",
-              },
-              {
-                title: "ICAI Latest Circular",
-                desc: "Important notifications and updates for practicing Chartered Accountants",
-                badge: "Circular",
-                icon: "🔔",
-                gradient: "from-indigo-500 to-indigo-600",
-                iconBg: "from-indigo-400 to-indigo-600",
-                link: "https://www.icai.org/",
-                date: "Today",
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                viewport={{ once: true }}
-                className="group"
-              >
-                {/* Card with Your Glass Morphism Style */}
-                <motion.div
-                  whileHover={{ scale: 1.05, y: -10 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                  className="relative h-full bg-white/10 backdrop-blur-lg p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/20 group-hover:border-white/40 overflow-hidden"
-                >
-                  {/* Glow Effect on Hover */}
-                  <div
-                    className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500`}
-                  />
-
-                  {/* Shine Effect - Like Your Consultation Form */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 group-hover:translate-x-full transition-transform duration-1000" />
-                  </div>
-
-                  {/* Content */}
-                  <div className="relative z-10">
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-6">
-                      {/* Icon - Matching Your Service Cards Style */}
-                      <motion.div
-                        whileHover={{ rotate: 360, scale: 1.2 }}
-                        transition={{ duration: 0.6 }}
-                        className={`w-16 h-16 bg-gradient-to-br ${item.iconBg} rounded-2xl flex items-center justify-center text-3xl shadow-lg`}
-                      >
-                        {item.icon}
-                      </motion.div>
-
-                      {/* Badge - Your Badge Style */}
-                      <span
-                        className={`px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r ${item.gradient} text-white shadow-lg uppercase tracking-wider`}
-                      >
-                        {item.badge}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors duration-300">
-                      {item.title}
-                    </h3>
-
-                    {/* Description */}
-                    <p className="text-gray-300 text-sm mb-6 leading-relaxed line-clamp-3 group-hover:text-white transition-colors duration-300">
-                      {item.desc}
-                    </p>
-
-                    {/* Date - Matching Your Career Section Style */}
-                    <div className="flex items-center text-xs text-gray-400 mb-4 group-hover:text-gray-300 transition-colors">
-                      <svg
-                        className="w-4 h-4 mr-2"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      {item.date}
-                    </div>
-
-                    {/* CTA Link - UPDATED WITH SEPARATE LINK */}
-                    <a
-                      href={item.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center font-bold text-sm text-cyan-400 hover:text-cyan-300 group-hover:translate-x-2 transition-all duration-300"
-                    >
-                      View Details
-                      <span className="ml-2 text-lg">→</span>
-                    </a>
-                  </div>
-
-                  {/* Corner Accent - Subtle */}
-                  <div
-                    className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${item.gradient} opacity-10 group-hover:opacity-20 rounded-tr-3xl transition-opacity duration-500`}
-                  />
-                </motion.div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Bottom CTA - Matching Your Button Style */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mt-12"
-          >
-            <motion.a
-              href="https://www.icai.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative inline-flex items-center px-12 py-5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-700 hover:via-indigo-700 hover:to-blue-700 text-white font-bold text-lg shadow-2xl transition-all duration-300 overflow-hidden group"
-            >
-              {/* Animated Background - Like Your Navbar Buttons */}
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-              {/* Shine Effect */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 group-hover:translate-x-full transition-transform duration-700" />
-              </div>
-
-              <span className="relative z-10 flex items-center">
-                View All ICAI Updates
-                <span className="ml-3 text-xl">→</span>
-              </span>
-            </motion.a>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* SERVICES SLIDER */}
-      <Section id="services" className="pt-2">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <SectionHeader
-            eyebrow="What we do"
-            title="A spectrum of services under one roof"
-            subtitle="Swipe through to explore how we can help."
-            center
-          />
-
-          <div className="relative">
-            <div className="absolute -left-2 top-1/2 -translate-y-1/2 z-10">
-              <Button
-                suppressHydrationWarning
-                variant="outline"
-                size="icon"
-                className="rounded-2xl"
-                onClick={() => scrollByCards(-1)}
-                aria-label="Scroll to previous services"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="absolute -right-2 top-1/2 -translate-y-1/2 z-10">
-              <Button
-                suppressHydrationWarning
-                variant="outline"
-                size="icon"
-                className="rounded-2xl"
-                onClick={() => scrollByCards(1)}
-                aria-label="Scroll to next services"
-              >
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </div>
-
-            <div
-              ref={sliderRef}
-              className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 px-1 scrollbar-thin scrollbar-thumb-slate-300"
-            >
-              {services.map((s, i) => (
-                <div
-                  key={i}
-                  className="min-w-[85%] md:min-w-[45%] lg:min-w-[32%] snap-start"
-                >
-                  <Card className="rounded-3xl overflow-hidden h-full">
-                    <div
-                      className="relative w-full "
-                      style={{ height: "170px" }}
-                    >
-                      <Image
-                        src={s.img}
-                        alt={s.title}
-                        fill
-                        sizes="100vw"
-                        className="object-cover w-full h-full"
-                        style={{
-                          objectFit: "cover",
-                          borderTopLeftRadius: "1.5rem",
-                          borderTopRightRadius: "1.5rem",
-                        }}
-                      />
-                    </div>
-                    <CardHeader>
-                      <CardTitle className="text-xl">{s.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-muted-foreground">
-                      {s.desc}
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Section>
-
+      
       {/* UMBRELLA OF OUR SERVICES with Enhanced Background */}
       <section className="relative py-16 overflow-hidden">
         {/* Enhanced Background with Parallax Effect */}
@@ -1835,6 +1712,88 @@ Resume: ${
         </div>
       </section>
 
+      {/* SERVICES SLIDER */}
+      <Section id="services" className="pt-2">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <SectionHeader
+            eyebrow="What we do"
+            title="A spectrum of services under one roof"
+            subtitle="Swipe through to explore how we can help."
+            center
+          />
+
+          <div className="relative">
+            <div className="absolute -left-2 top-1/2 -translate-y-1/2 z-10">
+              <Button
+                suppressHydrationWarning
+                variant="outline"
+                size="icon"
+                className="rounded-2xl"
+                onClick={() => scrollByCards(-1)}
+                aria-label="Scroll to previous services"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="absolute -right-2 top-1/2 -translate-y-1/2 z-10">
+              <Button
+                suppressHydrationWarning
+                variant="outline"
+                size="icon"
+                className="rounded-2xl"
+                onClick={() => scrollByCards(1)}
+                aria-label="Scroll to next services"
+              >
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <div
+              ref={sliderRef}
+              className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 px-1 scrollbar-thin scrollbar-thumb-slate-300"
+            >
+              {services.map((s, i) => (
+                <div
+                  key={i}
+                  className="min-w-[85%] md:min-w-[45%] lg:min-w-[32%] snap-start"
+                >
+                  <Card className="rounded-3xl overflow-hidden h-full">
+                    <div
+                      className="relative w-full "
+                      style={{ height: "170px" }}
+                    >
+                      <Image
+                        src={s.img}
+                        alt={s.title}
+                        fill
+                        sizes="100vw"
+                        className="object-cover w-full h-full"
+                        style={{
+                          objectFit: "cover",
+                          borderTopLeftRadius: "1.5rem",
+                          borderTopRightRadius: "1.5rem",
+                        }}
+                      />
+                    </div>
+                    <CardHeader>
+                      <CardTitle className="text-xl">{s.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-muted-foreground">
+                      {s.desc}
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* ACHIEVEMENT SECTION */}
+      <AchievementSection />
+
+
+      
       {/* TESTIMONIALS */}
       <section id="testimonials" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto text-center px-4 md:px-6">
@@ -2434,6 +2393,275 @@ Resume: ${
           </div>
         </div>
       </Section>
+
+{/* NEWS SECTION - THEMED TO MATCH WEBSITE */}
+      <section id="news" className="relative py-16 overflow-hidden">
+        {/* Background Image - Matching Umbrella Services Style */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2069&auto=format&fit=crop"
+            alt="Professional business meeting in modern office"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-blue-900/85 to-indigo-900/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
+        </div>
+
+        {/* Floating Elements - Subtle Like Your Site */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              x: [0, 90, 0],
+              y: [0, -30, 0],
+              opacity: [0.2, 0.4, 0.2],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-20 right-20 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              x: [0, -80, 0],
+              y: [0, 40, 0],
+              opacity: [0.15, 0.35, 0.15],
+              scale: [1, 1.3, 1],
+            }}
+            transition={{
+              duration: 18,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 3,
+            }}
+            className="absolute bottom-20 left-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl"
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Header - Matching Your Section Headers */}
+          <div className="text-center mb-12">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              {/* Badge - Style from Your News Ticker */}
+              <motion.div
+                className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-600/90 via-indigo-600/90 to-blue-600/90 text-white text-sm font-bold uppercase tracking-wider mb-6 shadow-xl backdrop-blur-sm border border-white/20"
+                animate={{
+                  boxShadow: [
+                    "0 0 20px rgba(59, 130, 246, 0.3)",
+                    "0 0 40px rgba(99, 102, 241, 0.4)",
+                    "0 0 20px rgba(59, 130, 246, 0.3)",
+                  ],
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <span className="mr-2 text-lg">📰</span>
+                Stay Informed
+              </motion.div>
+
+              {/* Heading - Matching Your Typography */}
+              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+                Latest News & Updates
+              </h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Stay updated with the latest circulars, notifications, and
+                announcements from ICAI and regulatory bodies
+              </p>
+            </motion.div>
+          </div>
+
+          {/* News Cards Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                title: "📌 All About GST ",
+                desc: "Important updates for compliance - New GST regulations effective from April 2025",
+                badge: "New",
+                icon: "📄",
+                gradient: "from-blue-500 to-blue-600",
+                iconBg: "from-blue-400 to-blue-600",
+                link: "https://www.cbic.gov.in/entities/gst",
+                date: "2 days ago",
+              },
+              {
+                title: "💡Income Tax Latest Amendments",
+                desc: "ITR filing deadline extended to July 31, 2025 - Check revised guidelines",
+                badge: "Updated",
+                icon: "📊",
+                gradient: "from-green-500 to-green-600",
+                iconBg: "from-green-400 to-green-600",
+                link: "https://www.incometax.gov.in/iec/foportal/latest-news",
+                date: "2 days ago",
+              },
+              {
+                title: "🏛️ All About MCA – Latest Rules & Alerts",
+                desc: "Transfer Pricing impact analysis - Recent Supreme Court judgment details",
+                badge: "Important",
+                icon: "⚖️",
+                gradient: "from-purple-500 to-purple-600",
+                iconBg: "from-purple-400 to-purple-600",
+                link: "https://www.mca.gov.in/content/mca/global/en/notifications-tender/news-updates/latest-news.html",
+                date: "1 day ago",
+              },
+              {
+                title: "Budget 2025 Highlights",
+                desc: "New corporate tax rates and compliance requirements announced",
+                badge: "Latest",
+                icon: "📈",
+                gradient: "from-orange-500 to-orange-600",
+                iconBg: "from-orange-400 to-orange-600",
+                link: "https://www.indiabudget.gov.in/doc/Key_to_Budget_Document_2025.pdf",
+                date: "1 week ago",
+              },
+              {
+                title: "📝 New Income Tax Act",
+                desc: "Free webinar registration - Learn essential financial strategies",
+                badge: "Event",
+                icon: "💡",
+                gradient: "from-cyan-500 to-cyan-600",
+                iconBg: "from-cyan-400 to-cyan-600",
+                link: "https://resource.cdn.icai.org/88381dtc-aps2500.pdf",
+                date: "Today",
+              },
+              {
+                title: "ICAI Latest Circular",
+                desc: "Important notifications and updates for practicing Chartered Accountants",
+                badge: "Circular",
+                icon: "🔔",
+                gradient: "from-indigo-500 to-indigo-600",
+                iconBg: "from-indigo-400 to-indigo-600",
+                link: "https://www.icai.org/",
+                date: "Today",
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                viewport={{ once: true }}
+                className="group"
+              >
+                {/* Card with Your Glass Morphism Style */}
+                <motion.div
+                  whileHover={{ scale: 1.05, y: -10 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                  className="relative h-full bg-white/10 backdrop-blur-lg p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/20 group-hover:border-white/40 overflow-hidden"
+                >
+                  {/* Glow Effect on Hover */}
+                  <div
+                    className={`absolute -inset-1 bg-gradient-to-r ${item.gradient} rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500`}
+                  />
+
+                  {/* Shine Effect - Like Your Consultation Form */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 group-hover:translate-x-full transition-transform duration-1000" />
+                  </div>
+
+                  {/* Content */}
+                  <div className="relative z-10">
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-6">
+                      {/* Icon - Matching Your Service Cards Style */}
+                      <motion.div
+                        whileHover={{ rotate: 360, scale: 1.2 }}
+                        transition={{ duration: 0.6 }}
+                        className={`w-16 h-16 bg-gradient-to-br ${item.iconBg} rounded-2xl flex items-center justify-center text-3xl shadow-lg`}
+                      >
+                        {item.icon}
+                      </motion.div>
+
+                      {/* Badge - Your Badge Style */}
+                      <span
+                        className={`px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r ${item.gradient} text-white shadow-lg uppercase tracking-wider`}
+                      >
+                        {item.badge}
+                      </span>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors duration-300">
+                      {item.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-gray-300 text-sm mb-6 leading-relaxed line-clamp-3 group-hover:text-white transition-colors duration-300">
+                      {item.desc}
+                    </p>
+
+                    {/* Date - Matching Your Career Section Style */}
+                    <div className="flex items-center text-xs text-gray-400 mb-4 group-hover:text-gray-300 transition-colors">
+                      <svg
+                        className="w-4 h-4 mr-2"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {item.date}
+                    </div>
+
+                    {/* CTA Link - UPDATED WITH SEPARATE LINK */}
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center font-bold text-sm text-cyan-400 hover:text-cyan-300 group-hover:translate-x-2 transition-all duration-300"
+                    >
+                      View Details
+                      <span className="ml-2 text-lg">→</span>
+                    </a>
+                  </div>
+
+                  {/* Corner Accent - Subtle */}
+                  <div
+                    className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${item.gradient} opacity-10 group-hover:opacity-20 rounded-tr-3xl transition-opacity duration-500`}
+                  />
+                </motion.div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Bottom CTA - Matching Your Button Style */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <motion.a
+              href="https://www.icai.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative inline-flex items-center px-12 py-5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-700 hover:via-indigo-700 hover:to-blue-700 text-white font-bold text-lg shadow-2xl transition-all duration-300 overflow-hidden group"
+            >
+              {/* Animated Background - Like Your Navbar Buttons */}
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              {/* Shine Effect */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 group-hover:translate-x-full transition-transform duration-700" />
+              </div>
+
+              <span className="relative z-10 flex items-center">
+                View All ICAI Updates
+                <span className="ml-3 text-xl">→</span>
+              </span>
+            </motion.a>
+          </motion.div>
+        </div>
+      </section>
+
 
 
       {/* OFFICES SECTION */}
