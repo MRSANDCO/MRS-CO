@@ -1351,6 +1351,25 @@ const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 specialization: "Forensic Auditing & Taxation"
               },
               {
+                name: "CA Mukesh Thakur",
+                role: "Director & Partner",
+                image: "/assets/team/mukesh-thakur.jpg",
+                imagePosition: "object-top",
+                qualification: "FCA, FAFD, M.Com",
+                experience: "30+",
+                specialization: "FEMA, IndAS, Taxation"
+              },
+              
+              {
+                name: "Advocate Prashant Shukla",
+                role: "Legal Advisor",
+                image: "/assets/team/prashant-shukla.png",
+                imagePosition: "object-top",
+                qualification: "LLB",
+                experience: "20+",
+                specialization: "Corporate Law & Direct and Indirect taxes specialisation"
+              },
+              {
                 name: "CA Rajeev Kumar", 
                 role: "Senior Partner",
                 image: "/assets/team/member2.jpg",
@@ -1368,15 +1387,7 @@ const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 experience: "15+",
                 specialization: "GST & Compliance"
               },
-              {
-                name: "CA Mukesh Thakur",
-                role: "Director & Partner",
-                image: "/assets/team/mukesh-thakur.jpg",
-                imagePosition: "object-top",
-                qualification: "FCA, FAFD, M.Com",
-                experience: "30+",
-                specialization: "FEMA, IndAS, Taxation"
-              },
+              
               {
                 name: "CA Neha Sharma",
                 role: "Partner",
@@ -1403,16 +1414,8 @@ const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 qualification: "Diploma in Financial Management",
                 experience: "15+",
                 specialization: "Accounting and Financial Management"
-              },
-              {
-                name: "Advocate Prashant Shukla",
-                role: "Legal Advisor",
-                image: "/assets/team/prashant-shukla.png",
-                imagePosition: "object-top",
-                qualification: "LLB",
-                experience: "15+",
-                specialization: "Corporate Law & Direct and Indirect taxes specialisation"
               }
+              
             ].map((member, idx) => (
               <motion.div
                 key={idx}

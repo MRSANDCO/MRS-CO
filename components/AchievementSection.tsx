@@ -264,8 +264,54 @@ const AchievementSection = () => {
                 </div>
               </div>
             </motion.div>
-          </div>
 
+
+ {/* Certificate 3 - Forensic Accounting */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="group"
+            >
+              <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-white/20 hover:border-indigo-400/50 transition-all duration-300 overflow-hidden">
+                {/* Glow Effect */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
+                
+                <div className="relative z-10 flex flex-col items-center text-center">
+                  {/* Certificate Image - Full Width & Natural Height */}
+                  <div className="w-full bg-white/5 rounded-xl overflow-hidden border-2 border-white/10 group-hover:border-indigo-400/30 transition-all duration-300 mb-8 shadow-2xl">
+                    <img 
+                      src="/assets/certificates/card_of_recognition.png" 
+                      alt="Forensic Accounting & Fraud Detection" 
+                      className="w-full h-auto object-contain"
+                    />
+                  </div>
+                  
+                  {/* Certificate Details */}
+                  <div className="max-w-3xl mx-auto">
+                    <div className="flex items-center justify-center mb-4">
+                      <h4 className="font-bold text-3xl text-white group-hover:text-indigo-300 transition-colors duration-300">
+                        Card Of Recognition 
+                      </h4>
+                      <Shield className="w-8 h-8 text-indigo-400 ml-4" />
+                    </div>
+                    <p className="text-lg text-gray-300 mb-6 leading-relaxed">
+                      Certified by The Institute of Chartered Accountants of India (ICAI)
+                    </p>
+                    <div className="flex items-center justify-center gap-4">
+                      <span className="px-6 py-2 rounded-full text-base font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                        ICAI Certified
+                      </span>
+                      <span className="px-6 py-2 rounded-full text-base font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                        Specialized
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
 
         {/* Trust Badges Row */}
