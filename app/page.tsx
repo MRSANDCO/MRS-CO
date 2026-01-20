@@ -3,7 +3,7 @@
 "use strict";
 // import emailjs from "emailjs-com";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
+import NextImage from "next/image";
 import AchievementSection from "@/components/AchievementSection";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,9 @@ import {
   Send,
   Briefcase,
   GraduationCap,
+
 } from "lucide-react";
+import { Image as ImageIcon  } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 // debounce utility
@@ -918,12 +920,13 @@ const handleCareerSubmit = useCallback(
         {/* Live Vibrant Background Video/Animation Layer */}
         <div className="absolute inset-0">
           {/* Base Background Image */}
-          <img
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
-            alt="Modern glass building with blue sky"
-            className="w-full h-full object-cover"
-          />
           
+        <img
+            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000&auto=format&fit=crop&fm=webp"
+            alt="Modern glass building"
+            className="w-full h-full object-cover"
+            loading="lazy" 
+        />
           {/* Vibrant Animated Gradient Overlays */}
           <motion.div
             animate={{
@@ -1220,9 +1223,14 @@ const handleCareerSubmit = useCallback(
                         className="relative"
                       >
                         <div className={`${(member as any).imageContainerClass || "w-36 h-36"} mx-auto relative`}>
-                          <img
+                          {/* <source srcSet={member.image.replace('.jpg', '.webp').replace('.png', '.webp')} type="image/webp" /> */}
+                          <NextImage
                             src={member.image}
                             alt={member.name}
+                            width="144" 
+                            height="144"
+                           priority={idx < 2} 
+                           quality={75}
                             className={`w-full h-full rounded-full object-cover border-4 border-white shadow-2xl group-hover:border-blue-200 transition-all duration-300 ${member.imagePosition || 'object-center'}`}
                           />
                           {/* Colorful Ring */}
@@ -1528,7 +1536,7 @@ const handleCareerSubmit = useCallback(
                       className="relative w-full "
                       style={{ height: "170px" }}
                     >
-                      <Image
+                      <NextImage
                         src={s.img}
                         alt={s.title}
                         fill
