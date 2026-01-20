@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use strict";
 // import emailjs from "emailjs-com";
-import React, { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import AchievementSection from "@/components/AchievementSection";
 import { motion } from "framer-motion";
@@ -34,6 +34,27 @@ import {
   Briefcase,
   GraduationCap,
 } from "lucide-react";
+import dynamic from 'next/dynamic';
+
+// debounce utility
+function useDebounce<T extends (...args: any[]) => any>(
+  callback: T,
+  delay: number
+) {
+  const timeoutRef = useRef<NodeJS.Timeout>();
+
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);
+      }, delay);
+    },
+    [callback, delay]
+  );
+}
 
 // EmailJS Configuration
 // const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
@@ -184,34 +205,45 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   </div>
 );
 
+
 // ------------------------
 // Main Component
 // ------------------------
 export default function MRSCoSite() {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useLockBody(menuOpen);
-
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const [, force] = useState(0);
 
-  const scrollByCards = (dir = 1) => {
+  useLockBody(menuOpen);
+
+  
+
+ const debouncedScroll = useDebounce((dir: number) => {
+  {
     const el = sliderRef.current;
     if (!el) return;
+    debouncedScroll(dir);
     const width = el.clientWidth;
     el.scrollBy({ left: dir * Math.floor(width * 0.85), behavior: "smooth" });
     force((x) => x + 1);
   };
-
+  }, 150);
   const year = useMemo(() => new Date().getFullYear(), []);
-
-  // Initialize EmailJS
-  // useEffect(() => {
-  //   if (typeof window !== "undefined" && EMAILJS_PUBLIC_KEY) {
-  //     emailjs.init(EMAILJS_PUBLIC_KEY);
-  //     console.log("EmailJS initialized successfully");
-  //   }
-  // }, []);
+   
+  const scrollByCards = useCallback((dir = 1) => {
+    debouncedScroll(dir);
+  }, [debouncedScroll]);
+  
+  const scrollToSection = useCallback((id: string): void => {
+    requestAnimationFrame(() => {
+      const section = document.getElementById(id);
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    });
+  }, []);
+  
 
   const scrollToServices = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -223,396 +255,127 @@ export default function MRSCoSite() {
     }
   };
 
-  const scrollToSection = (id: string): void => {
-    const section = document.getElementById(id);
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  
+  
+ 
+const handleConsultationSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      const submitButton = form.querySelector(
+        'button[type="submit"]'
+      ) as HTMLButtonElement;
+      const originalText = submitButton?.textContent || "Submit";
 
-  // EmailJS Form Handlers
-  // const handleConsultationSubmit = async (
-  //   e: React.FormEvent<HTMLFormElement>
-  // ) => {
-  //   e.preventDefault();
-  //   const form = e.currentTarget;
-  //   const submitButton = form.querySelector(
-  //     'button[type="submit"]'
-  //   ) as HTMLButtonElement;
-  //   const originalText = submitButton?.textContent || "Submit";
-    // Check if EmailJS is properly configured
-    // if (
-    //   !EMAILJS_PUBLIC_KEY ||
-    //   !EMAILJS_SERVICE_ID ||
-    //   !EMAILJS_CONSULTATION_TEMPLATE
-    // ) {
-    //   alert(
-    //     "❌ EmailJS configuration is incomplete. Please check your environment variables."
-    //   );
-    //   return;
-    // }
+      try {
+        if (submitButton) {
+          submitButton.textContent = "Sending...";
+          submitButton.disabled = true;
+        }
 
-    // try {
-      // Show loading state
-      // if (submitButton) {
-      //   submitButton.textContent = "Sending...";
-      //   submitButton.disabled = true;
-      // }
+        const formData = new FormData(form);
+        const data = {
+          name: formData.get("name") as string,
+          email: formData.get("email") as string,
+          phone: (formData.get("phone") as string) || "",
+          company: (formData.get("company") as string) || "",
+          service: (formData.get("service") as string) || "",
+          message: formData.get("message") as string,
+        };
 
-      // const formData = new FormData(form);
-      // const service = formData.get("service") as string;
-      // const baseMessage = formData.get("message") as string;
+        const response = await fetch("/api/consultation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
 
-      // Prepare email parameters
-      // const templateParams = {
-      //   from_name: formData.get("name") as string,
-      //   from_email: formData.get("email") as string,
-      //   phone: (formData.get("phone") as string) || "Not provided",
-      //   company: (formData.get("company") as string) || "Not provided",
-      //   service: service || "Not specified",
-      //   message: baseMessage,
-      //   full_message: service
-      //     ? `Service Requested: ${service}\n\n${baseMessage}`
-      //     : baseMessage,
-      //   to_email: "camrsandco@gmail.com",
-      // };
+        const result = await response.json();
 
-      // console.log("Sending consultation email with params:", templateParams);
+        if (!response.ok) {
+          throw new Error(result.error || "Failed to send message");
+        }
 
-    //   const result = await emailjs.send(
-    //   EMAILJS_SERVICE_ID,
-    //   EMAILJS_CONSULTATION_TEMPLATE,
-    //   templateParams,
-    //   EMAILJS_PUBLIC_KEY
-    // );
-    //   if (result.status === 200) {
-    //     console.log("Email sent successfully:", result);
-    //     alert(
-    //       "✅ Thank you! Your consultation request has been sent successfully. We'll get back to you within 24 hours."
-    //     );
-    //     form.reset();
-    //   } else {
-    //     throw new Error(`EmailJS returned status: ${result.status}`);
-    //   }
-    // } catch (error) {
-    //   console.error("Failed to send consultation email:", error);
-    //   alert(
-    //     "❌ Failed to send message. Please try again or contact us directly at camrsandco@gmail.com"
-    //   );
-    // } finally {
-      // Reset button state
-  //     if (submitButton) {
-  //       submitButton.textContent = originalText;
-  //       submitButton.disabled = false;
-  //     }
-  //   }
-  // };
+        // Defer alert to prevent blocking
+        setTimeout(() => {
+          alert(
+            "✅ Thank you! Your consultation request has been sent successfully. We'll get back to you within 24 hours."
+          );
+        }, 0);
 
-  // const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   const form = e.currentTarget;
-  //   const submitButton = form.querySelector(
-  //     'button[type="submit"]'
-  //   ) as HTMLButtonElement;
-  //   const originalText = submitButton?.textContent || "Submit";
-
-    // Check if EmailJS is properly configured
-    // if (
-    //   !EMAILJS_PUBLIC_KEY ||
-    //   !EMAILJS_SERVICE_ID ||
-    //   !EMAILJS_CAREER_TEMPLATE
-    // ) {
-    //   alert(
-    //     "❌ EmailJS configuration is incomplete. Please check your environment variables."
-    //   );
-    //   return;
-    // }
-
-    // try {
-      // Show loading state
-      // if (submitButton) {
-      //   submitButton.textContent = "Sending...";
-      //   submitButton.disabled = true;
-      // }
-
-      // const formData = new FormData(form);
-      // const experience =
-      //   (formData.get("experience") as string) || "Not specified";
-      // const notes = (formData.get("notes") as string) || "";
-
-      // Handle file upload for resume
-      // const resumeFile = formData.get("resume") as File;
-      // let resumeInfo = "No resume attached";
-
-      // if (resumeFile && resumeFile.size > 0) {
-      //   resumeInfo = `Resume: ${resumeFile.name} (${(
-      //     resumeFile.size / 1024
-      //   ).toFixed(2)} KB)`;
-        // Note: EmailJS doesn't support file attachments directly in the browser
-        // The user will need to mention this in the email
-      // }
-
-      // Prepare email parameters
-//       const templateParams = {
-//         from_name: formData.get("name") as string,
-//         from_email: formData.get("email") as string,
-//         phone: (formData.get("phone") as string) || "Not provided",
-//         role: (formData.get("role") as string) || "Not specified",
-//         experience: experience,
-//         notes: notes || "No additional notes",
-//         resume_info: resumeInfo,
-//         full_details: `
-// Role Applied: ${formData.get("role")}
-// Experience: ${experience}
-// ${notes ? `Additional Notes: ${notes}` : ""}
-// Resume: ${
-//           resumeFile && resumeFile.size > 0
-//             ? resumeFile.name
-//             : "Not attached - candidate should send separately"
-//         }
-//         `,
-//         to_email: "camrsandco@gmail.com",
-//       };
-
-//       console.log("Sending career application with params:", templateParams);
-
-//       const result = await emailjs.send(
-//         EMAILJS_SERVICE_ID,
-//         EMAILJS_CAREER_TEMPLATE,
-//         templateParams
-//       );
-
-//       if (result.status === 200) {
-//         console.log("Email sent successfully:", result);
-
-//         let successMessage =
-//           "✅ Thank you! Your application has been submitted successfully. We'll review it and get back to you soon.";
-//         if (resumeFile && resumeFile.size > 0) {
-//           successMessage +=
-//             "\n\nNote: Please also email your resume directly to camrsandco@gmail.com since file attachments cannot be sent through the web form.";
-//         }
-
-//         alert(successMessage);
-//         form.reset();
-//       } else {
-//         throw new Error(`EmailJS returned status: ${result.status}`);
-//       }
-//     } catch (error) {
-//       console.error("Failed to send career application:", error);
-//       alert(
-//         "❌ Failed to submit application. Please try again or email us directly at camrsandco@gmail.com"
-//       );
-//     } finally {
-//       // Reset button state
-//       if (submitButton) {
-//         submitButton.textContent = originalText;
-//         submitButton.disabled = false;
-//       }
-//     }
-//   };
-// const handleConsultationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-//   e.preventDefault();
-//   const form = e.currentTarget;
-//   const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-//   const originalText = submitButton?.textContent || "Submit";
-
-//   try {
-//     // Show loading state
-//     if (submitButton) {
-//       submitButton.textContent = "Sending...";
-//       submitButton.disabled = true;
-//     }
-
-//     const formData = new FormData(form);
-    
-    // Prepare data object
-//     const data = {
-//       name: formData.get("name") as string,
-//       email: formData.get("email") as string,
-//       phone: formData.get("phone") as string || "",
-//       company: formData.get("company") as string || "",
-//       service: formData.get("service") as string || "",
-//       message: formData.get("message") as string,
-//     };
-
-//     const response = await fetch("/api/consultation", {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify(data),
-//     });
-
-//     const result = await response.json();
-
-//     if (!response.ok) {
-//       throw new Error(result.error || "Failed to send message");
-//     }
-
-//     alert(
-//       "✅ Thank you! Your consultation request has been sent successfully. We'll get back to you within 24 hours."
-//     );
-//     form.reset();
-//   } catch (error) {
-//     console.error("Failed to send consultation email:", error);
-//     alert(
-//       "❌ Failed to send message. Please try again or contact us directly at camrsandco@gmail.com"
-//     );
-//   } finally {
-//     // Reset button state
-//     if (submitButton) {
-//       submitButton.textContent = originalText;
-//       submitButton.disabled = false;
-//     }
-//   }
-// };
+        form.reset();
+      } catch (error) {
+        console.error("Failed to send consultation email:", error);
+        setTimeout(() => {
+          alert(
+            "❌ Failed to send message. Please try again or contact us directly at camrsandco@gmail.com"
+          );
+        }, 0);
+      } finally {
+        if (submitButton) {
+          submitButton.textContent = originalText;
+          submitButton.disabled = false;
+        }
+      }
+    },
+    []
+  );
 
 // Replace handleCareerSubmit with this:
-// const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-//   e.preventDefault();
-//   const form = e.currentTarget;
-//   const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-//   const originalText = submitButton?.textContent || "Submit";
+const handleCareerSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      const submitButton = form.querySelector(
+        'button[type="submit"]'
+      ) as HTMLButtonElement;
+      const originalText = submitButton?.textContent || "Submit";
 
-//   try {
-//     // Show loading state
-  //   if (submitButton) {
-  //     submitButton.textContent = "Sending...";
-  //     submitButton.disabled = true;
-  //   }
+      try {
+        if (submitButton) {
+          submitButton.textContent = "Sending...";
+          submitButton.disabled = true;
+        }
 
-  //   const formData = new FormData(form);
+        const formData = new FormData(form);
+        const response = await fetch("/api/career", {
+          method: "POST",
+          body: formData,
+        });
 
-  //   const response = await fetch("/api/career", {
-  //     method: "POST",
-  //     body: formData, // Send FormData directly for file upload
-  //   });
+        const result = await response.json();
 
-  //   const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || "Failed to submit application");
+        }
 
-  //   if (!response.ok) {
-  //     throw new Error(result.error || "Failed to submit application");
-  //   }
+        setTimeout(() => {
+          alert(
+            "✅ Thank you! Your application has been submitted successfully. We'll review it and get back to you soon."
+          );
+        }, 0);
 
-  //   alert(
-  //     "✅ Thank you! Your application has been submitted successfully. We'll review it and get back to you soon."
-  //   );
-  //   form.reset();
-  // } catch (error) {
-  //   console.error("Failed to send career application:", error);
-  //   alert(
-  //     "❌ Failed to submit application. Please try again or email us directly at camrsandco@gmail.com"
-  //   );
-  // } finally {
-    // Reset button state
-//     if (submitButton) {
-//       submitButton.textContent = originalText;
-//       submitButton.disabled = false;
-//     }
-//   }
-// };
+        form.reset();
+      } catch (error) {
+        console.error("Failed to send career application:", error);
+        setTimeout(() => {
+          alert(
+            "❌ Failed to submit application. Please try again or email us directly at camrsandco@gmail.com"
+          );
+        }, 0);
+      } finally {
+        if (submitButton) {
+          submitButton.textContent = originalText;
+          submitButton.disabled = false;
+        }
+      }
+    },
+    []
+  );
+  const toggleMenu = useCallback(() => {
+    setMenuOpen((prev) => !prev);
+  }, []);
 
-const handleConsultationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  const form = e.currentTarget;
-  const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-  const originalText = submitButton?.textContent || "Submit";
 
-  try {
-    // Show loading state
-    if (submitButton) {
-      submitButton.textContent = "Sending...";
-      submitButton.disabled = true;
-    }
-
-    const formData = new FormData(form);
-    
-    // Prepare data object
-    const data = {
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      phone: formData.get("phone") as string || "",
-      company: formData.get("company") as string || "",
-      service: formData.get("service") as string || "",
-      message: formData.get("message") as string,
-    };
-
-    const response = await fetch("/api/consultation", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error || "Failed to send message");
-    }
-
-    alert(
-      "✅ Thank you! Your consultation request has been sent successfully. We'll get back to you within 24 hours."
-    );
-    form.reset();
-  } catch (error) {
-    console.error("Failed to send consultation email:", error);
-    alert(
-      "❌ Failed to send message. Please try again or contact us directly at camrsandco@gmail.com"
-    );
-  } finally {
-    // Reset button state
-    if (submitButton) {
-      submitButton.textContent = originalText;
-      submitButton.disabled = false;
-    }
-  }
-};
-
-// Replace handleCareerSubmit with this:
-const handleCareerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  const form = e.currentTarget;
-  const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-  const originalText = submitButton?.textContent || "Submit";
-
-  try {
-    // Show loading state
-    if (submitButton) {
-      submitButton.textContent = "Sending...";
-      submitButton.disabled = true;
-    }
-
-    const formData = new FormData(form);
-
-    const response = await fetch("/api/career", {
-      method: "POST",
-      body: formData, // Send FormData directly for file upload
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error || "Failed to submit application");
-    }
-
-    alert(
-      "✅ Thank you! Your application has been submitted successfully. We'll review it and get back to you soon."
-    );
-    form.reset();
-  } catch (error) {
-    console.error("Failed to send career application:", error);
-    alert(
-      "❌ Failed to submit application. Please try again or email us directly at camrsandco@gmail.com"
-    );
-  } finally {
-    // Reset button state
-    if (submitButton) {
-      submitButton.textContent = originalText;
-      submitButton.disabled = false;
-    }
-  }
-};
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
       {/* ENHANCED NAVBAR WITH COLORFUL BACKGROUND */}
