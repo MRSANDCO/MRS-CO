@@ -2,10 +2,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use strict";
 // import emailjs from "emailjs-com";
-import React, { useCallback, useEffect, useMemo, useRef, useState, Suspense } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, Suspense ,lazy } from "react";
 import NextImage from "next/image";
-import AchievementSection from "@/components/AchievementSection";
-import TeamSection from "@/components/TeamSection";
+// import AchievementSection from "@/components/AchievementSection";
+// import TeamSection from "@/components/TeamSection";
 import { motion, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,7 +36,7 @@ import {
   GraduationCap,
 
 } from "lucide-react";
-import { Image as ImageIcon  } from 'lucide-react';
+import { Image as ImageIcon } from 'lucide-react';
 // debounce utility
 function useDebounce<T extends (...args: any[]) => any>(
   callback: T,
@@ -186,9 +186,8 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   center,
 }) => (
   <div
-    className={`max-w-3xl ${
-      center ? "mx-auto text-center" : ""
-    } mb-10 md:mb-14`}
+    className={`max-w-3xl ${center ? "mx-auto text-center" : ""
+      } mb-10 md:mb-14`}
   >
     {eyebrow && (
       <div className="text-xs tracking-widest uppercase font-medium text-muted-foreground mb-3">
@@ -205,6 +204,8 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
     )}
   </div>
 );
+const TeamSection = lazy(() => import('@/components/TeamSection'));
+const AchievementSection = lazy(() => import('@/components/AchievementSection'));
 
 
 // ------------------------
@@ -220,24 +221,24 @@ export default function MRSCoSite() {
 
   useLockBody(menuOpen);
 
-  
 
- const debouncedScroll = useDebounce((dir: number) => {
-  {
-    const el = sliderRef.current;
-    if (!el) return;
-    debouncedScroll(dir);
-    const width = el.clientWidth;
-    el.scrollBy({ left: dir * Math.floor(width * 0.85), behavior: "smooth" });
-    force((x) => x + 1);
-  };
+
+  const debouncedScroll = useDebounce((dir: number) => {
+    {
+      const el = sliderRef.current;
+      if (!el) return;
+      debouncedScroll(dir);
+      const width = el.clientWidth;
+      el.scrollBy({ left: dir * Math.floor(width * 0.85), behavior: "smooth" });
+      force((x) => x + 1);
+    };
   }, 150);
   const year = useMemo(() => new Date().getFullYear(), []);
-   
+
   const scrollByCards = useCallback((dir = 1) => {
     debouncedScroll(dir);
   }, [debouncedScroll]);
-  
+
   const scrollToSection = useCallback((id: string): void => {
     requestAnimationFrame(() => {
       const section = document.getElementById(id);
@@ -246,7 +247,7 @@ export default function MRSCoSite() {
       }
     });
   }, []);
-  
+
 
   const scrollToServices = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -258,10 +259,10 @@ export default function MRSCoSite() {
     }
   };
 
-  
-  
- 
-const handleConsultationSubmit = useCallback(
+
+
+
+  const handleConsultationSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const form = e.currentTarget;
@@ -323,8 +324,8 @@ const handleConsultationSubmit = useCallback(
     []
   );
 
-// Replace handleCareerSubmit with this:
-const handleCareerSubmit = useCallback(
+  // Replace handleCareerSubmit with this:
+  const handleCareerSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const form = e.currentTarget;
@@ -386,10 +387,19 @@ const handleCareerSubmit = useCallback(
         <div className="relative overflow-hidden">
           {/* Background Image for Navbar */}
           <div className="absolute inset-0">
-            <img
+            {/* <img
               src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop"
               alt="Modern office background"
               className="w-full h-full object-cover"
+            /> */}
+            <NextImage
+              src="https://images.unsplash.com/photo-1497366216548-37526070297c"
+              alt="Modern office background"
+              fill
+              priority={true}
+              quality={80}
+              sizes="100vw"
+              className="object-cover"
             />
             {/* Refined Colorful Gradient Overlays */}
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/12 via-indigo-400/8 to-blue-600/12"></div>
@@ -566,10 +576,19 @@ const handleCareerSubmit = useCallback(
       {/* NEWS TICKER */}
       <section className="relative py-4 overflow-hidden">
         <div className="absolute inset-0">
-          <img
+          {/* <img
             src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
             alt="Modern business background"
             className="w-full h-full object-cover"
+          /> */}
+          <NextImage
+            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab"
+            alt="Modern business background"
+            fill
+            priority={false}  // Not above fold
+            quality={75}
+            sizes="100vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-blue-700/95 via-indigo-700/95 to-blue-800/95"></div>
         </div>
@@ -636,10 +655,22 @@ const handleCareerSubmit = useCallback(
         {/* Live Background Image with Parallax Effect */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-900/85 via-slate-800/75 to-indigo-900/80"></div>
-          <img
+          {/* <img
             src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
             alt="Modern glass building with blue tones"
             className="w-full h-full object-cover"
+          /> */}
+          <NextImage
+            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab"
+            alt="Modern glass building with blue tones"
+            fill
+            priority={true}  // CRITICAL for LCP
+            quality={85}
+            sizes="100vw"
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmQA//Z"
+            className="object-cover"
+            loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-blue-900/30"></div>
         </div>
@@ -917,9 +948,14 @@ const handleCareerSubmit = useCallback(
         </div>
       </section>
 
-     <TeamSection />
+      {/* <TeamSection /> */}
 
+      {/* Lazy load below-the-fold */}
+      <Suspense fallback={<div className="min-h-screen" />}>
+        <TeamSection />
+      </Suspense>
       
+
       {/* UMBRELLA OF OUR SERVICES with Enhanced Background */}
       <section className="relative py-16 overflow-hidden">
         {/* Enhanced Background with Parallax Effect */}
@@ -1141,10 +1177,13 @@ const handleCareerSubmit = useCallback(
       </Section>
 
       {/* ACHIEVEMENT SECTION */}
-      <AchievementSection />
+      {/* <AchievementSection /> */}
+   
+      <Suspense fallback={<div className="min-h-screen" />}>
+        <AchievementSection />
+      </Suspense>
 
 
-      
       {/* TESTIMONIALS */}
       <section id="testimonials" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto text-center px-4 md:px-6">
@@ -1745,7 +1784,7 @@ const handleCareerSubmit = useCallback(
         </div>
       </Section>
 
-{/* NEWS SECTION - THEMED TO MATCH WEBSITE */}
+      {/* NEWS SECTION - THEMED TO MATCH WEBSITE */}
       <section id="news" className="relative py-16 overflow-hidden">
         {/* Background Image - Matching Umbrella Services Style */}
         <div className="absolute inset-0">
@@ -2156,7 +2195,7 @@ const handleCareerSubmit = useCallback(
                 <div className="space-y-4 text-slate-600">
                   <p className="font-medium text-slate-800">Mumbai</p>
                   <p className="text-sm leading-relaxed ">
-                     Office no. 5 , topiwala centre , Kakaji Nagar
+                    Office no. 5 , topiwala centre , Kakaji Nagar
                     <br />
                     Goregaon, West
                     <br />

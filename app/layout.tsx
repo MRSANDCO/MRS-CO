@@ -19,6 +19,32 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.className}>
+      <head>
+        <link
+          rel="preload"
+          as="image"
+          href="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=85&w=1920&auto=format&fit=crop"
+          // fetchpriority="high"
+        />
+        
+        {/* Preload navbar background */}
+        <link
+          rel="preload"
+          as="image"
+          href="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop"
+        />
+        
+        {/* Preload news ticker background */}
+        <link
+          rel="preload"
+          as="image"
+          href="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
+        />
+        
+        {/* Establish early connection to Unsplash */}
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+      </head>
       <body className="antialiased">
         {children}
          <SpeedInsights />
