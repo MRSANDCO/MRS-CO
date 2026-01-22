@@ -393,11 +393,11 @@ export default function MRSCoSite() {
               className="w-full h-full object-cover"
             /> */}
             <NextImage
-              src="https://images.unsplash.com/photo-1497366216548-37526070297c"
+              src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop"
               alt="Modern office background"
               fill
               priority={true}
-              quality={80}
+              // quality={80}
               sizes="100vw"
               className="object-cover"
             />
@@ -582,7 +582,7 @@ export default function MRSCoSite() {
             className="w-full h-full object-cover"
           /> */}
           <NextImage
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab"
+            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
             alt="Modern business background"
             fill
             priority={false}  // Not above fold
@@ -661,11 +661,11 @@ export default function MRSCoSite() {
             className="w-full h-full object-cover"
           /> */}
           <NextImage
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab"
+            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
             alt="Modern glass building with blue tones"
             fill
             priority={true}  // CRITICAL for LCP
-            quality={85}
+            // quality={85}
             sizes="100vw"
             placeholder="blur"
             blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmQA//Z"
