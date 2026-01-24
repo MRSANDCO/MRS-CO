@@ -215,14 +215,23 @@ export default function TeamSection() {
               {
                 name: "CA Ram Kumar Dhiman",
                 role: "Founder & Managing Partner",
-                image: "/assets/team/member1.jpg",
+                image: "/assets/team/image.png",
                 qualification: "FCA, FAFD ,M.Com",
                 experience: "25+",
-                specialization: "Forensic Auditing & Taxation"
+                specialization: "Forensic Auditing & Taxation",
+                imageContainerClass: undefined
+              },
+              {
+                name: "CA Amit Pathak",
+                role: " Managing Partner",
+                image: "/assets/team/amitpathak.jpg",
+                qualification: "FCA, ICWA, ISO Auditor-ICRC(London)",
+                experience: "25+",
+                specialization: "Accounting Management and Taxation"
               },
               {
                 name: "CA Mukesh Thakur",
-                role: "Director & Partner",
+                role: "Senior Consultant",
                 image: "/assets/team/mukesh-thakur.jpg",
                 imagePosition: "object-top",
                 qualification: "FCA, FAFD, M.Com",
@@ -326,7 +335,7 @@ export default function TeamSection() {
                         transition={{ type: "spring", stiffness: 400 }}
                         className="relative"
                       >
-                        <div className={`${(member as any).imageContainerClass || "w-36 h-36"} mx-auto relative`}>
+                        <div className={`${member.imageContainerClass || "w-36 h-36"} mx-auto relative`}>
                           {/* <source srcSet={member.image.replace('.jpg', '.webp').replace('.png', '.webp')} type="image/webp" /> */}
                           <NextImage
                             src={member.image}
