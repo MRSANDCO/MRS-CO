@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import { Image as ImageIcon } from 'lucide-react';
 // debounce utility
-function useDebounce<T extends (...args: any[]) => any>(
+function useDebounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
   callback: T,
   delay: number
 ) {
@@ -504,12 +504,12 @@ export default function MRSCoSite() {
                 {/* Desktop Nav */}
                 <nav className="hidden md:flex items-center gap-2">
                   {[
-                    ["Home", "home"],
+                    // ["Home", "home"],
                     ["About", "about"],
                     ["Services", "services"],
                     ["News", "news"],
                     ["Team", "team"],
-                    ["Testimonials", "testimonials"],
+                    // ["Testimonials", "testimonials"],
                     ["Careers", "careers"],
                     ["Startup Advisory", "startup-advisory"],
                     ["Contact", "contact"],
@@ -547,12 +547,12 @@ export default function MRSCoSite() {
               <div className="md:hidden border-t bg-white/95 backdrop-blur-md">
                 <div className="max-w-7xl mx-auto px-4 py-4 grid gap-2">
                   {[
-                    ["Home", "home"],
+                    // ["Home", "home"],
                     ["About", "about"],
                     ["Services", "services"],
                     ["News", "news"],
                     ["Team", "team"],
-                    ["Testimonials", "testimonials"],
+                    // ["Testimonials", "testimonials"],
                     ["Careers", "careers"],
                     ["Startup Advisory", "startup-advisory"],
                     ["Contact", "contact"],
@@ -765,8 +765,8 @@ export default function MRSCoSite() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 1, x: 50 }}
+              animate={{ opacity: 2, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
@@ -901,7 +901,7 @@ export default function MRSCoSite() {
                 Expertise & Experience
               </h3>
               <p className="text-gray-600">
-                With over 12 years in the industry and a team of experienced
+                With over 25+ years in the industry and a team of experienced
                 CAs, we bring deep expertise across all financial domains.
               </p>
             </motion.div>

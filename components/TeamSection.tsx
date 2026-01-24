@@ -219,7 +219,7 @@ export default function TeamSection() {
                 qualification: "FCA, FAFD ,M.Com",
                 experience: "25+",
                 specialization: "Forensic Auditing & Taxation",
-                imageContainerClass: undefined
+                // imageContainerClass: undefined
               },
               {
                 name: "CA Amit Pathak",
@@ -335,7 +335,9 @@ export default function TeamSection() {
                         transition={{ type: "spring", stiffness: 400 }}
                         className="relative"
                       >
-                        <div className={`${member.imageContainerClass || "w-36 h-36"} mx-auto relative`}>
+                        {/* <div className={`${member.imageContainerClass || "w-36 h-36"} mx-auto relative`}> */}
+                         <div className="w-36 h-36 mx-auto relative">
+    
                           {/* <source srcSet={member.image.replace('.jpg', '.webp').replace('.png', '.webp')} type="image/webp" /> */}
                           <NextImage
                             src={member.image}
