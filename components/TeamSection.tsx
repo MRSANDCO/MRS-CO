@@ -215,7 +215,7 @@ export default function TeamSection() {
               {
                 name: "CA Ram Kumar Dhiman",
                 role: "Founder & Managing Partner",
-                image: "/assets/team/image.png",
+                image: "/assets/team/member1.jpg",
                 qualification: "FCA, FAFD ,M.Com",
                 experience: "25+",
                 specialization: "Forensic Auditing & Taxation",

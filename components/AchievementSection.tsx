@@ -262,6 +262,23 @@ const AchievementSection = memo(() => {
               iconColor="text-indigo-400"
               hoverColor="hover:text-indigo-300"
             />
+            
+            <CertificateCard
+              src="/assets/certificates/Uaecorporatetax.png"
+              alt="Card of Recognition"
+              title="UAE Corporate Tax Certificate"
+              issuer="The Institute of Chartered Accountants of India (ICAI)"
+              badges={[
+                { text: "ICAI Certified", variant: "indigo" },
+                { text: "Specialized", variant: "purple" }
+              ]}
+              delay={0.4}
+              gradientFrom="from-indigo-500"
+              gradientTo="to-purple-500"
+              icon={Shield}
+              iconColor="text-indigo-400"
+              hoverColor="hover:text-indigo-300"
+            />
           </div>
         </div>
 
