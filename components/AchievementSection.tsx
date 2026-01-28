@@ -161,7 +161,7 @@ const AchievementSection = memo(() => {
             <CertificateCard
               src="/assets/certificates/Concurrent_audit_ofbank.png"
               alt="Forensic Accounting & Fraud Detection"
-              title="Concurrent Audit Of Bank Certificate"
+              title="Concurrent Audit Of Bank "
               issuer="The Institute of Chartered Accountants of India (ICAI)"
               badges={[
                 { text: "ICAI Certified", variant: "indigo" },
