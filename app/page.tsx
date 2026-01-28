@@ -1,7 +1,5 @@
 "use client";
-/* eslint-disable @next/next/no-img-element */
 "use strict";
-// import emailjs from "emailjs-com";
 import React, { useCallback, useEffect, useMemo, useRef, useState, Suspense ,lazy } from "react";
 import NextImage from "next/image";
 // import AchievementSection from "@/components/AchievementSection";
@@ -57,24 +55,10 @@ function useDebounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
   );
 }
 
-// EmailJS Configuration
-// const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
-// const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-// const EMAILJS_CONSULTATION_TEMPLATE =
-//   process.env.NEXT_PUBLIC_EMAILJS_CONSULTATION_TEMPLATE;
-// const EMAILJS_CAREER_TEMPLATE = process.env.NEXT_PUBLIC_EMAILJS_CAREER_TEMPLATE;
 
-// Initialize EmailJS
-// if (typeof window !== "undefined" && EMAILJS_PUBLIC_KEY) {
-//   emailjs.init(EMAILJS_PUBLIC_KEY);
-// }
-
-// Helper Data
-// ------------------------
-// Add this NEW array before the services array
 const newsItems = [
   "🔔  Major Relief for CAs: Supreme Court rules Form 15CB issuance is not abetment of money laundering",
-  "💼 MRS & Co. Recognized Among North India’s Top 50 CA Firms & Empanelled as an RBI Category–I Firm",
+  "💼 MRS & Co. Recognized Among North India's Top 50 CA Firms & Empanelled as an RBI Category–I Firm",
   // "📊 ",
   "🚀 Income Tax Return Filling due date extended to 10th December 2025 ",
   "⚖️ We're hiring! Senior Tax Consultants and CA Articleship positions open",
@@ -161,6 +145,13 @@ interface SectionHeaderProps {
   center?: boolean;
 }
 
+interface StatItemProps {
+  value: string;
+  label: string;
+  gradient: string;
+  delay: number;
+}
+
 function useLockBody(lock: boolean) {
   useEffect(() => {
     if (lock) {
@@ -207,6 +198,23 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
 const TeamSection = lazy(() => import('@/components/TeamSection'));
 const AchievementSection = lazy(() => import('@/components/AchievementSection'));
 
+// FIX: Properly typed StatItem component
+const StatItem: React.FC<StatItemProps> = ({ value, label, gradient, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ delay, duration: 0.5 }}
+    whileHover={{ y: -5, backgroundColor: "rgba(255, 255, 255, 0.03)" }}
+    className="relative p-7 rounded-2xl border border-white/[0.05] bg-white/[0.02] transition-colors duration-300"
+  >
+    <div className={`text-4xl font-extrabold tracking-tight bg-gradient-to-br ${gradient} bg-clip-text text-transparent mb-1`}>
+      {value}
+    </div>
+    <div className="text-slate-400 font-medium text-xs uppercase tracking-widest">
+      {label}
+    </div>
+  </motion.div>
+);
 
 // ------------------------
 // Main Component
@@ -647,166 +655,187 @@ export default function MRSCoSite() {
         </div>
       </section>
 
-      {/* HERO with Live Background */}
-      <section
-        id="home"
-        className="relative pb-16 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center"
+    {/* REFINED PROFESSIONAL HERO with Elegant Stats Card */}
+<section
+  id="home"
+  className="relative pb-16 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center"
+>
+  {/* Live Background Image with Enhanced Overlay */}
+  <div className="absolute inset-0 z-0">
+    <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-blue-900/85 to-indigo-950/90"></div>
+    <NextImage
+      src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
+      alt="Modern glass building with blue tones"
+      fill
+      priority={true}
+      sizes="100vw"
+      placeholder="blur"
+      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmQA//Z"
+      className="object-cover"
+      loading="eager"
+    />
+    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-blue-950/40"></div>
+    {/* Subtle animated gradient overlay */}
+    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-blue-500/10 to-indigo-500/5 animate-pulse" style={{ animationDuration: '8s' }}></div>
+  </div>
+
+  {/* Subtle Floating Elements */}
+  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <motion.div
+      animate={{
+        y: [0, -20, 0],
+        rotate: [0, 5, 0],
+      }}
+      transition={{
+        duration: 6,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+      className="absolute top-20 right-10 w-20 h-20 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-2xl backdrop-blur-md border border-cyan-400/30 shadow-lg shadow-cyan-500/20"
+    />
+    <motion.div
+      animate={{
+        y: [0, -30, 0],
+        rotate: [0, -5, 0],
+      }}
+      transition={{
+        duration: 8,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay: 2,
+      }}
+      className="absolute top-40 left-10 w-16 h-16 bg-gradient-to-br from-blue-400/25 to-indigo-500/25 rounded-full backdrop-blur-md border border-blue-400/30 shadow-lg shadow-blue-500/20"
+    />
+    <motion.div
+      animate={{
+        y: [0, 25, 0],
+        rotate: [0, 10, 0],
+      }}
+      transition={{
+        duration: 7,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay: 1,
+      }}
+      className="absolute bottom-32 right-1/4 w-12 h-12 bg-gradient-to-br from-indigo-400/20 to-purple-500/20 rounded-xl backdrop-blur-md border border-indigo-400/25"
+    />
+  </div>
+
+  <div className="max-w-7xl mx-auto relative z-10">
+    <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8 }}
       >
-        {/* Live Background Image with Parallax Effect */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/85 via-slate-800/75 to-indigo-900/80"></div>
-          {/* <img
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
-            alt="Modern glass building with blue tones"
-            className="w-full h-full object-cover"
-          /> */}
-          <NextImage
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
-            alt="Modern glass building with blue tones"
-            fill
-            priority={true}  // CRITICAL for LCP
-            // quality={85}
-            sizes="100vw"
-            placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmQA//Z"
-            className="object-cover"
-            loading="eager"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-blue-900/30"></div>
+        {/* Enhanced Badge */}
+        <div className="inline-flex items-center px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500/25 to-blue-500/25 backdrop-blur-xl text-white text-sm font-semibold mb-6 border border-cyan-400/40 shadow-lg shadow-cyan-500/20">
+          <Award className="w-4 h-4 mr-2 text-cyan-300" />
+          <span className="bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
+            Trusted Since 1999
+          </span>
         </div>
 
-        {/* Floating Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            animate={{
-              y: [0, -20, 0],
-              rotate: [0, 5, 0],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="absolute top-20 right-10 w-16 h-16 bg-white/10 rounded-2xl backdrop-blur-sm"
-          />
-          <motion.div
-            animate={{
-              y: [0, -30, 0],
-              rotate: [0, -5, 0],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2,
-            }}
-            className="absolute top-40 left-10 w-12 h-12 bg-blue-400/15 rounded-full backdrop-blur-sm"
-          />
+        {/* Enhanced Heading */}
+        <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-6">
+          <span className="text-white drop-shadow-lg">Your Trusted</span>
+          <span className="block bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300 bg-clip-text text-transparent mt-2 drop-shadow-2xl">
+            Financial Partners
+          </span>
+        </h1>
+
+        {/* Enhanced Description */}
+        <p className="text-xl text-gray-100 mb-8 leading-relaxed font-light">
+          We are a premier Chartered Accountant firm providing
+          comprehensive <span className="text-cyan-300 font-medium">audit, tax, compliance</span>, and strategic finance
+          solutions across India and beyond.
+        </p>
+
+        {/* Enhanced Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-10">
+          <Button
+            suppressHydrationWarning
+            onClick={scrollToServices}
+            className="group bg-gradient-to-r from-cyan-500 via-blue-500 to-blue-600 hover:from-cyan-400 hover:via-blue-400 hover:to-blue-500 text-white px-8 py-6 rounded-2xl transition-all duration-300 font-semibold flex items-center justify-center shadow-2xl shadow-blue-500/40 hover:shadow-cyan-500/50 hover:scale-105 border border-cyan-400/20"
+          >
+            Explore Services
+            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+          </Button>
+          <Button
+            suppressHydrationWarning
+            onClick={() => scrollToSection("consult")}
+            className="group bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white px-8 py-6 rounded-2xl transition-all duration-300 font-semibold flex items-center justify-center shadow-xl shadow-slate-900/20 hover:shadow-white/10 hover:scale-105 border-2 border-white/30 hover:border-white/50"
+          >
+            Book Consultation
+          </Button>
         </div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-medium mb-6 border border-white/30">
-                <Award className="w-4 h-4 mr-2" />
-                Trusted Since 1999
-              </div>
-
-              <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight mb-6">
-                Your Trusted
-                <span className="block bg-gradient-to-r from-cyan-300 to-blue-200 bg-clip-text text-transparent">
-                  Financial Partners
-                </span>
-              </h1>
-
-              <p className="text-xl text-gray-200 mb-8 leading-relaxed">
-                We are a premier Chartered Accountant firm providing
-                comprehensive audit, tax, compliance, and strategic finance
-                solutions across India and beyond.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <Button
-                  suppressHydrationWarning
-                  onClick={scrollToServices}
-                  className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-3 rounded-xl transition-all duration-300 font-medium flex items-center justify-center shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105"
-                >
-                  Explore Services
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-                <Button
-                  suppressHydrationWarning
-                  onClick={() => scrollToSection("consult")}
-                  variant="outline"
-                  className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-3 rounded-xl transition-all duration-300 font-medium flex items-center justify-center shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105"
-                >
-                  Book Consultation
-                </Button>
-              </div>
-
-              <div className="flex items-center space-x-6 text-sm text-gray-200">
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
-                  ICAI Registered
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
-                  Pan India Services
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
-                  Startup Friendly
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 1, x: 50 }}
-              animate={{ opacity: 2, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative"
-            >
-              <div className="relative z-10 bg-white/10 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/20">
-                <div className="grid grid-cols-2 gap-6 text-center">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm"
-                  >
-                    <div className="text-3xl font-bold text-cyan-300">500+</div>
-                    <div className="text-gray-200">Happy Clients</div>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm"
-                  >
-                    <div className="text-3xl font-bold text-cyan-300">25+</div>
-                    <div className="text-gray-200">Years Experience</div>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm"
-                  >
-                    <div className="text-3xl font-bold text-cyan-300">40+</div>
-                    <div className="text-gray-200">Industries Served</div>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm"
-                  >
-                    <div className="text-3xl font-bold text-cyan-300">98%</div>
-                    <div className="text-gray-200">Client Satisfaction</div>
-                  </motion.div>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/30 to-cyan-500/30 rounded-3xl transform rotate-3 blur-xl"></div>
-            </motion.div>
+        {/* Enhanced Feature Badges */}
+        <div className="flex flex-wrap items-center gap-4 text-sm">
+          <div className="flex items-center bg-emerald-500/15 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-400/30">
+            <CheckCircle className="w-5 h-5 text-emerald-400 mr-2" />
+            <span className="text-emerald-100 font-medium">ICAI Registered</span>
+          </div>
+          <div className="flex items-center bg-blue-500/15 backdrop-blur-sm px-4 py-2 rounded-full border border-blue-400/30">
+            <CheckCircle className="w-5 h-5 text-blue-400 mr-2" />
+            <span className="text-blue-100 font-medium">Pan India Services</span>
+          </div>
+          <div className="flex items-center bg-purple-500/15 backdrop-blur-sm px-4 py-2 rounded-full border border-purple-400/30">
+            <CheckCircle className="w-5 h-5 text-purple-400 mr-2" />
+            <span className="text-purple-100 font-medium">Startup Friendly</span>
           </div>
         </div>
-      </section>
+      </motion.div>
+
+     <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="relative group p-[1px] rounded-[2.5rem] bg-gradient-to-b from-slate-700/50 to-slate-900/50"
+    >
+      {/* 1. Dynamic Background Glow */}
+      <div className="absolute -inset-10 bg-blue-500/5 blur-[100px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
+
+      {/* 2. Main Container */}
+      <div className="relative bg-[#0B0F1A] backdrop-blur-3xl p-10 rounded-[2.4rem] overflow-hidden border border-white/5 shadow-2xl">
+        
+        {/* subtle radial "spotlight" effect */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+          
+          {/* Stat Item Component */}
+          <StatItem 
+            value="500+" 
+            label="Global Clients" 
+            gradient="from-cyan-400 to-blue-500" 
+            delay={0.1}
+          />
+          <StatItem 
+            value="25+" 
+            label="Years of Mastery" 
+            gradient="from-blue-400 to-indigo-500" 
+            delay={0.2}
+          />
+          <StatItem 
+            value="40+" 
+            label="Industries Impacted" 
+            gradient="from-indigo-400 to-purple-500" 
+            delay={0.3}
+          />
+          <StatItem 
+            value="98%" 
+            label="Retention Rate" 
+            gradient="from-emerald-400 to-teal-500" 
+            delay={0.4}
+          />
+          
+        </div>
+      </div>
+    </motion.div>
+    </div>
+  </div>
+</section>
 
       {/* ABOUT SECTION */}
       <section id="about" className="relative py-16 overflow-hidden">
@@ -901,7 +930,7 @@ export default function MRSCoSite() {
                 Expertise & Experience
               </h3>
               <p className="text-gray-600">
-                With over 25+ years in the industry and a team of experienced
+                With over 27+ years in the industry and a team of experienced
                 CAs, we bring deep expertise across all financial domains.
               </p>
             </motion.div>
@@ -925,9 +954,10 @@ export default function MRSCoSite() {
               </p>
             </motion.div>
 
+            {/* FIX: Changed animate to whileInView */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
-              animate={isGrowthInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/50"
               whileHover={{ scale: 1.05, y: -5 }}
@@ -948,6 +978,7 @@ export default function MRSCoSite() {
         </div>
       </section>
 
+      
       {/* <TeamSection /> */}
 
       {/* Lazy load below-the-fold */}

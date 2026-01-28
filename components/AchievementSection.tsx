@@ -1,91 +1,4 @@
 
-// import React, { useEffect, useState } from 'react';
-
-// const AchievementSection = () => {
-//   const [counts, setCounts] = useState({ years: 0, clients: 0, retention: 0 });
-
-//   // Simple animation effect for numbers
-//   useEffect(() => {
-//     const interval = setInterval(() => {
-//       setCounts((prev) => ({
-//         years: prev.years < 25 ? prev.years + 1 : 25,
-//         clients: prev.clients < 500 ? prev.clients + 10 : 500,
-//         retention: prev.retention < 98 ? prev.retention + 1 : 98,
-//       }));
-//     }, 30);
-//     return () => clearInterval(interval);
-//   }, []);
-
-//   return (
-//     <section className="py-16 px-6 bg-slate-50 font-sans">
-//       <div className="max-w-7xl mx-auto">
-//         {/* Section Heading */}
-//         <div className="text-center mb-12">
-//           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-//             Our Credentials & Global Impact
-//           </h2>
-//           <div className="h-1 w-20 bg-blue-700 mx-auto"></div>
-//         </div>
-
-//         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
-//           {/* Left Side: 2 Certificates */}
-//           <div className="space-y-6">
-//             <h3 className="text-xl font-semibold text-slate-700 mb-4">Verified Accreditations</h3>
-            
-//             {/* Certificate 1 */}
-//             <div className="flex items-center p-6 bg-white rounded-xl shadow-sm border-l-4 border-blue-700 hover:shadow-md transition-shadow">
-//               <div className="flex-shrink-0 w-24 h-24 bg-blue-50 rounded-lg flex items-center justify-center mr-6 overflow-hidden">
-//                 <img 
-//                   src="/assets/certificates/peer-review-certificate.png" 
-//                   alt="ICAI Peer Review Certificate" 
-//                   className="w-full h-full object-cover"
-//                 />
-//               </div>
-//               <div>
-//                 <h4 className="font-bold text-slate-900">Peer Review Certificate</h4>
-//                 <p className="text-sm text-slate-600">Issued by The Institute of Chartered Accountants of India</p>
-//                 <p className="text-xs text-slate-500 mt-1">Valid till 2028</p>
-//               </div>
-//             </div>
-
-//             {/* Certificate 2 */}
-//             <div className="flex items-center p-6 bg-white rounded-xl shadow-sm border-l-4 border-blue-700 hover:shadow-md transition-shadow">
-//               <div className="flex-shrink-0 w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mr-6">
-//                 <img 
-//                   src="/path-to-your-cert2-logo.png" 
-//                   alt="Quality ISO Logo" 
-//                   className="w-10 h-10 object-contain"
-//                 />
-//               </div>
-//               <div>
-//                 <h4 className="font-bold text-slate-900">ISO 9001:2015 Certified</h4>
-//                 <p className="text-sm text-slate-600">Recognized for Global Standards in Consulting</p>
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* Right Side: Achievement Stats */}
-//           <div className="grid grid-cols-2 gap-6">
-//             <div className="p-8 bg-blue-900 text-white rounded-2xl text-center shadow-xl transform hover:-translate-y-2 transition-transform">
-//               <p className="text-4xl font-bold mb-2">{counts.years}+</p>
-//               <p className="text-blue-200 text-sm uppercase tracking-wider">Years Experience</p>
-//             </div>
-//             <div className="p-8 bg-white border border-slate-200 text-center rounded-2xl shadow-sm transform hover:-translate-y-2 transition-transform">
-//               <p className="text-4xl font-bold text-blue-900 mb-2">{counts.clients}+</p>
-//               <p className="text-slate-500 text-sm uppercase tracking-wider">Global Clients</p>
-//             </div>
-//             <div className="col-span-2 p-8 bg-slate-900 text-white rounded-2xl text-center shadow-xl transform hover:-translate-y-2 transition-transform">
-//               <p className="text-4xl font-bold mb-2">{counts.retention}%</p>
-//               <p className="text-slate-400 text-sm uppercase tracking-wider">Client Success & Retention Rate</p>
-//             </div>
-//           </div>
-
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
 
 // export default AchievementSection;
 import React, { memo } from 'react';
@@ -233,6 +146,22 @@ const AchievementSection = memo(() => {
               src="/assets/certificates/forensic-accounting-certificate.png"
               alt="Forensic Accounting & Fraud Detection"
               title="Forensic Accounting & Fraud Detection"
+              issuer="The Institute of Chartered Accountants of India (ICAI)"
+              badges={[
+                { text: "ICAI Certified", variant: "indigo" },
+                { text: "Specialized", variant: "purple" }
+              ]}
+              delay={0.2}
+              gradientFrom="from-indigo-500"
+              gradientTo="to-purple-500"
+              icon={Shield}
+              iconColor="text-indigo-400"
+              hoverColor="hover:text-indigo-300"
+            />
+            <CertificateCard
+              src="/assets/certificates/Concurrent_audit_ofbank.png"
+              alt="Forensic Accounting & Fraud Detection"
+              title="Concurrent Audit Of Bank Certificate"
               issuer="The Institute of Chartered Accountants of India (ICAI)"
               badges={[
                 { text: "ICAI Certified", variant: "indigo" },
