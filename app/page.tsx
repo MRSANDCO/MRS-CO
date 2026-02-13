@@ -32,7 +32,7 @@ import {
   Send,
   Briefcase,
   GraduationCap,
-
+  Edit3,
 } from "lucide-react";
 import { Image as ImageIcon } from 'lucide-react';
 // debounce utility
@@ -655,69 +655,42 @@ export default function MRSCoSite() {
         </div>
       </section>
 
-    {/* REFINED PROFESSIONAL HERO with Elegant Stats Card */}
+   
+{/* REFINED PROFESSIONAL HERO with Meticulous Advisory Theme */}
 <section
   id="home"
   className="relative pb-16 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center"
 >
-  {/* Live Background Image with Enhanced Overlay */}
+  {/* Themed Background Image - Pen, Paper, and Strategic Planning */}
   <div className="absolute inset-0 z-0">
-    <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-blue-900/85 to-indigo-950/90"></div>
+    <div className="absolute inset-0 bg-gradient-to-br from-slate-950/95 via-slate-900/80 to-blue-950/90"></div>
     <NextImage
-      src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
-      alt="Modern glass building with blue tones"
+      src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=2022&auto=format&fit=crop"
+      alt="Fountain pen on financial planning documents"
       fill
       priority={true}
       sizes="100vw"
       placeholder="blur"
       blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmQA//Z"
-      className="object-cover"
+      className="object-cover opacity-50"
       loading="eager"
     />
-    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-blue-950/40"></div>
-    {/* Subtle animated gradient overlay */}
-    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-blue-500/10 to-indigo-500/5 animate-pulse" style={{ animationDuration: '8s' }}></div>
+    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/30"></div>
+    {/* Subtle animated "ink-blue" glow */}
+    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-indigo-500/5 animate-pulse" style={{ animationDuration: '10s' }}></div>
   </div>
 
-  {/* Subtle Floating Elements */}
+  {/* Subtle Floating Elements - Tailored to "Paper" (Rectangles & Lines) */}
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
     <motion.div
-      animate={{
-        y: [0, -20, 0],
-        rotate: [0, 5, 0],
-      }}
-      transition={{
-        duration: 6,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }}
-      className="absolute top-20 right-10 w-20 h-20 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-2xl backdrop-blur-md border border-cyan-400/30 shadow-lg shadow-cyan-500/20"
+      animate={{ y: [0, -20, 0], rotate: [12, 15, 12] }}
+      transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+      className="absolute top-24 right-[15%] w-32 h-44 bg-white/5 border border-white/10 rounded-sm backdrop-blur-[2px]"
     />
     <motion.div
-      animate={{
-        y: [0, -30, 0],
-        rotate: [0, -5, 0],
-      }}
-      transition={{
-        duration: 8,
-        repeat: Infinity,
-        ease: "easeInOut",
-        delay: 2,
-      }}
-      className="absolute top-40 left-10 w-16 h-16 bg-gradient-to-br from-blue-400/25 to-indigo-500/25 rounded-full backdrop-blur-md border border-blue-400/30 shadow-lg shadow-blue-500/20"
-    />
-    <motion.div
-      animate={{
-        y: [0, 25, 0],
-        rotate: [0, 10, 0],
-      }}
-      transition={{
-        duration: 7,
-        repeat: Infinity,
-        ease: "easeInOut",
-        delay: 1,
-      }}
-      className="absolute bottom-32 right-1/4 w-12 h-12 bg-gradient-to-br from-indigo-400/20 to-purple-500/20 rounded-xl backdrop-blur-md border border-indigo-400/25"
+      animate={{ x: [-10, 10, -10] }}
+      transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+      className="absolute bottom-40 left-[5%] w-64 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"
     />
   </div>
 
@@ -729,23 +702,23 @@ export default function MRSCoSite() {
         transition={{ duration: 0.8 }}
       >
         {/* Enhanced Badge */}
-        <div className="inline-flex items-center px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500/25 to-blue-500/25 backdrop-blur-xl text-white text-sm font-semibold mb-6 border border-cyan-400/40 shadow-lg shadow-cyan-500/20">
-          <Award className="w-4 h-4 mr-2 text-cyan-300" />
-          <span className="bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
+        <div className="inline-flex items-center px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 backdrop-blur-xl text-white text-sm font-semibold mb-6 border border-white/10 shadow-lg">
+          <Award className="w-4 h-4 mr-2 text-cyan-400" />
+          <span className="bg-gradient-to-r from-cyan-100 to-blue-100 bg-clip-text text-transparent">
             Trusted Since 1999
           </span>
         </div>
 
         {/* Enhanced Heading */}
         <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-6">
-          <span className="text-white drop-shadow-lg">Your Trusted</span>
-          <span className="block bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300 bg-clip-text text-transparent mt-2 drop-shadow-2xl">
+          <span className="text-white drop-shadow-md">Your Trusted</span>
+          <span className="block bg-gradient-to-r from-cyan-300 via-blue-200 to-indigo-300 bg-clip-text text-transparent mt-2">
             Financial Partners
           </span>
         </h1>
 
         {/* Enhanced Description */}
-        <p className="text-xl text-gray-100 mb-8 leading-relaxed font-light">
+        <p className="text-xl text-gray-200 mb-8 leading-relaxed font-light">
           We are a premier Chartered Accountant firm providing
           comprehensive <span className="text-cyan-300 font-medium">audit, tax, compliance</span>, and strategic finance
           solutions across India and beyond.
@@ -756,7 +729,7 @@ export default function MRSCoSite() {
           <Button
             suppressHydrationWarning
             onClick={scrollToServices}
-            className="group bg-gradient-to-r from-cyan-500 via-blue-500 to-blue-600 hover:from-cyan-400 hover:via-blue-400 hover:to-blue-500 text-white px-8 py-6 rounded-2xl transition-all duration-300 font-semibold flex items-center justify-center shadow-2xl shadow-blue-500/40 hover:shadow-cyan-500/50 hover:scale-105 border border-cyan-400/20"
+            className="group bg-white text-slate-950 hover:bg-cyan-50 px-8 py-6 rounded-2xl transition-all duration-300 font-bold flex items-center justify-center shadow-2xl shadow-white/10 hover:scale-105"
           >
             Explore Services
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -764,7 +737,7 @@ export default function MRSCoSite() {
           <Button
             suppressHydrationWarning
             onClick={() => scrollToSection("consult")}
-            className="group bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white px-8 py-6 rounded-2xl transition-all duration-300 font-semibold flex items-center justify-center shadow-xl shadow-slate-900/20 hover:shadow-white/10 hover:scale-105 border-2 border-white/30 hover:border-white/50"
+            className="group bg-transparent border-2 border-white/20 hover:border-white/50 backdrop-blur-md text-white px-8 py-6 rounded-2xl transition-all duration-300 font-semibold flex items-center justify-center hover:bg-white/5"
           >
             Book Consultation
           </Button>
@@ -772,17 +745,17 @@ export default function MRSCoSite() {
 
         {/* Enhanced Feature Badges */}
         <div className="flex flex-wrap items-center gap-4 text-sm">
-          <div className="flex items-center bg-emerald-500/15 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-400/30">
+          <div className="flex items-center bg-emerald-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-400/20">
             <CheckCircle className="w-5 h-5 text-emerald-400 mr-2" />
-            <span className="text-emerald-100 font-medium">ICAI Registered</span>
+            <span className="text-emerald-500/90 font-medium">ICAI Registered</span>
           </div>
-          <div className="flex items-center bg-blue-500/15 backdrop-blur-sm px-4 py-2 rounded-full border border-blue-400/30">
+          <div className="flex items-center bg-blue-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-blue-400/20">
             <CheckCircle className="w-5 h-5 text-blue-400 mr-2" />
-            <span className="text-blue-100 font-medium">Pan India Services</span>
+            <span className="text-blue-400 font-medium">Pan India Services</span>
           </div>
-          <div className="flex items-center bg-purple-500/15 backdrop-blur-sm px-4 py-2 rounded-full border border-purple-400/30">
+          <div className="flex items-center bg-purple-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-purple-400/20">
             <CheckCircle className="w-5 h-5 text-purple-400 mr-2" />
-            <span className="text-purple-100 font-medium">Startup Friendly</span>
+            <span className="text-purple-400 font-medium">Startup Friendly</span>
           </div>
         </div>
       </motion.div>
@@ -791,36 +764,30 @@ export default function MRSCoSite() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="relative group p-[1px] rounded-[2.5rem] bg-gradient-to-b from-slate-700/50 to-slate-900/50"
+      className="relative group p-[1px] rounded-[2.5rem] bg-gradient-to-b from-white/10 to-transparent"
     >
-      {/* 1. Dynamic Background Glow */}
-      <div className="absolute -inset-10 bg-blue-500/5 blur-[100px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
+      <div className="absolute -inset-10 bg-cyan-500/5 blur-[100px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
 
-      {/* 2. Main Container */}
-      <div className="relative bg-[#0B0F1A] backdrop-blur-3xl p-10 rounded-[2.4rem] overflow-hidden border border-white/5 shadow-2xl">
-        
-        {/* subtle radial "spotlight" effect */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
+      <div className="relative bg-[#0B0F1A]/80 backdrop-blur-3xl p-10 rounded-[2.4rem] overflow-hidden border border-white/10 shadow-2xl">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-gradient-to-b from-cyan-500/10 to-transparent pointer-events-none" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-          
-          {/* Stat Item Component */}
           <StatItem 
             value="500+" 
             label="Global Clients" 
-            gradient="from-cyan-400 to-blue-500" 
+            gradient="from-white to-cyan-400" 
             delay={0.1}
           />
           <StatItem 
             value="25+" 
             label="Years of Mastery" 
-            gradient="from-blue-400 to-indigo-500" 
+            gradient="from-cyan-300 to-blue-500" 
             delay={0.2}
           />
           <StatItem 
             value="40+" 
             label="Industries Impacted" 
-            gradient="from-indigo-400 to-purple-500" 
+            gradient="from-blue-400 to-indigo-500" 
             delay={0.3}
           />
           <StatItem 
@@ -829,14 +796,12 @@ export default function MRSCoSite() {
             gradient="from-emerald-400 to-teal-500" 
             delay={0.4}
           />
-          
         </div>
       </div>
     </motion.div>
     </div>
   </div>
 </section>
-
       {/* ABOUT SECTION */}
       <section id="about" className="relative py-16 overflow-hidden">
         {/* Background Image */}
