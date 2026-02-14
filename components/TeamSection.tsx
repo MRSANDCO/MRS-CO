@@ -218,12 +218,12 @@ export default function TeamSection() {
                 image: "/assets/team/member1.jpg",
                 qualification: "FCA, FAFD ,M.Com",
                 experience: "25+",
-                specialization: "Forensic Auditing & Taxation",
+                specialization: "Forensic Auditing & International Taxation",
                 // imageContainerClass: undefined
               },
               {
                 name: "CA Amit Pathak",
-                role: " Managing Partner",
+                role: "Senior Partner",
                 image: "/assets/team/amitpathak.jpg",
                 qualification: "FCA, ICWA, ISO Auditor-ICRC(London)",
                 experience: "25+",
@@ -231,11 +231,11 @@ export default function TeamSection() {
               },
               {
                 name: "CA Mukesh Thakur",
-                role: "Senior Consultant",
+                role: "Associate Partner",
                 image: "/assets/team/mukesh-thakur.jpg",
                 imagePosition: "object-top",
                 qualification: "FCA, FAFD, M.Com",
-                experience: "30+",
+                experience: "25+",
                 specialization: "FEMA, IndAS, Taxation"
               },
               
@@ -264,7 +264,7 @@ export default function TeamSection() {
                 imagePosition: "object-top",
                 qualification: "FCA, M.Com",
                 experience: "15+",
-                specialization: "GST & Compliance"
+                specialization: "GST & Compliance and International Corporate Taxation (UAE)"
               },
               
               {
