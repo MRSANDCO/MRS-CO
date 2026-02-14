@@ -278,7 +278,7 @@ export default function TeamSection() {
               },
               {
                 name: "CA Yash Pal Sharma",
-                role: "Associate Partner",
+                role: "Partner",
                 image: "/assets/team/member5.jpg",
                 imagePosition: "object-top",
                 qualification: "ACA, LLB",
@@ -287,7 +287,7 @@ export default function TeamSection() {
               },
               {
                 name: "CA Rinky Vishwakarma",
-                role: "Associate Partner",
+                role: "Partner",
                 image: "/assets/team/member6.jpg",
                 imagePosition: "object-top",
                 qualification: "Diploma in Financial Management",
