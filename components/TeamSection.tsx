@@ -290,7 +290,7 @@ export default function TeamSection() {
                 role: "Partner",
                 image: "/assets/team/member6.jpg",
                 imagePosition: "object-top",
-                qualification: "Diploma in Financial Management",
+                qualification: "FCA, B.Com",
                 experience: "15+",
                 specialization: "Accounting and Financial Management"
               }
