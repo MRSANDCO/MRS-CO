@@ -1,8 +1,9 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { AuthProvider } from '@/lib/auth-context'
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
 })
@@ -24,30 +25,32 @@ export default function RootLayout({
           rel="preload"
           as="image"
           href="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=85&w=1920&auto=format&fit=crop"
-          // fetchpriority="high"
+        // fetchpriority="high"
         />
-        
+
         {/* Preload navbar background */}
         <link
           rel="preload"
           as="image"
           href="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop"
         />
-        
+
         {/* Preload news ticker background */}
         <link
           rel="preload"
           as="image"
           href="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
         />
-        
+
         {/* Establish early connection to Unsplash */}
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
       </head>
       <body className="antialiased">
-        {children}
-         <SpeedInsights />
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+        <SpeedInsights />
       </body>
     </html>
   )
