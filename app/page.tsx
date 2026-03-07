@@ -1,7 +1,8 @@
 "use client";
 "use strict";
-import React, { useCallback, useEffect, useMemo, useRef, useState, Suspense ,lazy } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, Suspense, lazy } from "react";
 import NextImage from "next/image";
+import Link from "next/link";
 // import AchievementSection from "@/components/AchievementSection";
 // import TeamSection from "@/components/TeamSection";
 import { motion, useInView } from "framer-motion";
@@ -536,6 +537,12 @@ export default function MRSCoSite() {
                   >
                     <a href="#consult">Book a Call</a>
                   </Button>
+                  <Button
+                    asChild
+                    className="rounded-2xl border-2 border-blue-500/40 bg-transparent hover:bg-blue-600/10 text-blue-700 hover:text-blue-800 shadow-sm hover:shadow-blue-500/20 transform hover:scale-105 transition-all duration-500"
+                  >
+                    <Link href="/login">Client Login</Link>
+                  </Button>
                 </nav>
 
                 {/* Mobile */}
@@ -575,6 +582,13 @@ export default function MRSCoSite() {
                       <ChevronRight className="w-4 h-4" />
                     </a>
                   ))}
+                  <Link
+                    href="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="px-3 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white text-sm font-medium text-center"
+                  >
+                    Client Login
+                  </Link>
                 </div>
               </div>
             )}
@@ -655,153 +669,153 @@ export default function MRSCoSite() {
         </div>
       </section>
 
-   
-{/* REFINED PROFESSIONAL HERO with Meticulous Advisory Theme */}
-<section
-  id="home"
-  className="relative pb-16 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center"
->
-  {/* Themed Background Image - Pen, Paper, and Strategic Planning */}
-  <div className="absolute inset-0 z-0">
-    <div className="absolute inset-0 bg-gradient-to-br from-slate-950/95 via-slate-900/80 to-blue-950/90"></div>
-    <NextImage
-      src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=2022&auto=format&fit=crop"
-      alt="Fountain pen on financial planning documents"
-      fill
-      priority={true}
-      sizes="100vw"
-      placeholder="blur"
-      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmQA//Z"
-      className="object-cover opacity-50"
-      loading="eager"
-    />
-    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/30"></div>
-    {/* Subtle animated "ink-blue" glow */}
-    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-indigo-500/5 animate-pulse" style={{ animationDuration: '10s' }}></div>
-  </div>
 
-  {/* Subtle Floating Elements - Tailored to "Paper" (Rectangles & Lines) */}
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    <motion.div
-      animate={{ y: [0, -20, 0], rotate: [12, 15, 12] }}
-      transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-      className="absolute top-24 right-[15%] w-32 h-44 bg-white/5 border border-white/10 rounded-sm backdrop-blur-[2px]"
-    />
-    <motion.div
-      animate={{ x: [-10, 10, -10] }}
-      transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      className="absolute bottom-40 left-[5%] w-64 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"
-    />
-  </div>
-
-  <div className="max-w-7xl mx-auto relative z-10">
-    <div className="grid lg:grid-cols-2 gap-12 items-center">
-      <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8 }}
+      {/* REFINED PROFESSIONAL HERO with Meticulous Advisory Theme */}
+      <section
+        id="home"
+        className="relative pb-16 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center"
       >
-        {/* Enhanced Badge */}
-        <div className="inline-flex items-center px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 backdrop-blur-xl text-white text-sm font-semibold mb-6 border border-white/10 shadow-lg">
-          <Award className="w-4 h-4 mr-2 text-cyan-400" />
-          <span className="bg-gradient-to-r from-cyan-100 to-blue-100 bg-clip-text text-transparent">
-            Trusted Since 1999
-          </span>
+        {/* Themed Background Image - Pen, Paper, and Strategic Planning */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-950/95 via-slate-900/80 to-blue-950/90"></div>
+          <NextImage
+            src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=2022&auto=format&fit=crop"
+            alt="Fountain pen on financial planning documents"
+            fill
+            priority={true}
+            sizes="100vw"
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmQA//Z"
+            className="object-cover opacity-50"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/30"></div>
+          {/* Subtle animated "ink-blue" glow */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-indigo-500/5 animate-pulse" style={{ animationDuration: '10s' }}></div>
         </div>
 
-        {/* Enhanced Heading */}
-        <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-6">
-          <span className="text-white drop-shadow-md">Your Trusted</span>
-          <span className="block bg-gradient-to-r from-cyan-300 via-blue-200 to-indigo-300 bg-clip-text text-transparent mt-2">
-            Financial Partners
-          </span>
-        </h1>
-
-        {/* Enhanced Description */}
-        <p className="text-xl text-gray-200 mb-8 leading-relaxed font-light">
-          We are a premier Chartered Accountant firm providing
-          comprehensive <span className="text-cyan-300 font-medium">audit, tax, compliance</span>, and strategic finance
-          solutions across India and beyond.
-        </p>
-
-        {/* Enhanced Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-10">
-          <Button
-            suppressHydrationWarning
-            onClick={scrollToServices}
-            className="group bg-white text-slate-950 hover:bg-cyan-50 px-8 py-6 rounded-2xl transition-all duration-300 font-bold flex items-center justify-center shadow-2xl shadow-white/10 hover:scale-105"
-          >
-            Explore Services
-            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-          </Button>
-          <Button
-            suppressHydrationWarning
-            onClick={() => scrollToSection("consult")}
-            className="group bg-transparent border-2 border-white/20 hover:border-white/50 backdrop-blur-md text-white px-8 py-6 rounded-2xl transition-all duration-300 font-semibold flex items-center justify-center hover:bg-white/5"
-          >
-            Book Consultation
-          </Button>
+        {/* Subtle Floating Elements - Tailored to "Paper" (Rectangles & Lines) */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{ y: [0, -20, 0], rotate: [12, 15, 12] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-24 right-[15%] w-32 h-44 bg-white/5 border border-white/10 rounded-sm backdrop-blur-[2px]"
+          />
+          <motion.div
+            animate={{ x: [-10, 10, -10] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-40 left-[5%] w-64 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"
+          />
         </div>
 
-        {/* Enhanced Feature Badges */}
-        <div className="flex flex-wrap items-center gap-4 text-sm">
-          <div className="flex items-center bg-emerald-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-400/20">
-            <CheckCircle className="w-5 h-5 text-emerald-400 mr-2" />
-            <span className="text-emerald-500/90 font-medium">ICAI Registered</span>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              {/* Enhanced Badge */}
+              <div className="inline-flex items-center px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 backdrop-blur-xl text-white text-sm font-semibold mb-6 border border-white/10 shadow-lg">
+                <Award className="w-4 h-4 mr-2 text-cyan-400" />
+                <span className="bg-gradient-to-r from-cyan-100 to-blue-100 bg-clip-text text-transparent">
+                  Trusted Since 1999
+                </span>
+              </div>
+
+              {/* Enhanced Heading */}
+              <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-6">
+                <span className="text-white drop-shadow-md">Your Trusted</span>
+                <span className="block bg-gradient-to-r from-cyan-300 via-blue-200 to-indigo-300 bg-clip-text text-transparent mt-2">
+                  Financial Partners
+                </span>
+              </h1>
+
+              {/* Enhanced Description */}
+              <p className="text-xl text-gray-200 mb-8 leading-relaxed font-light">
+                We are a premier Chartered Accountant firm providing
+                comprehensive <span className="text-cyan-300 font-medium">audit, tax, compliance</span>, and strategic finance
+                solutions across India and beyond.
+              </p>
+
+              {/* Enhanced Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-10">
+                <Button
+                  suppressHydrationWarning
+                  onClick={scrollToServices}
+                  className="group bg-white text-slate-950 hover:bg-cyan-50 px-8 py-6 rounded-2xl transition-all duration-300 font-bold flex items-center justify-center shadow-2xl shadow-white/10 hover:scale-105"
+                >
+                  Explore Services
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <Button
+                  suppressHydrationWarning
+                  onClick={() => scrollToSection("consult")}
+                  className="group bg-transparent border-2 border-white/20 hover:border-white/50 backdrop-blur-md text-white px-8 py-6 rounded-2xl transition-all duration-300 font-semibold flex items-center justify-center hover:bg-white/5"
+                >
+                  Book Consultation
+                </Button>
+              </div>
+
+              {/* Enhanced Feature Badges */}
+              <div className="flex flex-wrap items-center gap-4 text-sm">
+                <div className="flex items-center bg-emerald-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-400/20">
+                  <CheckCircle className="w-5 h-5 text-emerald-400 mr-2" />
+                  <span className="text-emerald-500/90 font-medium">ICAI Registered</span>
+                </div>
+                <div className="flex items-center bg-blue-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-blue-400/20">
+                  <CheckCircle className="w-5 h-5 text-blue-400 mr-2" />
+                  <span className="text-blue-400 font-medium">Pan India Services</span>
+                </div>
+                <div className="flex items-center bg-purple-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-purple-400/20">
+                  <CheckCircle className="w-5 h-5 text-purple-400 mr-2" />
+                  <span className="text-purple-400 font-medium">Startup Friendly</span>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="relative group p-[1px] rounded-[2.5rem] bg-gradient-to-b from-white/10 to-transparent"
+            >
+              <div className="absolute -inset-10 bg-cyan-500/5 blur-[100px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
+
+              <div className="relative bg-[#0B0F1A]/80 backdrop-blur-3xl p-10 rounded-[2.4rem] overflow-hidden border border-white/10 shadow-2xl">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-gradient-to-b from-cyan-500/10 to-transparent pointer-events-none" />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                  <StatItem
+                    value="500+"
+                    label="Global Clients"
+                    gradient="from-white to-cyan-400"
+                    delay={0.1}
+                  />
+                  <StatItem
+                    value="25+"
+                    label="Years of Mastery"
+                    gradient="from-cyan-300 to-blue-500"
+                    delay={0.2}
+                  />
+                  <StatItem
+                    value="40+"
+                    label="Industries Impacted"
+                    gradient="from-blue-400 to-indigo-500"
+                    delay={0.3}
+                  />
+                  <StatItem
+                    value="98%"
+                    label="Retention Rate"
+                    gradient="from-emerald-400 to-teal-500"
+                    delay={0.4}
+                  />
+                </div>
+              </div>
+            </motion.div>
           </div>
-          <div className="flex items-center bg-blue-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-blue-400/20">
-            <CheckCircle className="w-5 h-5 text-blue-400 mr-2" />
-            <span className="text-blue-400 font-medium">Pan India Services</span>
-          </div>
-          <div className="flex items-center bg-purple-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-purple-400/20">
-            <CheckCircle className="w-5 h-5 text-purple-400 mr-2" />
-            <span className="text-purple-400 font-medium">Startup Friendly</span>
-          </div>
         </div>
-      </motion.div>
-
-     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-      className="relative group p-[1px] rounded-[2.5rem] bg-gradient-to-b from-white/10 to-transparent"
-    >
-      <div className="absolute -inset-10 bg-cyan-500/5 blur-[100px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
-
-      <div className="relative bg-[#0B0F1A]/80 backdrop-blur-3xl p-10 rounded-[2.4rem] overflow-hidden border border-white/10 shadow-2xl">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-gradient-to-b from-cyan-500/10 to-transparent pointer-events-none" />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-          <StatItem 
-            value="500+" 
-            label="Global Clients" 
-            gradient="from-white to-cyan-400" 
-            delay={0.1}
-          />
-          <StatItem 
-            value="25+" 
-            label="Years of Mastery" 
-            gradient="from-cyan-300 to-blue-500" 
-            delay={0.2}
-          />
-          <StatItem 
-            value="40+" 
-            label="Industries Impacted" 
-            gradient="from-blue-400 to-indigo-500" 
-            delay={0.3}
-          />
-          <StatItem 
-            value="98%" 
-            label="Retention Rate" 
-            gradient="from-emerald-400 to-teal-500" 
-            delay={0.4}
-          />
-        </div>
-      </div>
-    </motion.div>
-    </div>
-  </div>
-</section>
+      </section>
       {/* ABOUT SECTION */}
       <section id="about" className="relative py-16 overflow-hidden">
         {/* Background Image */}
@@ -943,14 +957,14 @@ export default function MRSCoSite() {
         </div>
       </section>
 
-      
+
       {/* <TeamSection /> */}
 
       {/* Lazy load below-the-fold */}
       <Suspense fallback={<div className="min-h-screen" />}>
         <TeamSection />
       </Suspense>
-      
+
 
       {/* UMBRELLA OF OUR SERVICES with Enhanced Background */}
       <section className="relative py-16 overflow-hidden">
@@ -1174,7 +1188,7 @@ export default function MRSCoSite() {
 
       {/* ACHIEVEMENT SECTION */}
       {/* <AchievementSection /> */}
-   
+
       <Suspense fallback={<div className="min-h-screen" />}>
         <AchievementSection />
       </Suspense>

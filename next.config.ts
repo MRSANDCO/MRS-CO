@@ -2,8 +2,9 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   // Acknowledge Turbopack usage (top level, not in experimental)
-  turbopack: { root: process.cwd(), 
-    
+  turbopack: {
+    root: process.cwd(),
+
   },
 
   // Image optimization
@@ -23,7 +24,7 @@ const nextConfig: NextConfig = {
   //   // Minimize layout shift
   //   minimumCacheTTL: 60,
   // },
-// next.config.js
+  // next.config.js
 
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -48,7 +49,7 @@ const nextConfig: NextConfig = {
 
   // Performance optimizations
   reactStrictMode: true,
-  
+
   // SWC minification is now the default in Next.js 15+ (removed swcMinify)
 
   // Optimize production builds
@@ -112,6 +113,16 @@ const nextConfig: NextConfig = {
     }
 
     return config
+  },
+
+  // Proxy API calls to Spring Boot backend
+  async rewrites() {
+    return [
+      {
+        source: '/backend/:path*',
+        destination: `${process.env.BACKEND_API_URL}/:path*`, // Proxy to Backend
+      },
+    ];
   },
 
   // Headers for better caching
