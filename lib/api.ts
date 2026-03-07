@@ -3,7 +3,7 @@ import { getAuthToken } from './auth-context';
 
 // Direct backend URL — Next.js rewrites strip Authorization headers,
 // so authenticated requests must go directly to the Spring Boot server.
-const BACKEND_DIRECT = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8083/api';
+const BACKEND_DIRECT = process.env.NEXT_PUBLIC_BACKEND_URL;
 // Proxy path for unauthenticated requests (login) — avoids CORS issues
 const API_PROXY = '/backend';
 

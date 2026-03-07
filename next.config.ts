@@ -120,9 +120,9 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/backend/:path*',
-        destination: `${process.env.BACKEND_API_URL || 'http://localhost:8083/api'}/:path*`,
+        destination: `${process.env.BACKEND_API_URL}/:path*`, // Proxy to Backend
       },
-    ]
+    ];
   },
 
   // Headers for better caching
