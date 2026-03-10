@@ -153,6 +153,23 @@ export async function changeUserPassword(userId: string, newPassword: string): P
     return handleResponse<{ message: string; userId: string }>(res);
 }
 
+export async function updateUser(userId: string, data: { fullName?: string, email?: string, phone?: string }): Promise<{ message: string; userId: string }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/users/${userId}`, {
+        method: 'PUT',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(data),
+    });
+    return handleResponse<{ message: string; userId: string }>(res);
+}
+
+export async function deleteUser(userId: string): Promise<{ message: string; userId: string }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+    });
+    return handleResponse<{ message: string; userId: string }>(res);
+}
+
 export interface UploadDocumentResponse {
     message: string;
     documentId: string;
@@ -187,4 +204,12 @@ export async function getAdminDocuments(userId?: string): Promise<UserDocument[]
         headers: authHeaders(),
     });
     return handleResponse<UserDocument[]>(res);
+}
+
+export async function deleteDocument(documentId: string): Promise<{ message: string; documentId: string }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/documents/${documentId}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+    });
+    return handleResponse<{ message: string; documentId: string }>(res);
 }
