@@ -15,6 +15,9 @@ import {
     changeUserPassword,
     uploadDocument,
     getAdminDocuments,
+    updateUser,
+    deleteUser,
+    deleteDocument,
     type UserProfile,
     type UserDocument,
     type CreateUserRequest,
@@ -47,6 +50,7 @@ import {
     Trash2,
     File,
     UploadCloud,
+    Edit,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -85,6 +89,21 @@ export default function DashboardPage() {
     const [changingPassword, setChangingPassword] = useState(false);
     const [passwordChangeSuccess, setPasswordChangeSuccess] = useState('');
     const [passwordChangeError, setPasswordChangeError] = useState('');
+
+    // Edit User state
+    const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
+    const [editFullName, setEditFullName] = useState('');
+    const [editEmail, setEditEmail] = useState('');
+    const [editPhone, setEditPhone] = useState('');
+    const [updatingUser, setUpdatingUser] = useState(false);
+
+    // Delete User state
+    const [userToDelete, setUserToDelete] = useState<string | null>(null);
+    const [deletingUser, setDeletingUser] = useState(false);
+
+    // Delete Doc state
+    const [docToDelete, setDocToDelete] = useState<string | null>(null);
+    const [deletingDoc, setDeletingDoc] = useState(false);
 
     // Document upload state
     const [uploadUserId, setUploadUserId] = useState('');
@@ -253,6 +272,50 @@ export default function DashboardPage() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.role, docsFilterUser]);
+
+    const handleUpdateUser = async () => {
+        if (!editingUser) return;
+        setUpdatingUser(true);
+        try {
+            await updateUser(editingUser.userId, { fullName: editFullName, email: editEmail, phone: editPhone });
+            setCreateSuccess(`User "${editingUser.userId}" updated successfully!`);
+            setEditingUser(null);
+            fetchUsers();
+        } catch (err: unknown) {
+            setCreateError(err instanceof Error ? err.message : 'Update failed');
+        } finally {
+            setUpdatingUser(false);
+        }
+    };
+
+    const handleDeleteUser = async () => {
+        if (!userToDelete) return;
+        setDeletingUser(true);
+        try {
+            await deleteUser(userToDelete);
+            setCreateSuccess(`User "${userToDelete}" deleted successfully!`);
+            setUserToDelete(null);
+            fetchUsers();
+        } catch (err: unknown) {
+            setCreateError(err instanceof Error ? err.message : 'Delete failed');
+        } finally {
+            setDeletingUser(false);
+        }
+    };
+
+    const handleDeleteDoc = async () => {
+        if (!docToDelete) return;
+        setDeletingDoc(true);
+        try {
+            await deleteDocument(docToDelete);
+            fetchDocs();
+            setDocToDelete(null);
+        } catch (err: unknown) {
+            alert(err instanceof Error ? err.message : 'Delete document failed');
+        } finally {
+            setDeletingDoc(false);
+        }
+    };
 
     const handleLogout = () => {
         logout();
@@ -734,14 +797,32 @@ export default function DashboardPage() {
                                                                         </Button>
                                                                     </form>
                                                                 ) : (
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        onClick={() => { setChangingPasswordFor(u.userId); setNewPasswordValue(''); setPasswordChangeError(''); setPasswordChangeSuccess(''); }}
-                                                                        className="h-8 px-2 text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 transition-all"
-                                                                        title="Change password"
-                                                                    >
-                                                                        <KeyRound className="w-4 h-4" />
-                                                                    </Button>
+                                                                    <div className="flex items-center justify-end gap-1">
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            onClick={() => { setChangingPasswordFor(u.userId); setNewPasswordValue(''); setPasswordChangeError(''); setPasswordChangeSuccess(''); }}
+                                                                            className="h-8 px-2 text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 transition-all"
+                                                                            title="Change password"
+                                                                        >
+                                                                            <KeyRound className="w-4 h-4" />
+                                                                        </Button>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            onClick={() => { setEditingUser(u); setEditFullName(u.fullName || ''); setEditEmail(u.email || ''); setEditPhone(u.phone || ''); }}
+                                                                            className="h-8 px-2 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all"
+                                                                            title="Edit User"
+                                                                        >
+                                                                            <Edit className="w-4 h-4" />
+                                                                        </Button>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            onClick={() => setUserToDelete(u.userId)}
+                                                                            className="h-8 px-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                                                                            title="Delete User"
+                                                                        >
+                                                                            <Trash2 className="w-4 h-4" />
+                                                                        </Button>
+                                                                    </div>
                                                                 )}
                                                             </td>
                                                         </motion.tr>
@@ -956,6 +1037,7 @@ export default function DashboardPage() {
                                                         <th className="text-left py-3 px-3 text-slate-400 font-medium text-xs uppercase tracking-wider hidden sm:table-cell">Category</th>
                                                         <th className="text-left py-3 px-3 text-slate-400 font-medium text-xs uppercase tracking-wider hidden md:table-cell">Size</th>
                                                         <th className="text-left py-3 px-3 text-slate-400 font-medium text-xs uppercase tracking-wider hidden lg:table-cell">Uploaded</th>
+                                                        <th className="text-right py-3 px-3 text-slate-400 font-medium text-xs uppercase tracking-wider">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -990,6 +1072,16 @@ export default function DashboardPage() {
                                                             </td>
                                                             <td className="py-3 px-3 text-slate-400 text-xs hidden lg:table-cell">
                                                                 {doc.createdAt ? formatDate(doc.createdAt) : '—'}
+                                                            </td>
+                                                            <td className="py-3 px-3 text-right">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    onClick={() => setDocToDelete(doc.id)}
+                                                                    className="h-8 px-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                                                                    title="Delete Document"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </Button>
                                                             </td>
                                                         </motion.tr>
                                                     ))}
@@ -1140,6 +1232,11 @@ export default function DashboardPage() {
                                                         <div className="text-white font-medium text-sm truncate">
                                                             {doc.title}
                                                         </div>
+                                                        {doc.description && (
+                                                            <p className="text-slate-400 text-xs mt-0.5 line-clamp-2">
+                                                                {doc.description}
+                                                            </p>
+                                                        )}
                                                         <div className="flex flex-wrap items-center gap-2 mt-1">
                                                             {doc.category && (
                                                                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gradient-to-r border text-[10px] font-medium uppercase tracking-wider ${getCategoryColor(doc.category)}`}>
@@ -1195,6 +1292,80 @@ export default function DashboardPage() {
                     </div>
                 )}
             </main>
+
+            {/* Modals */}
+            {editingUser && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+                    <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-md">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                <Edit className="w-5 h-5 text-blue-400" /> Edit User: {editingUser.userId}
+                            </h3>
+                            <Button variant="ghost" onClick={() => setEditingUser(null)} className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/10 rounded-full"><XCircle className="w-5 h-5" /></Button>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="text-xs text-slate-400 uppercase tracking-wider">Full Name</label>
+                                <Input value={editFullName} onChange={e => setEditFullName(e.target.value)} className="bg-white/[0.04] text-white border-white/10 focus:border-cyan-500/50" placeholder="e.g. John Doe" />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-xs text-slate-400 uppercase tracking-wider">Email</label>
+                                <Input value={editEmail} onChange={e => setEditEmail(e.target.value)} type="email" className="bg-white/[0.04] text-white border-white/10 focus:border-cyan-500/50" placeholder="john@example.com" />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-xs text-slate-400 uppercase tracking-wider">Phone</label>
+                                <Input value={editPhone} onChange={e => setEditPhone(e.target.value)} className="bg-white/[0.04] text-white border-white/10 focus:border-cyan-500/50" placeholder="+91 98765 43210" />
+                            </div>
+                        </div>
+                        <div className="flex gap-3 justify-end mt-6">
+                            <Button variant="ghost" onClick={() => setEditingUser(null)} className="text-slate-400 hover:text-white">Cancel</Button>
+                            <Button onClick={handleUpdateUser} disabled={updatingUser} className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20">
+                                {updatingUser ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</> : 'Save Changes'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {userToDelete && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+                    <div className="bg-slate-900 border border-red-500/20 rounded-2xl p-6 w-full max-w-sm">
+                        <div className="flex items-center gap-3 mb-4 text-red-400">
+                            <AlertCircle className="w-6 h-6" />
+                            <h3 className="text-lg font-bold">Delete User</h3>
+                        </div>
+                        <p className="text-slate-300 text-sm mb-6 leading-relaxed">
+                            Are you sure you want to delete user <strong className="text-white">{userToDelete}</strong>? This will also permanently delete all their assigned documents. This action cannot be undone.
+                        </p>
+                        <div className="flex gap-3 justify-end">
+                            <Button variant="ghost" onClick={() => setUserToDelete(null)} className="text-slate-400 hover:text-white">Cancel</Button>
+                            <Button variant="destructive" onClick={handleDeleteUser} disabled={deletingUser} className="bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/20">
+                                {deletingUser ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />} Delete User
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {docToDelete && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+                    <div className="bg-slate-900 border border-red-500/20 rounded-2xl p-6 w-full max-w-sm">
+                        <div className="flex items-center gap-3 mb-4 text-red-400">
+                            <AlertCircle className="w-6 h-6" />
+                            <h3 className="text-lg font-bold">Delete Document</h3>
+                        </div>
+                        <p className="text-slate-300 text-sm mb-6 leading-relaxed">
+                            Are you sure you want to delete this document? The file will be permanently removed from the server.
+                        </p>
+                        <div className="flex gap-3 justify-end">
+                            <Button variant="ghost" onClick={() => setDocToDelete(null)} className="text-slate-400 hover:text-white">Cancel</Button>
+                            <Button variant="destructive" onClick={handleDeleteDoc} disabled={deletingDoc} className="bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/20">
+                                {deletingDoc ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />} Delete Document
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
