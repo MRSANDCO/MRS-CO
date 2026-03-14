@@ -53,6 +53,110 @@ import {
     Edit,
 } from 'lucide-react';
 import Link from 'next/link';
+function MRSLogo() {
+    return (
+        <Link href="/" className="flex items-center gap-3.5 hover:opacity-90 transition-all duration-300 group select-none">
+            {/* SVG Emblem */}
+            <div className="relative flex-shrink-0 w-11 h-11">
+                <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-11 h-11 drop-shadow-[0_0_8px_rgba(103,232,249,0.15)]">
+                    <defs>
+                        <linearGradient id="emblemFill" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stopColor="#0f2744" />
+                            <stop offset="100%" stopColor="#070f1f" />
+                        </linearGradient>
+                        <linearGradient id="emblemStroke" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stopColor="#67e8f9" />
+                            <stop offset="60%" stopColor="#60a5fa" />
+                            <stop offset="100%" stopColor="#818cf8" />
+                        </linearGradient>
+                        <linearGradient id="textGrad" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stopColor="#e0f2fe" />
+                            <stop offset="100%" stopColor="#93c5fd" />
+                        </linearGradient>
+                    </defs>
+ 
+                    {/* Outer octagon */}
+                    <path
+                        d="M22 2 L35 8.5 L42 22 L35 35.5 L22 42 L9 35.5 L2 22 L9 8.5 Z"
+                        fill="url(#emblemFill)"
+                        stroke="url(#emblemStroke)"
+                        strokeWidth="0.8"
+                    />
+ 
+                    {/* Inner octagon (decorative ring) */}
+                    <path
+                        d="M22 7 L31 11.5 L36 22 L31 32.5 L22 37 L13 32.5 L8 22 L13 11.5 Z"
+                        fill="none"
+                        stroke="url(#emblemStroke)"
+                        strokeWidth="0.35"
+                        opacity="0.4"
+                    />
+ 
+                    {/* Balance scales motif — horizontal beam */}
+                    <line x1="12" y1="21" x2="32" y2="21" stroke="url(#emblemStroke)" strokeWidth="0.9" strokeLinecap="round" opacity="0.6"/>
+ 
+                    {/* Vertical fulcrum */}
+                    <line x1="22" y1="15" x2="22" y2="29" stroke="url(#emblemStroke)" strokeWidth="0.9" strokeLinecap="round" opacity="0.55"/>
+ 
+                    {/* Left pan */}
+                    <path d="M10 21 Q12 25 16 25 Q20 25 18 21" fill="none" stroke="url(#emblemStroke)" strokeWidth="0.7" strokeLinecap="round" opacity="0.7"/>
+ 
+                    {/* Right pan */}
+                    <path d="M26 21 Q28 25 32 25 Q36 25 34 21" fill="none" stroke="url(#emblemStroke)" strokeWidth="0.7" strokeLinecap="round" opacity="0.7"/>
+ 
+                    {/* Serif initials */}
+                    <text
+                        x="22"
+                        y="20"
+                        textAnchor="middle"
+                        fill="url(#textGrad)"
+                        fontSize="6.5"
+                        fontFamily="Georgia, 'Times New Roman', serif"
+                        fontWeight="bold"
+                        letterSpacing="1"
+                    >
+                        MRS
+                    </text>
+                </svg>
+ 
+                {/* Hover glow ring */}
+                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{ boxShadow: '0 0 16px 2px rgba(103,232,249,0.18)' }} />
+            </div>
+ 
+            {/* Wordmark */}
+            <div className="flex flex-col leading-none gap-[3px]">
+                {/* Firm name */}
+                <div className="flex items-baseline gap-1.5">
+                    <span
+                        className="text-[15px] font-bold tracking-[0.15em] text-white"
+                        style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+                    >
+                        MRS
+                    </span>
+                    <span
+                        className="text-[11px] font-normal tracking-[0.06em] text-cyan-300/75"
+                        style={{ fontFamily: 'Georgia, serif' }}
+                    >
+                        &amp; Co.
+                    </span>
+                </div>
+ 
+                {/* Subtitle with flanking rules */}
+                <div className="flex items-center gap-1.5">
+                    <div className="h-px w-3.5 bg-gradient-to-r from-cyan-400/50 to-transparent rounded-full" />
+                    <span
+                        className="text-[7.5px] tracking-[0.22em] text-slate-400/90 uppercase"
+                        style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif', fontWeight: 500 }}
+                    >
+                        Chartered Accountants
+                    </span>
+                    <div className="h-px w-3.5 bg-gradient-to-l from-blue-400/50 to-transparent rounded-full" />
+                </div>
+            </div>
+        </Link>
+    );
+}
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -367,17 +471,7 @@ export default function DashboardPage() {
             <header className="relative z-10 border-b border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
                 <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                            <img
-                                src="https://education21.in/wp-content/uploads/2023/12/CA-India-Logo-1024x762.png"
-                                alt="CA Logo"
-                                className="w-10 h-10 object-contain rounded-full bg-white/10 border border-white/[0.08] p-1"
-                            />
-                            <div>
-                                <div className="text-sm font-bold text-white">MRS & Co.</div>
-                                <div className="text-[9px] text-cyan-400 font-semibold tracking-wide">Chartered Accountants</div>
-                            </div>
-                        </Link>
+                        <MRSLogo />
                         <div className="hidden sm:block h-6 w-px bg-white/10" />
                         <span className="hidden sm:block text-sm text-slate-400 font-medium">Dashboard</span>
                     </div>
