@@ -56,107 +56,67 @@ import Link from 'next/link';
 function MRSLogo() {
     return (
         <Link href="/" className="flex items-center gap-3.5 hover:opacity-90 transition-all duration-300 group select-none">
-            {/* SVG Emblem */}
-            <div className="relative flex-shrink-0 w-11 h-11">
-                <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-11 h-11 drop-shadow-[0_0_8px_rgba(103,232,249,0.15)]">
-                    <defs>
-                        <linearGradient id="emblemFill" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stopColor="#0f2744" />
-                            <stop offset="100%" stopColor="#070f1f" />
-                        </linearGradient>
-                        <linearGradient id="emblemStroke" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stopColor="#67e8f9" />
-                            <stop offset="60%" stopColor="#60a5fa" />
-                            <stop offset="100%" stopColor="#818cf8" />
-                        </linearGradient>
-                        <linearGradient id="textGrad" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stopColor="#e0f2fe" />
-                            <stop offset="100%" stopColor="#93c5fd" />
-                        </linearGradient>
-                    </defs>
- 
-                    {/* Outer octagon */}
-                    <path
-                        d="M22 2 L35 8.5 L42 22 L35 35.5 L22 42 L9 35.5 L2 22 L9 8.5 Z"
-                        fill="url(#emblemFill)"
-                        stroke="url(#emblemStroke)"
-                        strokeWidth="0.8"
+            {/* Official CA India logo in a polished circular frame */}
+            <div className="relative flex-shrink-0">
+                {/* Subtle glow behind the logo */}
+                <div
+                    className="absolute inset-0 rounded-full opacity-60 group-hover:opacity-90 transition-opacity duration-500 blur-md"
+                    style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.45) 0%, transparent 70%)', margin: '-6px' }}
+                />
+                {/* Logo container */}
+                <div
+                    className="relative w-11 h-11 rounded-full flex items-center justify-center"
+                    style={{
+                        background: 'linear-gradient(145deg, #ffffff 0%, #dceeff 100%)',
+                        border: '1.5px solid rgba(255,255,255,0.85)',
+                        boxShadow: '0 0 0 1px rgba(59,130,246,0.3), 0 4px 16px rgba(59,130,246,0.35), 0 2px 6px rgba(0,0,0,0.5)',
+                    }}
+                >
+                    <img
+                        src="https://education21.in/wp-content/uploads/2023/12/CA-India-Logo-1024x762.png"
+                        alt="CA India Logo"
+                        className="w-7 h-7 object-contain"
+                        style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.12))' }}
                     />
- 
-                    {/* Inner octagon (decorative ring) */}
-                    <path
-                        d="M22 7 L31 11.5 L36 22 L31 32.5 L22 37 L13 32.5 L8 22 L13 11.5 Z"
-                        fill="none"
-                        stroke="url(#emblemStroke)"
-                        strokeWidth="0.35"
-                        opacity="0.4"
-                    />
- 
-                    {/* Balance scales motif — horizontal beam */}
-                    <line x1="12" y1="21" x2="32" y2="21" stroke="url(#emblemStroke)" strokeWidth="0.9" strokeLinecap="round" opacity="0.6"/>
- 
-                    {/* Vertical fulcrum */}
-                    <line x1="22" y1="15" x2="22" y2="29" stroke="url(#emblemStroke)" strokeWidth="0.9" strokeLinecap="round" opacity="0.55"/>
- 
-                    {/* Left pan */}
-                    <path d="M10 21 Q12 25 16 25 Q20 25 18 21" fill="none" stroke="url(#emblemStroke)" strokeWidth="0.7" strokeLinecap="round" opacity="0.7"/>
- 
-                    {/* Right pan */}
-                    <path d="M26 21 Q28 25 32 25 Q36 25 34 21" fill="none" stroke="url(#emblemStroke)" strokeWidth="0.7" strokeLinecap="round" opacity="0.7"/>
- 
-                    {/* Serif initials */}
-                    <text
-                        x="22"
-                        y="20"
-                        textAnchor="middle"
-                        fill="url(#textGrad)"
-                        fontSize="6.5"
-                        fontFamily="Georgia, 'Times New Roman', serif"
-                        fontWeight="bold"
-                        letterSpacing="1"
-                    >
-                        MRS
-                    </text>
-                </svg>
- 
-                {/* Hover glow ring */}
-                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    style={{ boxShadow: '0 0 16px 2px rgba(103,232,249,0.18)' }} />
+                </div>
             </div>
  
             {/* Wordmark */}
             <div className="flex flex-col leading-none gap-[3px]">
                 {/* Firm name */}
-                <div className="flex items-baseline gap-1.5">
-                    <span
-                        className="text-[15px] font-bold tracking-[0.15em] text-white"
-                        style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                    >
-                        MRS
-                    </span>
-                    <span
-                        className="text-[11px] font-normal tracking-[0.06em] text-cyan-300/75"
-                        style={{ fontFamily: 'Georgia, serif' }}
-                    >
-                        &amp; Co.
-                    </span>
+                <div
+                    className="text-[15px] font-bold text-white tracking-[0.06em]"
+                    style={{
+                        fontFamily: 'Georgia, "Times New Roman", serif',
+                        textShadow: '0 1px 8px rgba(59,130,246,0.3)',
+                    }}
+                >
+                    MRS &amp; Co.
                 </div>
  
                 {/* Subtitle with flanking rules */}
                 <div className="flex items-center gap-1.5">
-                    <div className="h-px w-3.5 bg-gradient-to-r from-cyan-400/50 to-transparent rounded-full" />
+                    <div className="h-px w-3 bg-gradient-to-r from-blue-400/60 to-transparent rounded-full" />
                     <span
-                        className="text-[7.5px] tracking-[0.22em] text-slate-400/90 uppercase"
-                        style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif', fontWeight: 500 }}
+                        className="text-[7.5px] tracking-[0.22em] uppercase"
+                        style={{
+                            fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+                            fontWeight: 500,
+                            color: 'transparent',
+                            background: 'linear-gradient(90deg, #93c5fd, #bfdbfe, #93c5fd)',
+                            WebkitBackgroundClip: 'text',
+                            backgroundClip: 'text',
+                        }}
                     >
                         Chartered Accountants
                     </span>
-                    <div className="h-px w-3.5 bg-gradient-to-l from-blue-400/50 to-transparent rounded-full" />
+                    <div className="h-px w-3 bg-gradient-to-l from-blue-400/60 to-transparent rounded-full" />
                 </div>
             </div>
         </Link>
     );
 }
+ 
 
 export default function DashboardPage() {
     const router = useRouter();
