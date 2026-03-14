@@ -371,7 +371,7 @@ export default function DashboardPage() {
                             <img
                                 src="https://education21.in/wp-content/uploads/2023/12/CA-India-Logo-1024x762.png"
                                 alt="CA Logo"
-                                className="w-10 h-10 object-contain brightness-0 invert"
+                                className="w-10 h-10 object-contain rounded-full bg-white/10 border border-white/[0.08] p-1"
                             />
                             <div>
                                 <div className="text-sm font-bold text-white">MRS & Co.</div>
