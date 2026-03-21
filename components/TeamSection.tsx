@@ -225,13 +225,13 @@ export default function TeamSection() {
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 rounded-3xl blur-md opacity-30 group-hover:opacity-50 transition-opacity duration-500 -z-10" />
 
             {/* Image */}
-            <div className="relative w-full h-[420px] sm:h-[500px] lg:h-[560px]">
+            <div className="relative w-full h-[500px] sm:h-[580px] lg:h-[650px]">
               <NextImage
                 src="/assets/team/Group-photo.jpeg" 
                 alt="CA MRS Team"
                 fill
                 sizes="100vw"
-                className="object-cover object-top"
+                className="object-cover object-centre"
                 priority
               />
 
