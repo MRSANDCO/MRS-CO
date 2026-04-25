@@ -36,6 +36,7 @@ import {
   Edit3,
 } from "lucide-react";
 import { Image as ImageIcon } from 'lucide-react';
+import IncomeTaxNavigatorCard from "@/components/IncomeTaxNavigatorCard";
 // debounce utility
 function useDebounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
   callback: T,
@@ -595,6 +596,7 @@ export default function MRSCoSite() {
           </div>
         </div>
       </div>
+      
       {/* NEWS TICKER */}
       <section className="relative py-4 overflow-hidden">
         <div className="absolute inset-0">
@@ -811,11 +813,23 @@ export default function MRSCoSite() {
                     delay={0.4}
                   />
                 </div>
+                {/* Income Tax Mapper Section */}
+<section className="py-16 px-6 max-w-6xl mx-auto">
+  <h2 className="text-2xl font-semibold text-slate-900 mb-2">
+    Tax Law Navigator
+  </h2>
+  <p className="text-slate-500 mb-8">
+    Transition guide for the new Income Tax Act 2025
+  </p>
+  <IncomeTaxNavigatorCard />
+</section>
+
               </div>
             </motion.div>
           </div>
         </div>
       </section>
+      
       {/* ABOUT SECTION */}
       <section id="about" className="relative py-16 overflow-hidden">
         {/* Background Image */}

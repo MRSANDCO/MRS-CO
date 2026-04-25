@@ -1,0 +1,718 @@
+{
+  "sections": [
+    {
+      "id": "s1",
+      "old": {
+        "section": "1",
+        "heading": "Short title, extent and commencement",
+        "chapter": "Chapter I — Preliminary",
+        "text": "(1) This Act may be called the Income-tax Act, 1961.\n(2) It extends to the whole of India.\n(3) Save as otherwise provided in this Act, it shall come into force on the 1st day of April, 1962."
+      },
+      "new": {
+        "section": "1",
+        "heading": "Short title, extent and commencement",
+        "chapter": "Chapter I — Preliminary",
+        "text": "(1) This Act may be called the Income-tax Act, 2025.\n(2) It extends to the whole of India.\n(3) It shall come into force on the 1st day of April, 2026."
+      },
+      "change_type": "moved",
+      "change_summary": "Renumbered with updated year references. No substantive change."
+    },
+    {
+      "id": "s2",
+      "old": {
+        "section": "2",
+        "heading": "Definitions",
+        "chapter": "Chapter I — Preliminary",
+        "text": "In this Act, unless the context otherwise requires,—\n(1) 'advance tax' means the advance tax payable in accordance with the provisions of Chapter XVII-C;\n(7) 'assessee' means a person by whom any tax or any other sum of money is payable under this Act;\n(8) 'assessment' includes reassessment;\n(9) 'assessment year' means the period of twelve months commencing on the 1st day of April every year;\n(24) 'income' includes—(i) profits and gains; (ii) dividend; (iii) voluntary contributions received by a trust...\n(31) 'person' includes—(i) an individual; (ii) a Hindu undivided family; (iii) a company; (iv) a firm; (v) an association of persons or a body of individuals...\n(42A) 'short-term capital asset' means a capital asset held for not more than thirty-six months immediately preceding the date of its transfer;\n(42B) 'long-term capital asset' means a capital asset which is not a short-term capital asset."
+      },
+      "new": {
+        "section": "2",
+        "heading": "Definitions",
+        "chapter": "Chapter I — Preliminary",
+        "text": "In this Act, unless the context otherwise requires,—\n(1) 'advance tax' means advance tax payable under Chapter XVII;\n(4) 'assessee' means a person by whom tax or any other sum is payable under this Act, and includes a person in respect of whom any proceeding has been taken;\n(5) 'assessment' includes reassessment and best judgment assessment;\n(6) 'assessment year'— the concept of 'assessment year' is replaced by 'tax year' under section 3;\n(21) 'income' has the same inclusive meaning as under the 1961 Act, now defined with greater clarity in sub-clauses;\n(38) 'person' includes individual, HUF, company, firm, AOP, BOI, local authority and every artificial juridical person;\n'short-term capital asset' and 'long-term capital asset' — definitions now aligned with revised holding periods specified in Chapter IV."
+      },
+      "change_type": "restructured",
+      "change_summary": "Definition section significantly reorganised. Clause numbering changed. 'Assessment year' concept replaced by 'Tax Year' (see §3). Language simplified throughout."
+    },
+    {
+      "id": "s3",
+      "old": {
+        "section": "3",
+        "heading": "Previous year defined",
+        "chapter": "Chapter I — Preliminary",
+        "text": "For the purposes of this Act, 'previous year' means the financial year immediately preceding the assessment year:\nProvided that, in the case of a business or profession newly set up, or a source of income newly coming into existence, in the said financial year, the previous year shall be the period beginning with the date of setting up of the business or profession or, as the case may be, the date on which the source of income newly comes into existence and ending with the said financial year."
+      },
+      "new": {
+        "section": "3",
+        "heading": "Tax year",
+        "chapter": "Chapter I — Preliminary",
+        "text": "(1) For the purposes of this Act, 'tax year' means the twelve-month period beginning on the 1st day of April of every calendar year.\n(2) In the case of a newly set-up business or profession, or a source of income that newly comes into existence, the tax year shall be the period beginning with the date of setting up or coming into existence of such business, profession or source of income and ending with the 31st day of March of the financial year in which it was set up.\n(3) The expressions 'previous year' and 'assessment year' used in any other enactment shall, for the purposes of this Act, be construed as references to the 'tax year'."
+      },
+      "change_type": "restructured",
+      "change_summary": "Major conceptual change: The dual concept of 'Previous Year' and 'Assessment Year' is abolished and replaced by a single unified 'Tax Year'. This simplifies filing and assessment references throughout the Act."
+    },
+    {
+      "id": "s4",
+      "old": {
+        "section": "4",
+        "heading": "Charge of income-tax",
+        "chapter": "Chapter II — Basis of Charge",
+        "text": "(1) Where any Central Act enacts that income-tax shall be charged for any assessment year at any rate or rates, income-tax at that rate or those rates shall be charged for that year in accordance with, and subject to the provisions of, this Act in respect of the total income of the previous year of every person:\nProvided that where by virtue of any provision of this Act income-tax is to be charged in respect of the income of a period other than the previous year, income-tax shall be charged accordingly.\n(2) In respect of income chargeable under sub-section (1), income-tax shall be deducted at the source or paid in advance, where it is so deductible or payable under any provision of this Act."
+      },
+      "new": {
+        "section": "4",
+        "heading": "Charge of income-tax",
+        "chapter": "Chapter II — Basis of Charge",
+        "text": "(1) Income-tax shall be charged for every tax year at the rate or rates specified in the relevant Finance Act, on the total income of every person for that tax year, in accordance with and subject to the provisions of this Act.\n(2) Income-tax shall be deducted at source or paid in advance, as required under Chapter XVII.\n(3) Where income of a period other than the tax year is chargeable under any provision of this Act, income-tax shall be charged on such income accordingly."
+      },
+      "change_type": "moved",
+      "change_summary": "Substantively same. Reference to 'previous year' replaced by 'tax year'. Clause on TDS/advance tax consolidated in sub-section (2)."
+    },
+    {
+      "id": "s5",
+      "old": {
+        "section": "5",
+        "heading": "Scope of total income",
+        "chapter": "Chapter II — Basis of Charge",
+        "text": "(1) Subject to the provisions of this Act, the total income of any previous year of a person who is a resident includes all income from whatever source derived which—\n(a) is received or is deemed to be received in India in such year by or on behalf of such person; or\n(b) accrues or arises or is deemed to accrue or arise to him in India during such year; or\n(c) accrues or arises to him outside India during such year.\n(2) Subject to the provisions of this Act, the total income of any previous year of a person who is a non-resident includes all income from whatever source derived which—\n(a) is received or is deemed to be received in India in such year by or on behalf of such person; or\n(b) accrues or arises or is deemed to accrue or arise to him in India during such year."
+      },
+      "new": {
+        "section": "5",
+        "heading": "Scope of total income",
+        "chapter": "Chapter II — Basis of Charge",
+        "text": "(1) The total income of a resident person for any tax year includes all income, from whatever source, which—\n(a) is received or deemed to be received in India during the tax year; or\n(b) accrues, arises or is deemed to accrue or arise in India during the tax year; or\n(c) accrues or arises outside India during the tax year.\n(2) The total income of a non-resident person for any tax year includes all income, from whatever source, which—\n(a) is received or deemed to be received in India during the tax year; or\n(b) accrues, arises or is deemed to accrue or arise in India during the tax year.\n(3) Explanation.— Income accruing outside India shall not be included in the total income of a non-resident."
+      },
+      "change_type": "moved",
+      "change_summary": "Substantively unchanged. 'Previous year' replaced by 'tax year'. An Explanation clarifying exclusion of foreign-accruing income for non-residents added for clarity."
+    },
+    {
+      "id": "s6",
+      "old": {
+        "section": "6",
+        "heading": "Residence in India",
+        "chapter": "Chapter II — Basis of Charge",
+        "text": "For the purposes of this Act,—\n(1) An individual is said to be resident in India in any previous year, if he—\n(a) is in India in that year for a period or periods amounting in all to one hundred and eighty-two days or more; or\n(c) having within the four years preceding that year been in India for a period or periods amounting in all to three hundred and sixty-five or more days, is in India for a period or periods amounting in all to sixty days or more in that year.\n(6) A person is said to be 'not ordinarily resident' in India in any previous year if such person is a non-resident in India in nine out of the ten previous years preceding that year, or has been in India for a period of, or periods amounting in all to, seven hundred and twenty-nine days or less during the seven previous years preceding that year."
+      },
+      "new": {
+        "section": "6",
+        "heading": "Residence in India",
+        "chapter": "Chapter II — Basis of Charge",
+        "text": "(1) An individual is resident in India in a tax year if—\n(a) he is in India for 182 days or more during the tax year; or\n(b) he is in India for 60 days or more during the tax year and for 365 days or more during the four tax years immediately preceding that tax year.\n(2) A Hindu undivided family, firm, or other association of persons is resident in India unless the control and management of its affairs is situated wholly outside India.\n(3) A company is resident in India if it is an Indian company, or if its place of effective management is in India at any time during the tax year.\n(4) An individual or HUF is 'not ordinarily resident' if the individual has been non-resident in nine out of the ten preceding tax years, or has been in India for 729 days or less in the seven preceding tax years."
+      },
+      "change_type": "moved",
+      "change_summary": "Substantively the same. Reorganised into cleaner sub-sections. 'Place of effective management' test for company residence now explicitly codified."
+    },
+    {
+      "id": "s14",
+      "old": {
+        "section": "14",
+        "heading": "Heads of income",
+        "chapter": "Chapter IV — Computation of Total Income",
+        "text": "Save as otherwise provided by this Act, all income shall, for the purposes of charge of income-tax and computation of total income, be classified under the following heads of income:—\nA.— Salaries.\nB.— Interest on securities.\nC.— Income from house property.\nD.— Profits and gains of business or profession.\nE.— Capital gains.\nF.— Income from other sources."
+      },
+      "new": {
+        "section": "13",
+        "heading": "Heads of income",
+        "chapter": "Chapter IV — Computation of Total Income",
+        "text": "Save as otherwise provided by this Act, all income shall, for the purposes of charge of income-tax and computation of total income, be classified under the following heads:—\n(a) Salaries;\n(b) Income from house property;\n(c) Profits and gains of business or profession;\n(d) Capital gains;\n(e) Income from other sources.\n\nNote: The head 'Interest on securities' (Head B under 1961 Act) has been merged into 'Income from other sources'."
+      },
+      "change_type": "moved",
+      "change_summary": "Head B (Interest on securities) abolished as a separate head — subsumed under 'Income from other sources'. Section renumbered from 14 to 13."
+    },
+    {
+      "id": "s15",
+      "old": {
+        "section": "15",
+        "heading": "Salaries",
+        "chapter": "Chapter IV — Salaries",
+        "text": "The following income shall be chargeable to income-tax under the head 'Salaries':—\n(a) any salary due from an employer or a former employer to an assessee in the previous year, whether paid or not;\n(b) any salary paid or allowed to him in the previous year by or on behalf of an employer or a former employer though not due or before it became due to him;\n(c) any arrears of salary paid or allowed to him in the previous year by or on behalf of an employer or a former employer, if not charged to income-tax for any earlier previous year."
+      },
+      "new": {
+        "section": "15",
+        "heading": "Salaries",
+        "chapter": "Chapter IV — Salaries",
+        "text": "The following income shall be chargeable under the head 'Salaries':—\n(a) salary due from an employer or former employer, whether paid or not;\n(b) salary paid or allowed in the tax year before it became due;\n(c) arrears of salary paid in the tax year not charged to tax in any earlier tax year.\n\nExplanation.— Where salary is due from an employer, it shall be chargeable in the tax year in which it is due, irrespective of the tax year to which it relates."
+      },
+      "change_type": "moved",
+      "change_summary": "Substantively unchanged. Language simplified. 'Previous year' replaced by 'tax year'. An Explanation on accrual basis added."
+    },
+    {
+      "id": "s16",
+      "old": {
+        "section": "16",
+        "heading": "Deductions from salaries",
+        "chapter": "Chapter IV — Salaries",
+        "text": "In computing the income chargeable under the head 'Salaries', the following deductions shall be allowed:—\n(ia) a deduction of fifty thousand rupees or the amount of salary, whichever is less; [Standard Deduction]\n(ii) a deduction in respect of any allowance in the nature of an entertainment allowance specifically granted by an employer to the assessee;\n(iii) a deduction of the amount of any tax on employment (professional tax)."
+      },
+      "new": {
+        "section": "19",
+        "heading": "Deductions from salaries",
+        "chapter": "Chapter IV — Salaries",
+        "text": "In computing income under the head 'Salaries', the following deductions shall be allowed:—\n(1) Standard deduction: ₹75,000 or the amount of salary, whichever is less. [Increased from ₹50,000]\n(2) Entertainment allowance: deduction in respect of entertainment allowance specifically granted by the employer, subject to limits for government employees.\n(3) Professional tax: deduction of the amount of any tax on employment paid during the tax year.\n(4) Retirement and separation receipts [Consolidated from §10(10), §10(10A), §10(10AA), §10(10B), §10(10C)]:—\n  (a) Gratuity received on retirement/death — exempt up to specified limits;\n  (b) Commuted pension — exempt as prescribed;\n  (c) Leave encashment on retirement — exempt up to ₹25 lakh;\n  (d) Retrenchment compensation — exempt up to prescribed limits;\n  (e) VRS compensation — exempt up to ₹5 lakh."
+      },
+      "change_type": "consolidated",
+      "change_summary": "Standard deduction increased from ₹50,000 to ₹75,000. Multiple retirement exemptions previously scattered across §10 sub-clauses consolidated here for clarity."
+    },
+    {
+      "id": "s22",
+      "old": {
+        "section": "22",
+        "heading": "Income from house property",
+        "chapter": "Chapter IV — House Property",
+        "text": "The annual value of property consisting of any buildings or lands appurtenant thereto of which the assessee is the owner, other than such portions of such property as he may occupy for the purposes of any business or profession carried on by him the profits of which are chargeable to income-tax, shall be chargeable to income-tax under the head 'Income from house property'."
+      },
+      "new": {
+        "section": "20",
+        "heading": "Income from house property",
+        "chapter": "Chapter IV — House Property",
+        "text": "The annual value of any building or land appurtenant thereto, of which the assessee is the owner, shall be chargeable to income-tax under the head 'Income from house property', other than any portion occupied for the purposes of a business or profession whose profits are chargeable to income-tax."
+      },
+      "change_type": "moved",
+      "change_summary": "Substantively identical. Sentence restructured for clarity. Section renumbered from 22 to 20."
+    },
+    {
+      "id": "s23",
+      "old": {
+        "section": "23",
+        "heading": "Annual value — how determined",
+        "chapter": "Chapter IV — House Property",
+        "text": "(1) For the purposes of section 22, the annual value of any property shall be deemed to be—\n(a) the sum for which the property might reasonably be expected to let from year to year; or\n(b) where the property or any part of the property is let and the actual rent received or receivable by the owner in respect thereof is in excess of the sum referred to in clause (a), the amount so received or receivable; or\n(c) where the property or any part of the property is let and was vacant during the whole or any part of the previous year and owing to such vacancy the actual rent received or receivable by the owner in respect thereof is less than the sum referred to in clause (a), the amount so received or receivable.\n(2) Where the property consists of a house or part of a house which—\n(a) is in the occupation of the owner for the purposes of his own residence; or\n(b) cannot actually be occupied by the owner by reason of the fact that owing to his employment, business or profession carried on at any other place, he has to reside at that other place in a building not belonging to him,\nthe annual value of such house or part of the house shall be taken to be nil."
+      },
+      "new": {
+        "section": "21",
+        "heading": "Annual value — how determined",
+        "chapter": "Chapter IV — House Property",
+        "text": "(1) The annual value of a property shall be—\n(a) the sum for which the property might reasonably be expected to be let from year to year (fair rent or municipal value, whichever is higher, but not exceeding the standard rent); or\n(b) where actual rent received or receivable exceeds the sum in clause (a), the actual rent; or\n(c) where the property was vacant during the whole or part of the tax year and actual rent is consequently less than the amount in clause (a), the actual rent received.\n(2) Where the house property is self-occupied or cannot be occupied due to employment elsewhere, the annual value shall be nil.\n(3) Where a person owns more than two house properties for self-occupation, the annual value of any two (at the option of the assessee) shall be nil, and the remaining shall be deemed to be let out."
+      },
+      "change_type": "moved",
+      "change_summary": "Sub-section (3) added explicitly providing that only two self-occupied properties may be claimed as nil annual value (previously this was a Finance Act amendment; now embedded in main section)."
+    },
+    {
+      "id": "s24",
+      "old": {
+        "section": "24",
+        "heading": "Deductions from income from house property",
+        "chapter": "Chapter IV — House Property",
+        "text": "Income chargeable under the head 'Income from house property' shall be computed after making the following deductions, namely:—\n(a) a sum equal to thirty per cent of the annual value;\n(b) where the property has been acquired, constructed, repaired, renewed or reconstructed with borrowed capital, the amount of any interest payable on such capital:\nProvided that in respect of property referred to in sub-section (2) of section 23, the amount of deduction shall not exceed two lakh rupees:\nProvided further that where the property referred to in the first proviso is acquired or constructed with capital borrowed on or after the 1st day of April, 1999 and such acquisition or construction is not completed within five years from the end of the financial year in which capital was borrowed, the amount of deduction under this clause shall not exceed thirty thousand rupees."
+      },
+      "new": {
+        "section": "22",
+        "heading": "Deductions from income from house property",
+        "chapter": "Chapter IV — House Property",
+        "text": "Income chargeable under the head 'Income from house property' shall be computed after the following deductions:—\n(a) Standard deduction: 30% of the annual value of the property;\n(b) Interest on borrowed capital: the full amount of interest payable on capital borrowed for acquisition, construction, repair, renewal or reconstruction of the property:\n  Proviso 1: For a self-occupied property, the deduction is limited to ₹2,00,000 per year.\n  Proviso 2: If construction/acquisition is not completed within 5 years from the end of the tax year in which the loan was taken, the limit is ₹30,000.\n  Proviso 3: Pre-construction interest shall be deducted in five equal annual instalments beginning from the tax year in which construction is completed.\n(c) Amounts not deductible [from former §25]: no deduction shall be allowed for any sum paid on account of any rent, rates, taxes, charges or ground rent paid in respect of the property, or for broker's fee for collecting rent."
+      },
+      "change_type": "moved",
+      "change_summary": "Former §25 (amounts not deductible) merged here. Pre-construction interest instalment rule now explicitly stated within the section."
+    },
+    {
+      "id": "s28",
+      "old": {
+        "section": "28",
+        "heading": "Profits and gains of business or profession",
+        "chapter": "Chapter IV — PGBP",
+        "text": "The following income shall be chargeable to income-tax under the head 'Profits and gains of business or profession':—\n(i) the profits and gains of any business or profession which was carried on by the assessee at any time during the previous year;\n(ii) any compensation or other payment due to or received by,—\n(a) any person, by whatever name called, managing the whole or substantially the whole of the affairs of an Indian company, at or in connection with the termination of his management or the modification of the terms and conditions relating thereto;\n(iii) income derived by a trade, professional or similar association from specific services performed for its members;\n(iv) the value of any benefit or perquisite, whether convertible into money or not, arising from business or the exercise of a profession;\n(vi) any interest, salary, bonus, commission or remuneration due to or received by a partner from the firm."
+      },
+      "new": {
+        "section": "26",
+        "heading": "Profits and gains of business or profession",
+        "chapter": "Chapter IV — PGBP",
+        "text": "The following income shall be chargeable under the head 'Profits and gains of business or profession':—\n(a) profits and gains of any business or profession carried on by the assessee at any time during the tax year;\n(b) any compensation received in connection with termination or modification of a management contract;\n(c) income derived by a trade or professional association from specific services to its members;\n(d) the value of any benefit or perquisite, whether convertible into money or not, arising from business or profession;\n(e) any interest, salary, bonus, commission or remuneration received by a partner from the firm in which they are a partner;\n(f) any sum received under a Keyman insurance policy including bonus."
+      },
+      "change_type": "moved",
+      "change_summary": "Keyman insurance policy receipts now explicitly listed as a separate clause (earlier covered by CBDT circulars/case law). Clause lettering changed from roman numerals to alphabets."
+    },
+    {
+      "id": "s32",
+      "old": {
+        "section": "32",
+        "heading": "Depreciation",
+        "chapter": "Chapter IV — PGBP",
+        "text": "(1) In respect of depreciation of—\n(i) buildings, machinery, plant or furniture, being tangible assets;\n(ii) know-how, patents, copyrights, trade marks, licences, franchises or any other business or commercial rights of similar nature, being intangible assets acquired on or after the 1st day of April, 1998,\nowned, wholly or partly, by the assessee and used for the purposes of the business or profession, the following deductions shall be allowed:—\n(i) in the case of assets of an undertaking engaged in generation or generation and distribution of power, such percentage on the actual cost thereof to the assessee as may be prescribed;\n(ii) in the case of any block of assets, such percentage on the written down value thereof as may be prescribed:\nProvided that no deduction shall be allowed under this clause in respect of—\n(a) any motor vehicle manufactured outside India...\n(2) Where, in the assessment of the assessee, full effect cannot be given to any allowance under sub-section (1) in any previous year owing to there being no profits or gains chargeable for that year, the allowance or the part thereof to which effect has not been given shall be added to the amount of the allowance for depreciation for the following previous year and deemed to be part of that allowance."
+      },
+      "new": {
+        "section": "33",
+        "heading": "Depreciation",
+        "chapter": "Chapter IV — PGBP",
+        "text": "(1) Depreciation shall be allowed on—\n(a) tangible assets: buildings, machinery, plant or furniture; and\n(b) intangible assets: know-how, patents, copyrights, trade marks, licences, franchises or any other business or commercial rights of similar nature,\nowned, wholly or partly, by the assessee and used for the purposes of business or profession, at rates prescribed in the Rules.\n(2) For power-generation undertakings, depreciation shall be on the actual cost at prescribed rates.\n(3) For all other assets, depreciation shall be on the written down value of the block of assets at prescribed rates.\n(4) Where full effect cannot be given in a tax year due to absence of profits, the unabsorbed depreciation shall be carried forward and treated as depreciation of the following tax year. [No time limit for carry-forward.]\n(5) Investment allowance for new manufacturing plant and machinery [formerly §32AC]: an additional allowance of 15% of actual cost of new plant and machinery acquired and installed by a manufacturing company shall be allowed, subject to prescribed conditions."
+      },
+      "change_type": "merged",
+      "change_summary": "§32AC (investment allowance for manufacturing) merged into §33. Unabsorbed depreciation carry-forward rules now explicit. Structure simplified."
+    },
+    {
+      "id": "s36",
+      "old": {
+        "section": "36",
+        "heading": "Other deductions",
+        "chapter": "Chapter IV — PGBP",
+        "text": "(1) The deductions provided for in the following clauses shall be allowed in respect of the matters dealt with therein:—\n(i) the amount of any premium paid in respect of insurance against risk of damage or destruction of stocks or stores used for the purposes of the business;\n(ii) the amount of any premium paid by a federal milk co-operative society;\n(iii) the amount paid by way of bonus or commission to an employee;\n(iii)(a) the amount of any sum paid by the assessee as an employer by way of contribution towards a recognised provident fund or approved superannuation fund;\n(vii) subject to the provisions of sub-section (2), the amount of any bad debt or part thereof which is written off as irrecoverable in the accounts of the assessee for the previous year;\n(viia) the aggregate amount of sums contributed by the assessee-bank to the Rural Infrastructure Development Fund or any other fund set up by the National Housing Bank;\n(viii) the amount of any expenditure incurred by the assessee on account of any norms of procedure laid down by the Bureau of Indian Standards."
+      },
+      "new": {
+        "section": "29",
+        "heading": "Deductions — employee costs and bad debts",
+        "chapter": "Chapter IV — PGBP",
+        "text": "(1) The following deductions shall be allowed:—\n(a) insurance premium against risk of damage or destruction of stocks;\n(b) bonus or commission to employees;\n(c) employer's contribution to recognised provident fund or approved superannuation fund;\n(d) employer's contribution to approved gratuity fund;\n(e) bad debts written off as irrecoverable in the accounts of the tax year (subject to the conditions in sub-section (2));\n(f) contributions to Rural Infrastructure Development Fund or fund set up by NHB.\n\nSection 30 — Premium deductions (insurance premiums for all assets)\nSection 31 — Bad debts and provisions for doubtful debts (banks)\nSection 32 — Miscellaneous specific deductions"
+      },
+      "change_type": "restructured",
+      "change_summary": "Old §36 (omnibus deductions clause) split into three separate sections (§§29-32) for readability. Each type of deduction now has its own focused section."
+    },
+    {
+      "id": "s37",
+      "old": {
+        "section": "37",
+        "heading": "General",
+        "chapter": "Chapter IV — PGBP",
+        "text": "(1) Any expenditure (not being expenditure of the nature described in sections 30 to 36 and not being in the nature of capital expenditure or personal expenses of the assessee), laid out or expended wholly and exclusively for the purposes of the business or profession shall be allowed in computing the income chargeable under the head 'Profits and gains of business or profession':\nProvided that any expenditure incurred by an assessee for any purpose which is an offence or which is prohibited by law shall not be deemed to have been incurred for the purpose of business or profession and no deduction or allowance shall be made in respect of such expenditure:\nExplanation 1.—For the removal of doubts, it is hereby declared that any expenditure incurred by an assessee on the activities relating to corporate social responsibility referred to in section 135 of the Companies Act, 2013 shall not be deemed to be an expenditure incurred by the assessee for the purposes of the business or profession.\nExplanation 2.—For the removal of doubts, it is hereby declared that for the purposes of sub-section (1), any expenditure incurred by an assessee on advertisement in any souvenir, brochure, tract, pamphlet or the like published by a political party shall be deemed to be expenditure incurred for a purpose which is prohibited by law."
+      },
+      "new": {
+        "section": "39",
+        "heading": "General deduction for business expenditure",
+        "chapter": "Chapter IV — PGBP",
+        "text": "(1) Any expenditure laid out or expended wholly and exclusively for the purposes of the business or profession, not being—\n(a) expenditure of the nature described in sections 28 to 38; or\n(b) capital expenditure; or\n(c) personal expenses,\nshall be allowed as a deduction.\n(2) No deduction shall be allowed for expenditure incurred for any purpose which is an offence or prohibited by law.\n(3) CSR expenditure under section 135 of the Companies Act, 2013 shall not be treated as business expenditure.\n(4) Expenditure on advertisement in any publication of a political party shall be deemed to be expenditure for a purpose prohibited by law."
+      },
+      "change_type": "moved",
+      "change_summary": "Explanations converted to numbered sub-sections for readability. Substantive content unchanged. Section renumbered from 37 to 39."
+    },
+    {
+      "id": "s43B",
+      "old": {
+        "section": "43B",
+        "heading": "Certain deductions to be only on actual payment",
+        "chapter": "Chapter IV — PGBP",
+        "text": "Notwithstanding anything contained in any other provision of this Act, a deduction otherwise allowable under this Act in respect of—\n(a) any sum payable by the assessee by way of tax, duty, cess or fee, by whatever name called, under any law for the time being in force; or\n(b) any sum payable by the assessee as an employer by way of contribution to any provident fund or superannuation fund or gratuity fund or any other fund for the welfare of employees; or\n(c) any sum referred to in clause (ii) of sub-section (1) of section 36; or\n(d) any sum payable by the assessee as interest on any loan or borrowing from any public financial institution or a State financial corporation or a State industrial investment corporation; or\n(e) any sum payable by the assessee as interest on any loan or advances from a scheduled bank or a co-operative bank; or\n(f) any sum payable by the assessee as an employer in lieu of any leave at the credit of his employee; or\n(g) any sum payable by the assessee to Indian Railways for use of railway assets,\nshall be allowed as deduction only in computing the income of that previous year in which such sum is actually paid."
+      },
+      "new": {
+        "section": "44",
+        "heading": "Deductions allowable only on actual payment",
+        "chapter": "Chapter IV — PGBP",
+        "text": "Notwithstanding anything in any other provision, a deduction otherwise allowable shall be allowed only in the tax year in which the following sums are actually paid:—\n(a) any tax, duty, cess or fee payable under any law;\n(b) employer's contribution to provident fund, superannuation fund, gratuity fund or any other employee welfare fund;\n(c) bonus or commission to employees;\n(d) interest on loans from public financial institutions, State financial corporations or scheduled banks or co-operative banks;\n(e) leave encashment in lieu of leave at the credit of the employee;\n(f) payment to Indian Railways for use of railway assets;\n(g) payment to MSME suppliers — allowed only on actual payment within the time limit specified under the MSMED Act, 2006. [New clause added]"
+      },
+      "change_type": "moved",
+      "change_summary": "New clause (g) added: MSME payment deduction now explicitly disallowed on accrual basis — must be actually paid within the MSMED Act timeline. This codifies the amendment made by Finance Act 2023."
+    },
+    {
+      "id": "s44AB",
+      "old": {
+        "section": "44AB",
+        "heading": "Audit of accounts of certain persons carrying on business or profession",
+        "chapter": "Chapter IV — PGBP",
+        "text": "Every person,—\n(a) carrying on business shall, if his total sales, turnover or gross receipts, as the case may be, in business exceed or exceeds one crore rupees in any previous year;\n(b) carrying on profession shall, if his gross receipts in profession exceed fifty lakh rupees in any previous year;\n(c) carrying on business and who has declared profits and gains for the previous year in accordance with the provisions of section 44AD;\n(d) carrying on business and who has not declared profits or gains for the previous year in accordance with the provisions of section 44ADA;\nget his accounts of such previous year audited by an accountant before the specified date and furnish by that date the report of such audit in the prescribed form duly signed and verified by such accountant."
+      },
+      "new": {
+        "section": "63",
+        "heading": "Audit of accounts",
+        "chapter": "Chapter IV — PGBP",
+        "text": "Every person—\n(a) carrying on business, if total sales, turnover or gross receipts exceed ₹1 crore in any tax year [₹10 crore if cash receipts and payments do not exceed 5% of total receipts and payments];\n(b) carrying on profession, if gross receipts exceed ₹50 lakh;\n(c) opting out of presumptive taxation under §58 (business) or §59 (profession) after having opted in;\nmust get accounts audited by a Chartered Accountant and furnish the audit report in the prescribed form before the due date.\n\nExplanation.— The threshold of ₹1 crore is enhanced to ₹10 crore for digital businesses (cash transactions ≤ 5%)."
+      },
+      "change_type": "moved",
+      "change_summary": "₹10 crore digital business threshold (introduced by Finance Act 2021) now codified in the main provision. References updated to new section numbers for presumptive taxation."
+    },
+    {
+      "id": "s44AD",
+      "old": {
+        "section": "44AD",
+        "heading": "Special provision for computing profits and gains of business on presumptive basis",
+        "chapter": "Chapter IV — PGBP",
+        "text": "(1) Notwithstanding anything to the contrary contained in sections 28 to 43C, in the case of an eligible assessee engaged in an eligible business, a sum equal to eight per cent of the total turnover or gross receipts of the assessee in the previous year on account of such business or, as the case may be, a sum higher than the aforesaid sum claimed to have been earned by the eligible assessee, shall be deemed to be the profits and gains of such business chargeable to tax under the head 'Profits and gains of business or profession':\nProvided that this sub-section shall have effect as if the words 'eight per cent' were substituted by the words 'six per cent' in respect of the amount of total turnover or gross receipts which is received by an account payee cheque or an account payee bank draft or use of electronic clearing system through a bank account or through such other electronic mode as may be prescribed during the previous year or before the due date specified in sub-section (1) of section 139 in respect of that previous year.\n(4) The provisions of this section, notwithstanding anything contained in the foregoing provisions, shall not apply to—\n(i) a person carrying on profession as referred to in sub-section (1) of section 44AA;\n(ii) a person earning income in the nature of commission or brokerage; or\n(iii) a person carrying on any agency business."
+      },
+      "new": {
+        "section": "58",
+        "heading": "Presumptive taxation — eligible business",
+        "chapter": "Chapter IV — PGBP",
+        "text": "(1) In the case of an eligible assessee carrying on an eligible business, profits shall be presumed to be—\n(a) 8% of total turnover or gross receipts; or\n(b) 6% of turnover received through banking channels or digital modes.\nThe assessee may declare a higher income if the actual profits exceed the above.\n(2) Eligible business: any business (other than plying, hiring or leasing goods carriages under §60) whose total turnover does not exceed ₹3 crore.\n[Limit increased from ₹2 crore — digital receipt threshold applies: if cash receipts exceed 5% of total receipts, the ₹2 crore limit applies.]\n(3) Once an assessee opts out of this scheme, they cannot re-opt for the next 5 tax years.\n(4) This section does not apply to persons earning commission, brokerage or income from agency business."
+      },
+      "change_type": "moved",
+      "change_summary": "Turnover limit enhanced to ₹3 crore for fully digital businesses. The 6%/8% differential for digital vs cash receipts retained. Section renumbered from 44AD to 58."
+    },
+    {
+      "id": "s44ADA",
+      "old": {
+        "section": "44ADA",
+        "heading": "Special provision for computing profits and gains of profession on presumptive basis",
+        "chapter": "Chapter IV — PGBP",
+        "text": "(1) Notwithstanding anything contained in sections 28 to 43C, in the case of an assessee, being an individual or a partnership firm other than a limited liability partnership, who is engaged in a profession referred to in sub-section (1) of section 44AA and whose total gross receipts do not exceed fifty lakh rupees in a previous year, a sum equal to fifty per cent of the total gross receipts of the assessee in the previous year on account of such profession or, as the case may be, a sum higher than the aforesaid sum as claimed to have been actually earned, shall be deemed to be the profits and gains of such profession chargeable to tax under the head 'Profits and gains of business or profession'."
+      },
+      "new": {
+        "section": "59",
+        "heading": "Presumptive taxation — professionals",
+        "chapter": "Chapter IV — PGBP",
+        "text": "(1) In the case of an eligible assessee (individual or partnership firm, not an LLP) engaged in a specified profession, profits shall be presumed to be 50% of gross receipts, or the actual amount if higher.\n(2) Eligible gross receipts limit: ₹75 lakh [increased from ₹50 lakh].\n[Digital receipt threshold: if cash receipts exceed 5% of total receipts, the ₹50 lakh limit applies.]\n(3) Specified professions include: legal, medical, engineering, architectural, accountancy, technical consultancy, interior decoration, and such other professions as prescribed."
+      },
+      "change_type": "moved",
+      "change_summary": "Gross receipts limit enhanced from ₹50 lakh to ₹75 lakh for fully digital professionals. Section renumbered from 44ADA to 59."
+    },
+    {
+      "id": "s45",
+      "old": {
+        "section": "45",
+        "heading": "Capital gains",
+        "chapter": "Chapter IV — Capital Gains",
+        "text": "(1) Any profits or gains arising from the transfer of a capital asset effected in the previous year shall, save as otherwise provided in sections 54, 54B, 54D, 54E, 54EA, 54EB, 54EC, 54ED, 54EE, 54F, 54G, 54GA, 54GB, be chargeable to income-tax under the head 'Capital gains', and shall be deemed to be the income of the previous year in which the transfer took place.\n(2) Notwithstanding anything contained in sub-section (1), where a member of a company receives, in lieu of or in addition to shares held by him in such company, any other asset, then the profits or gains arising from such receipt shall be chargeable as the income of the member under the head 'Capital gains' in the tax year in which the said asset is received.\n(3) The profits or gains arising from the transfer of a capital asset by a person to a firm or other association of persons or body of individuals in which he is or becomes a partner or member, by way of capital contribution or otherwise, shall be chargeable to tax as his income of the previous year in which such transfer takes place."
+      },
+      "new": {
+        "section": "67",
+        "heading": "Capital gains",
+        "chapter": "Chapter IV — Capital Gains",
+        "text": "(1) Profits or gains arising from the transfer of a capital asset in a tax year shall be chargeable under the head 'Capital gains', and shall be deemed to be income of the tax year in which the transfer takes place, subject to exemptions in sections 81 to 90.\n(2) Where a member of a company receives any asset (other than shares) in lieu of shares, the gain shall be chargeable as capital gains in the tax year of receipt.\n(3) Transfer of a capital asset to a firm/AOP/BOI by way of capital contribution shall be chargeable in the tax year of transfer.\n(4) Profits on transfer of units in a business trust, and receipts under life insurance policies exceeding prescribed limits, shall also be chargeable under this head.\n(5) [New] Where capital asset is transferred and consideration is received in instalments over multiple years, the entire capital gain shall be chargeable in the year of transfer."
+      },
+      "change_type": "moved",
+      "change_summary": "New sub-section (5) codifies that instalment receipts of sale consideration do not defer capital gains — the entire gain is taxed in the year of transfer. Section renumbered from 45 to 67."
+    },
+    {
+      "id": "s54",
+      "old": {
+        "section": "54",
+        "heading": "Profit on sale of property used for residence",
+        "chapter": "Chapter IV — Capital Gains",
+        "text": "(1) Subject to the provisions of sub-section (2), where, in the case of an assessee being an individual or a Hindu undivided family, the capital gain arises from the transfer of a long-term capital asset, being buildings or lands appurtenant thereto, and being a residential house, the income of which is chargeable under the head 'Income from house property' (hereafter in this section referred to as the original asset), and the assessee has, within a period of one year before or two years after the date on which the transfer took place, purchased, or has within a period of three years after that date constructed, one residential house in India (hereafter in this section referred to as the new asset), the capital gain shall not be charged to tax.\n(2) The amount of the capital gain which is not utilised by the assessee for the purchase or construction of the new asset before the date of furnishing the return of income under section 139, shall be deposited before furnishing such return in an account in any such bank or institution as may be specified in, and utilised in accordance with, any scheme which the Central Government may, by notification in the Official Gazette, frame in this behalf; and the return shall be accompanied by proof of such deposit."
+      },
+      "new": {
+        "section": "81",
+        "heading": "Exemption on capital gains — reinvestment in residential house",
+        "chapter": "Chapter IV — Capital Gains",
+        "text": "(1) Where an individual or HUF transfers a long-term capital asset being a residential house, and within—\n(a) one year before, or two years after, the date of transfer, purchases one residential house in India; or\n(b) three years after the date of transfer, constructs one residential house in India,\nthe capital gain shall not be charged to tax.\n(2) Where the new asset is sold within three years of purchase or construction, the exempted capital gain shall be taxed as capital gains of the tax year of sale.\n(3) Unutilised capital gains must be deposited in a Capital Gains Deposit Account Scheme before the due date of filing the return.\n(4) Maximum exemption: ₹10 crore [cap introduced — gains beyond ₹10 crore are taxable even if reinvested in a new house]."
+      },
+      "change_type": "moved",
+      "change_summary": "Key change: ₹10 crore cap on exemption under §81 (formerly §54). Gains exceeding ₹10 crore are taxable even if the full proceeds are reinvested in a new residential house. Section renumbered from 54 to 81."
+    },
+    {
+      "id": "s54EC",
+      "old": {
+        "section": "54EC",
+        "heading": "Capital gain not to be charged on investment in certain bonds",
+        "chapter": "Chapter IV — Capital Gains",
+        "text": "(1) Where the capital gain arises from the transfer of a long-term capital asset (other than under sections 54B, 54D, 54F, 54G and 54GA) and the assessee has, at any time within a period of six months after the date of such transfer, invested the whole or any part of capital gains in the long-term specified asset, the capital gain shall not be charged to tax.\n(2) If only a part of the capital gain is so invested, the exemption shall be proportionate.\nExplanation.— For the purposes of this section,—\n'long-term specified asset' means any bond redeemable after three years and issued on or after the 1st day of April, 2007 by the National Highways Authority of India constituted under section 3 of the National Highways Authority of India Act, 1988, or by the Rural Electrification Corporation Limited;\nthe maximum amount that can be invested in the long-term specified asset during any financial year shall not exceed fifty lakh rupees."
+      },
+      "new": {
+        "section": "82",
+        "heading": "Exemption on LTCG — investment in specified bonds",
+        "chapter": "Chapter IV — Capital Gains",
+        "text": "(1) Where long-term capital gain arises from the transfer of any capital asset, and the assessee invests the whole or part of such gains within 6 months of transfer in long-term specified bonds, the capital gain invested shall not be charged to tax.\n(2) Proportionate exemption if only part of the gain is invested.\n(3) Long-term specified bonds means bonds—\n(a) redeemable after 5 years [lock-in increased from 3 years]; and\n(b) issued by NHAI, REC, Power Finance Corporation, or Indian Railway Finance Corporation.\n(4) Maximum investment: ₹50 lakh per tax year (unchanged).\n(5) If the bonds are transferred or converted to money within 5 years of acquisition, the exempted capital gain shall be deemed to be long-term capital gains of the tax year of such transfer."
+      },
+      "change_type": "moved",
+      "change_summary": "Lock-in period for §82 bonds increased from 3 years to 5 years. PFC and IRFC bonds now also qualify as specified bonds (expanded from only NHAI and REC). Section renumbered from 54EC to 82."
+    },
+    {
+      "id": "s56",
+      "old": {
+        "section": "56",
+        "heading": "Income from other sources",
+        "chapter": "Chapter IV — Other Sources",
+        "text": "(1) Income of every kind which is not to be excluded from the total income under this Act shall be chargeable to income-tax under the head 'Income from other sources', if it is not chargeable to income-tax under any of the heads specified in section 14, items A to E.\n(2) In particular, and without prejudice to the generality of the provisions of sub-section (1), the following income shall be chargeable to income-tax under the head 'Income from other sources', namely:—\n(i) dividends;\n(ii) income from winnings from lotteries, crossword puzzles, races including horse races, card games and other games of any sort or from gambling or betting of any form or nature;\n(viia) where any immovable property is received without consideration, the stamp duty value of such property, if the stamp duty value of such property exceeds fifty thousand rupees;\n(x) where any person receives, in any previous year, from any person or persons on or after the 1st day of April, 2017,—\n(a) any sum of money, without consideration, the aggregate value of which exceeds fifty thousand rupees, the whole of the aggregate value;\n(b) any immovable property,—\n(i) without consideration, the stamp duty value of which exceeds fifty thousand rupees, the stamp duty value;\n(ii) for a consideration, the stamp duty value exceeds such consideration by more than the higher of the following amounts, namely:— fifty thousand rupees; five per cent of the consideration."
+      },
+      "new": {
+        "section": "93",
+        "heading": "Income from other sources",
+        "chapter": "Chapter IV — Other Sources",
+        "text": "(1) Income not chargeable under any other head shall be chargeable under 'Income from other sources'.\n(2) The following shall, in particular, be chargeable under this head:—\n(a) dividends;\n(b) winnings from lotteries, crossword puzzles, races, card games, gambling or betting;\n(c) interest on securities;\n(d) gifts received [gifts-in-kind threshold]:—\n  (i) sum of money received without consideration exceeding ₹50,000 — whole amount taxable;\n  (ii) immovable property received without consideration — stamp duty value taxable if exceeding ₹50,000;\n  (iii) immovable property received for inadequate consideration — difference between stamp duty value and consideration taxable if gap > ₹50,000 or 10% of consideration [threshold increased from 5% to 10%];\n  (iv) movable property received without consideration — fair market value taxable if exceeding ₹50,000.\n(e) income from virtual digital assets (VDAs/crypto) not covered under capital gains."
+      },
+      "change_type": "moved",
+      "change_summary": "Key change: tolerance band for immovable property consideration increased from 5% to 10% (or ₹50,000, whichever is higher). Interest on securities moved from Head B into this section. VDA income explicitly mentioned. Section renumbered from 56 to 93."
+    },
+    {
+      "id": "s80C",
+      "old": {
+        "section": "80C",
+        "heading": "Deduction in respect of life insurance premia, deferred annuity, contributions to provident fund, subscription to certain equity shares or debentures, etc.",
+        "chapter": "Chapter VI-A — Deductions",
+        "text": "(1) In computing the total income of an assessee, being an individual or a Hindu undivided family, there shall be deducted, in accordance with and subject to the provisions of this section, the whole of the amount paid or deposited in the previous year, being the aggregate of the sums referred to in sub-section (2), as does not exceed one lakh and fifty thousand rupees.\n(2) The sums referred to in sub-section (1) shall be any sums paid or deposited in the previous year by the assessee—\n(i) as premium to effect or to keep in force an insurance on the life of the assessee, the spouse or any child of the assessee;\n(ii) as a contribution by the assessee to any provident fund to which the Provident Funds Act, 1925 applies;\n(iii) as subscription to any notified savings certificate;\n(iv) as contribution by the assessee to a notified Public Provident Fund;\n(v) as contribution by the assessee to a notified pension fund;\n(xvi) as subscription to any units of any Mutual Fund referred to in clause (23D) of section 10 or from the Unit Trust of India;\n(xvii) as a term deposit for a fixed period of not less than five years with a scheduled bank;\n(xviii) as subscription to notified bonds issued by the National Bank for Agriculture and Rural Development;\n(xix) as tuition fees (excluding any payment towards any development fees or donation or payment of similar nature), paid at the time of admission or thereafter to any university, college, school or other educational institution situated within India."
+      },
+      "new": {
+        "section": "123",
+        "heading": "Deductions — savings, investments and pension contributions",
+        "chapter": "Chapter VII — Deductions from Gross Total Income",
+        "text": "(1) An individual or HUF may claim a deduction up to ₹1,50,000 in a tax year for the aggregate of the following:—\n(a) life insurance premium for self, spouse or child;\n(b) contribution to Provident Fund (GPF, EPF, PPF);\n(c) subscription to NSC, NSS or notified savings certificates;\n(d) contribution to notified pension fund or Tier-I NPS account;\n(e) subscription to ELSS units of a mutual fund;\n(f) fixed deposit with scheduled bank for 5 years or more (tax-saver FD);\n(g) tuition fees for full-time education of up to two children in India;\n(h) repayment of principal on home loan for a residential house;\n(i) contribution to Sukanya Samriddhi Yojana.\n(2) Contribution to pension fund of LIC or an approved insurer [formerly §80CCC] shall also be included within the ₹1,50,000 limit.\n(3) Employee's own NPS contribution [formerly §80CCD(1)] shall be within the ₹1,50,000 limit.\n(4) Employer's NPS contribution [formerly §80CCD(2)]: deduction up to 14% of salary [increased from 10%] for central government employees and 10% for others — available even under the new tax regime (§202).\n\nImportant: Deductions under sub-sections (1), (2) and (3) are NOT available under the new tax regime (§202). Only sub-section (4) [employer NPS] is available under the new regime."
+      },
+      "change_type": "consolidated",
+      "change_summary": "§§80C, 80CCC, 80CCD consolidated into §123. Employer NPS deduction limit increased to 14% for central govt employees. New regime availability clarified. No change in ₹1.5 lakh overall cap."
+    },
+    {
+      "id": "s80D",
+      "old": {
+        "section": "80D",
+        "heading": "Deduction in respect of health insurance premia",
+        "chapter": "Chapter VI-A — Deductions",
+        "text": "(1) In computing the total income of an assessee, being an individual or a Hindu undivided family, there shall be deducted such sum, as specified in sub-section (2) or sub-section (3), in respect of payments made by the assessee—\n(a) towards premium paid for health insurance of self and family: up to ₹25,000;\n(b) premium paid for health insurance of parents: additional ₹25,000;\n(c) if the insured (self/family/parents) is a senior citizen: ₹50,000;\n(d) preventive health check-up: ₹5,000 within the overall limit.\nWhere the assessee is a HUF: up to ₹25,000 for members."
+      },
+      "new": {
+        "section": "124",
+        "heading": "Deduction for health insurance premium",
+        "chapter": "Chapter VII — Deductions from Gross Total Income",
+        "text": "(1) An individual or HUF shall be allowed a deduction for premium paid for health insurance under an approved scheme of GIC or IRDAI-approved insurer:—\n(a) for self, spouse and dependent children: up to ₹25,000;\n(b) for parents: additional ₹25,000;\n(c) where the insured person is a senior citizen: limit enhanced to ₹50,000 per category;\n(d) preventive health check-up: ₹5,000 within the above limits.\n(2) Payment must be by any mode other than cash (except for preventive check-up).\n(3) This deduction is NOT available under the new tax regime (§202).\n(4) [New] Deduction also allowed for contribution to Central Government Health Scheme (CGHS) within the same limits."
+      },
+      "change_type": "moved",
+      "change_summary": "CGHS contributions now explicitly included. New regime non-availability codified. Section renumbered from 80D to 124. Limits unchanged."
+    },
+    {
+      "id": "s80G",
+      "old": {
+        "section": "80G",
+        "heading": "Deduction in respect of donations to certain funds, charitable institutions, etc.",
+        "chapter": "Chapter VI-A — Deductions",
+        "text": "(1) In computing the total income of an assessee, there shall be deducted, in accordance with and subject to the provisions of this section,—\n(i) in a case where the aggregate of the sums donated (as specified in sub-section (2)) to funds or institutions referred to in clause (a) of sub-section (2): 100% of the amount donated;\n(ii) in a case where such donations are to the funds referred to in clause (b): 50% of the amount donated.\n(2)(a) Donations qualifying for 100% deduction without limit: PM National Relief Fund, National Defence Fund, PM's Armenia Earthquake Relief Fund, Africa (Public Contributions-India) Fund, National Foundation for Communal Harmony, etc.\n(2)(b) Donations qualifying for 50% deduction with 10% of adjusted GTI limit: any other approved institution."
+      },
+      "new": {
+        "section": "132",
+        "heading": "Deduction for donations to approved funds and institutions",
+        "chapter": "Chapter VII — Deductions from Gross Total Income",
+        "text": "(1) An assessee shall be allowed deduction in respect of donations made in the tax year to—\n(a) Government funds and national causes — 100% deduction without any limit:\n  PM National Relief Fund, PM CARES Fund, National Defence Fund, National Foundation for Communal Harmony, approved universities and educational institutions of national eminence;\n(b) Other approved institutions — 50% deduction, subject to a limit of 10% of Adjusted Gross Total Income:\n  Institutions registered under §80G approval and having a valid registration.\n(2) No deduction shall be allowed for donations in cash exceeding ₹2,000.\n(3) Donation must be backed by a receipt containing the institution's registration number, PAN and 80G registration details.\n(4) This deduction is NOT available under the new tax regime (§202)."
+      },
+      "change_type": "moved",
+      "change_summary": "PM CARES Fund now included in 100% deduction category (added by Finance Act 2020, now codified). New regime non-availability stated explicitly. Section renumbered from 80G to 132."
+    },
+    {
+      "id": "s87A",
+      "old": {
+        "section": "87A",
+        "heading": "Rebate of income-tax in case of certain individuals",
+        "chapter": "Chapter VIII — Rebates and Reliefs",
+        "text": "An assessee, being an individual resident in India, whose total income does not exceed five hundred thousand rupees, shall be entitled to a deduction from the amount of income-tax (before adding surcharge) on his total income with which he is chargeable for any assessment year, of an amount equal to hundred per cent of such income-tax or an amount of twelve thousand five hundred rupees, whichever is less."
+      },
+      "new": {
+        "section": "161",
+        "heading": "Rebate of income-tax",
+        "chapter": "Chapter VIII — Rebates and Reliefs",
+        "text": "(1) A resident individual whose total income does not exceed ₹12,00,000 under the new tax regime (§202) shall be entitled to a rebate equal to 100% of income-tax payable, or ₹60,000, whichever is less, so that no tax is payable on income up to ₹12 lakh.\n(2) Under the old tax regime, the rebate is available where total income does not exceed ₹5,00,000, limited to ₹12,500.\n(3) The rebate under sub-section (1) shall not apply to income chargeable at special rates (e.g., capital gains under §162, §163, §164, or lottery winnings).\n(4) Where income exceeds ₹12,00,000 under new regime, marginal relief may be available so that tax payable does not exceed income in excess of ₹12 lakh."
+      },
+      "change_type": "restructured",
+      "change_summary": "Major enhancement: Under the new tax regime (§202), rebate limit raised to ₹12 lakh (from ₹5 lakh), making income up to ₹12 lakh tax-free. Old regime rebate remains at ₹5 lakh / ₹12,500. Section renumbered from 87A to 161."
+    },
+    {
+      "id": "s111A",
+      "old": {
+        "section": "111A",
+        "heading": "Tax on short-term capital gains in certain cases",
+        "chapter": "Chapter XII — Special Rates of Tax",
+        "text": "(1) Where the total income of an assessee includes any income chargeable under the head 'Capital gains', arising from the transfer of a short-term capital asset, being an equity share in a company or a unit of an equity oriented fund or a unit of a business trust, and—\n(a) the transaction of sale of such equity share or unit is entered into on or after the date on which Chapter VII of the Finance (No. 2) Act, 2004 comes into force; and\n(b) such transaction is chargeable to securities transaction tax under that Chapter,\ntax payable by the assessee on the total income shall be determined as if such income were the last item in the total income, and such income shall be charged at the rate of fifteen per cent."
+      },
+      "new": {
+        "section": "162",
+        "heading": "Tax on short-term capital gains from equity and units",
+        "chapter": "Chapter VIII — Rates of Tax",
+        "text": "(1) Short-term capital gains arising from the transfer of—\n(a) an equity share in a company;\n(b) a unit of an equity oriented fund; or\n(c) a unit of a business trust,\nbeing an asset on which securities transaction tax (STT) has been paid, shall be charged to tax at the rate of 20% [increased from 15%].\n(2) Such income shall be treated as the last item of total income for the purpose of computing the tax rate.\n(3) The concessional rate under sub-section (1) is not available where STT has not been paid on the transaction."
+      },
+      "change_type": "moved",
+      "change_summary": "STCG rate on equity/equity MF/business trust units increased from 15% to 20%. Section renumbered from 111A to 162."
+    },
+    {
+      "id": "s112A",
+      "old": {
+        "section": "112A",
+        "heading": "Tax on long-term capital gains on certain assets",
+        "chapter": "Chapter XII — Special Rates of Tax",
+        "text": "(1) Notwithstanding anything contained in sub-section (1) of section 112, where the total income of an assessee includes any income chargeable under the head 'Capital gains', arising from the transfer of a long-term capital asset being an equity share in a company or a unit of an equity oriented fund or a unit of a business trust and—\n(a) in the case of equity share in a company, the transaction of sale of such equity share is entered into on or after 1st April 2018 and is chargeable to securities transaction tax; or\n(b) in the case of unit of equity oriented fund or business trust, STT is paid on transfer,\ntax on such capital gains exceeding one lakh rupees shall be charged at the rate of ten per cent."
+      },
+      "new": {
+        "section": "164",
+        "heading": "Tax on long-term capital gains from equity and units",
+        "chapter": "Chapter VIII — Rates of Tax",
+        "text": "(1) Long-term capital gains arising from the transfer of—\n(a) equity shares (STT paid); or\n(b) units of equity oriented fund (STT paid); or\n(c) units of a business trust (STT paid),\nshall be charged at 12.5% on the amount exceeding ₹1,25,000 in a tax year [rate increased from 10%; exemption threshold raised from ₹1 lakh to ₹1.25 lakh].\n(2) Indexation benefit is not available for assets covered under this section.\n(3) Grandfathering: the cost of acquisition for assets acquired before 31 January 2018 shall be the higher of actual cost or the fair market value as on 31 January 2018."
+      },
+      "change_type": "moved",
+      "change_summary": "LTCG rate on equity increased from 10% to 12.5%. Exemption threshold raised from ₹1 lakh to ₹1.25 lakh. Grandfathering provisions and indexation exclusion now codified. Section renumbered from 112A to 164."
+    },
+    {
+      "id": "s115BAC",
+      "old": {
+        "section": "115BAC",
+        "heading": "Tax on income of individuals, Hindu undivided family, association of persons, body of individuals and artificial juridical person",
+        "chapter": "Chapter XII — Special Rates",
+        "text": "(1) Notwithstanding anything contained in this Act but subject to the provisions of this Chapter, the income-tax payable in respect of the total income of a person, being an individual or a Hindu undivided family or an association of persons or a body of individuals, whether incorporated or not, or an artificial juridical person referred to in sub-clause (vii) of clause (31) of section 2, other than a co-operative society, for any previous year relevant to the assessment year beginning on or after the 1st day of April, 2021, shall, at the option of such person, be computed at the following rate of income-tax, namely:—\nUp to ₹2,50,000: NIL\n₹2,50,001–₹5,00,000: 5%\n₹5,00,001–₹7,50,000: 10%\n₹7,50,001–₹10,00,000: 15%\n₹10,00,001–₹12,50,000: 20%\n₹12,50,001–₹15,00,000: 25%\nAbove ₹15,00,000: 30%\n(2) A person exercising the option shall not be entitled to claim various exemptions and deductions.\n[The new regime became the default regime from AY 2024-25]"
+      },
+      "new": {
+        "section": "202",
+        "heading": "New tax regime — default regime for individuals and HUF",
+        "chapter": "Chapter X — Special Tax Rates",
+        "text": "(1) The income-tax on total income of an individual, HUF, AOP (other than co-operative), BOI or AJP shall be computed at the following rates under the default new tax regime:—\nUp to ₹4,00,000: NIL [increased from ₹2.5 lakh]\n₹4,00,001–₹8,00,000: 5%\n₹8,00,001–₹12,00,000: 10%\n₹12,00,001–₹16,00,000: 15%\n₹16,00,001–₹20,00,000: 20%\n₹20,00,001–₹24,00,000: 25%\nAbove ₹24,00,000: 30%\n(2) Combined with §161 rebate, no tax is payable on income up to ₹12 lakh.\n(3) This is the DEFAULT regime. Assessee must exercise option to switch to old regime.\n(4) Under this regime, the following shall NOT be allowed:—\n  (a) Deductions under §§123 to 149 (except employer NPS §123(4), §143, and §144);\n  (b) House property loss set-off against other heads;\n  (c) Standard deduction (§19) applies to salary income under this regime also.\n(5) Option to switch to old regime must be exercised before the due date of filing return."
+      },
+      "change_type": "restructured",
+      "change_summary": "Major restructuring: Tax slabs revised with NIL slab up to ₹4 lakh and top slab starting from ₹24 lakh. Combined with §161 rebate, effective tax-free income is ₹12 lakh. Standard deduction of ₹75,000 available under new regime also. This is now the default regime."
+    },
+    {
+      "id": "s115JB",
+      "old": {
+        "section": "115JB",
+        "heading": "Special provision for payment of tax by certain companies — Minimum Alternate Tax",
+        "chapter": "Chapter XII — Special Rates",
+        "text": "(1) Notwithstanding anything contained in any other provision of this Act, where in the case of an assessee, being a company, the income-tax payable on the total income as computed under this Act in respect of any previous year relevant to the assessment year commencing on or after the 1st day of April, 2012 is less than eighteen and one-half per cent of its book profit, such book profit shall be deemed to be the total income of the assessee and the tax payable by the assessee on such total income shall be the amount of income-tax at the rate of eighteen and one-half per cent.\n(2) Every company shall, for the purposes of this section, prepare its profit and loss account for the relevant previous year in accordance with the provisions of Schedule VI to the Companies Act, 1956 (now Schedule III, Companies Act, 2013)."
+      },
+      "new": {
+        "section": "210",
+        "heading": "Minimum Alternate Tax (MAT)",
+        "chapter": "Chapter X — Special Tax Rates",
+        "text": "(1) Where the income-tax payable by a company on its total income is less than 15% of its book profit, the company shall be liable to pay MAT at 15% of book profit [reduced from 18.5%].\n(2) Book profit shall be computed in accordance with the Companies Act, 2013 (Schedule III), with prescribed adjustments.\n(3) MAT credit [formerly §115JAA] shall be allowed as credit against the regular tax in subsequent years, for a period of up to 15 years.\n(4) MAT does not apply to:—\n  (a) Companies opting for concessional rate under §203 (22%) or §204 (15%);\n  (b) Foreign companies with income from royalties, FTS or capital gains under DTAA;\n  (c) A unit in an IFSC in respect of income from permitted activities."
+      },
+      "change_type": "moved",
+      "change_summary": "MAT rate reduced from 18.5% to 15%. MAT credit provisions (formerly §115JAA) integrated. Exemptions for IFSC units and concessional rate companies now part of the main section. Section renumbered from 115JB to 210."
+    },
+    {
+      "id": "s139",
+      "old": {
+        "section": "139",
+        "heading": "Return of income",
+        "chapter": "Chapter XIV — Procedure for Assessment",
+        "text": "(1) Every person,—\n(a) being a company or a firm; or\n(b) being a person other than a company or a firm, if his total income or the total income of any other person in respect of which he is assessable under this Act during the previous year exceeded the maximum amount which is not chargeable to income-tax,\nshall, on or before the due date, furnish a return of his income or the income of such other person during the previous year, in the prescribed form and verified in the prescribed manner and setting forth such other particulars as may be prescribed.\nDue dates: Persons required to audit — 31st October; Transfer Pricing cases — 30th November; Others — 31st July.\n(4) Any person who has not furnished a return within the time allowed to him under sub-section (1) may furnish the return for any previous year at any time before the end of the relevant assessment year or before the completion of the assessment, whichever is earlier.\n(5) If any person, having furnished a return under sub-section (1) or sub-section (4), discovers any omission or any wrong statement therein, he may furnish a revised return at any time before the expiry of one year from the end of the relevant assessment year or before the completion of the assessment, whichever is earlier."
+      },
+      "new": {
+        "section": "263",
+        "heading": "Return of income",
+        "chapter": "Chapter XI — Return of Income and Assessment",
+        "text": "(1) Mandatory filing: Every company, firm, and every individual/HUF/AOP/BOI whose total income exceeds the basic exemption limit shall furnish a return of income for the tax year in the prescribed form before the due date:—\n  — Persons liable to tax audit: 31st October of the following tax year;\n  — Transfer pricing cases: 30th November;\n  — Others: 31st July.\n(2) Persons not required to file mandatorily shall still file if claiming a refund, carrying forward a loss, or if gross income (before deductions) exceeds the exemption limit.\n(4) Belated return: A return may be filed after the due date but before 31st December of the tax year [changed from end of assessment year, i.e., 31st March].\n(5) Revised return: A filed return may be revised any time before 31st December of the tax year or before completion of assessment, whichever is earlier [same as belated return deadline].\n(8A) Updated return (ITR-U): An updated return may be filed within 48 months of the end of the tax year [extended from 24 months], with payment of additional tax of 25% to 50% of the tax and interest."
+      },
+      "change_type": "restructured",
+      "change_summary": "Key change: Belated and revised return deadline moved from 31st March (end of AY) to 31st December of the tax year itself — 3 months earlier. Updated return window extended from 24 to 48 months. Section renumbered from 139 to 263."
+    },
+    {
+      "id": "s147",
+      "old": {
+        "section": "147",
+        "heading": "Income escaping assessment",
+        "chapter": "Chapter XIV — Procedure for Assessment",
+        "text": "If the Assessing Officer has reason to believe that any income chargeable to tax has escaped assessment for any assessment year, he may, subject to the provisions of sections 148 to 153, assess or reassess such income and also any other income chargeable to tax which has escaped assessment and which comes to his notice subsequently in the course of the proceedings under this section, or recompute the loss or the depreciation allowance or any other allowance, as the case may be, for the assessment year concerned.\nExplanation.— Production before the Assessing Officer of account books or other evidence from which material evidence could with due diligence have been discovered by the Assessing Officer will not necessarily amount to disclosure within the meaning of the proviso."
+      },
+      "new": {
+        "section": "274",
+        "heading": "Reassessment — income escaping assessment",
+        "chapter": "Chapter XI — Return of Income and Assessment",
+        "text": "(1) Where the Assessing Officer has information (as defined) suggesting that income chargeable to tax has escaped assessment, he may reassess or assess such income after following the procedure under §§275–276.\n(2) 'Information' means:—\n  (a) information from prescribed authorities (SFT, AIS, Form 26AS, etc.);\n  (b) information received under DTAA or tax treaties;\n  (c) information from audit objections;\n  (d) information from court orders.\n(3) Time limits for reassessment:—\n  — General: within 3 years from the end of the tax year;\n  — Where income escaped exceeds ₹50 lakh: within 10 years from the end of the tax year;\n  — Search cases: up to 6 years from the end of the tax year.\n(4) Reassessment cannot be initiated merely on the basis of a change of opinion. An AO who completes the assessment cannot reassess on grounds that were already considered."
+      },
+      "change_type": "moved",
+      "change_summary": "Threshold for extended 10-year reassessment window retained at ₹50 lakh. 'Information' for reassessment is now defined in the Act itself (not just circulars). Change of opinion doctrine codified. Section renumbered from 147 to 274."
+    },
+    {
+      "id": "s154",
+      "old": {
+        "section": "154",
+        "heading": "Rectification of mistake",
+        "chapter": "Chapter XV — Liability in Special Cases",
+        "text": "(1) With a view to rectifying any mistake apparent from the record an income-tax authority referred to in section 116 may—\n(a) amend any order passed by it under the provisions of this Act;\n(b) amend any intimation or deemed intimation under sub-section (1) of section 143.\n(2) Subject to the other provisions of this section, the authority concerned—\n(a) may make an amendment under sub-section (1) of its own motion;\n(b) shall make such amendment if the mistake is brought to its notice by the assessee.\n(7) Save as otherwise provided in section 155 or sub-section (4) of section 186, no amendment under this section shall be made after the expiry of four years from the end of the financial year in which the order sought to be amended was passed."
+      },
+      "new": {
+        "section": "283",
+        "heading": "Rectification of mistake apparent from record",
+        "chapter": "Chapter XI — Return of Income and Assessment",
+        "text": "(1) Any income-tax authority may amend any order passed or intimation issued by it to rectify a mistake apparent from the record:—\n(a) on its own motion; or\n(b) on an application made by the assessee or the deductor.\n(2) An application for rectification must be made within 4 years from the end of the tax year in which the order was passed.\n(3) No amendment shall be made after 4 years from the end of the tax year in which the order sought to be rectified was made, subject to exceptions in §284.\n(4) Where an amendment has the effect of increasing the assessment or reducing a refund, the assessee shall be given a reasonable opportunity of being heard before such amendment is made.\n(5) [New] Rectification application filed online shall be disposed of within 6 months of filing."
+      },
+      "change_type": "moved",
+      "change_summary": "Online rectification disposal timeline of 6 months now mandatory. Principles of natural justice (hearing before adverse amendment) now explicit in the section. Section renumbered from 154 to 283."
+    },
+    {
+      "id": "s192",
+      "old": {
+        "section": "192",
+        "heading": "Tax deduction at source — Salaries",
+        "chapter": "Chapter XVII — Collection and Recovery",
+        "text": "(1) Any person responsible for paying any income chargeable under the head 'Salaries' shall, at the time of payment, deduct income-tax on the amount payable at the average rate of income-tax computed on the basis of the rates in force for the financial year in which the payment is made, on the estimated income of the assessee under that head for that financial year.\n(1A) A person referred to in sub-section (1) may, at the time of making any deduction, increase or reduce the amount to be deducted under that sub-section for the purpose of adjusting any excess or deficiency arising out of any previous deduction or failure to deduct during the financial year.\n(2) Where an assessee is employed simultaneously under more than one employer, or where he has changed his employment during the financial year, such assessee may furnish to the employer or, as the case may be, to the last employer, the details of income under the head 'Salaries' due or received from the former or, as the case may be, other employer and also of any tax deducted at source therefrom, and thereupon such employer shall take into account the details so furnished for the purposes of making the deduction under sub-section (1)."
+      },
+      "new": {
+        "section": "392",
+        "heading": "TDS on salaries",
+        "chapter": "Chapter XVII — Deduction of Tax at Source",
+        "text": "(1) Every person responsible for paying income chargeable under 'Salaries' shall deduct income-tax at the average rate on the estimated total salary income for the tax year, at the time of payment.\n(2) The employer shall compute average rate based on the applicable tax regime (new regime §202 is default; employee must opt for old regime in writing).\n(3) For multiple employers: the employee may provide details of income and TDS from the other employer; the current employer shall factor this in when computing TDS.\n(4) Salary paid in foreign currency shall be converted to INR at the telegraphic transfer buying rate on the date of payment.\n(5) TDS certificate (Form 16) must be issued to the employee by 15th June of the following tax year.\n(6) All TDS provisions (§§392–394) are now in a structured tabular format prescribing rates, thresholds, and deductors in one consolidated place."
+      },
+      "change_type": "consolidated",
+      "change_summary": "TDS on salaries now explicitly requires employer to compute TDS based on the employee's chosen tax regime (new or old). All TDS sections consolidated into §§392–394. Section renumbered from 192 to 392."
+    },
+    {
+      "id": "s194C",
+      "old": {
+        "section": "194C",
+        "heading": "Payments to contractors",
+        "chapter": "Chapter XVII — Collection and Recovery",
+        "text": "(1) Any person responsible for paying any sum to any resident for carrying out any work (including supply of labour for carrying out any work) in pursuance of a contract between the contractor and a specified person shall, at the time of credit of such sum to the account of the contractor or at the time of payment thereof in cash or by issue of a cheque or draft or by any other mode, whichever is earlier, deduct an amount equal to—\n(i) one per cent where the payment is being made or credit is being given to an individual or a Hindu undivided family;\n(ii) two per cent where the payment is being made or credit is being given to a person other than an individual or a Hindu undivided family.\nThreshold: ₹30,000 per payment, ₹1,00,000 in aggregate per financial year."
+      },
+      "new": {
+        "section": "393",
+        "heading": "TDS — consolidated section (all payments except salary)",
+        "chapter": "Chapter XVII — Deduction of Tax at Source",
+        "text": "Section 393 is a comprehensive TDS table consolidating all TDS provisions (formerly §§193–206AB) into a single structured section with columns for: Nature of Payment | Payer | Payee | Rate | Threshold.\n\nFor payments to contractors (formerly §194C):—\nNature: Contract payments (work contracts, labour supply)\nRate: 1% (individual/HUF payee); 2% (others)\nThreshold: ₹30,000 per payment or ₹1,00,000 aggregate in the tax year\nPayer: Specified persons (Government, companies, firms, trusts, individuals with business audit)\nNote: No TDS if payee furnishes a valid Form 15G/15H or a nil/lower deduction certificate."
+      },
+      "change_type": "consolidated",
+      "change_summary": "All TDS provisions (20+ sections) consolidated into §393 as a structured table. Rates and thresholds for contract payments unchanged. Section renumbered from 194C to 393."
+    },
+    {
+      "id": "s194IA",
+      "old": {
+        "section": "194IA",
+        "heading": "Payment on transfer of certain immovable property other than agricultural land",
+        "chapter": "Chapter XVII — Collection and Recovery",
+        "text": "(1) Any person, being a transferee, responsible for paying (other than the person referred to in sub-section (1) of section 194LA) to a resident transferor any sum by way of consideration for transfer of any immovable property (other than agricultural land), shall, at the time of credit of such sum to the account of the transferor or at the time of payment of such sum in cash or by issue of a cheque or draft or by any other mode, whichever is earlier, deduct an amount equal to one per cent of such sum as income-tax thereon.\n(2) No deduction under sub-section (1) shall be made where the consideration for the transfer of an immovable property is less than fifty lakh rupees."
+      },
+      "new": {
+        "section": "393",
+        "heading": "TDS — consolidated section (immovable property)",
+        "chapter": "Chapter XVII — Deduction of Tax at Source",
+        "text": "For purchase of immovable property (formerly §194IA), within the consolidated §393 table:—\nNature: Consideration for transfer of immovable property (other than agricultural land)\nPayer: Transferee (buyer)\nPayee: Resident transferor (seller)\nRate: 1% of consideration [or stamp duty value, whichever is higher — new rule]\nThreshold: Consideration or stamp duty value ≥ ₹50 lakh\nDue date: TDS to be deposited within 30 days from end of the month of deduction.\nForm: 26QB (online challan-cum-statement).\n\nKey change: TDS is now on the higher of actual consideration or stamp duty value — aligning TDS base with capital gains computation."
+      },
+      "change_type": "consolidated",
+      "change_summary": "Key change: TDS base for property purchases is now the higher of actual consideration or stamp duty value (previously only on actual consideration). Section consolidated into §393."
+    },
+    {
+      "id": "s194S",
+      "old": {
+        "section": "194S",
+        "heading": "Payment on transfer of virtual digital asset",
+        "chapter": "Chapter XVII — Collection and Recovery",
+        "text": "(1) Any person responsible for paying to any resident any sum by way of consideration for transfer of a virtual digital asset shall, at the time of credit of such sum to the account of the resident or at the time of payment of such sum in cash or by issue of a cheque or draft or by any other mode, whichever is earlier, deduct an amount equal to one per cent of such sum as income-tax thereon.\n(2) No deduction shall be made under sub-section (1) in a case where—\n(a) the consideration is payable by a specified person (individual/HUF below audit threshold) and the aggregate value during the financial year does not exceed fifty thousand rupees;\n(b) the consideration is payable by a person other than a specified person and the aggregate value during the financial year does not exceed ten thousand rupees."
+      },
+      "new": {
+        "section": "393",
+        "heading": "TDS — consolidated section (VDA / Crypto)",
+        "chapter": "Chapter XVII — Deduction of Tax at Source",
+        "text": "For transfer of virtual digital assets (VDA/Crypto) (formerly §194S), within the consolidated §393 table:—\nNature: Consideration for transfer of Virtual Digital Assets (VDA) including cryptocurrency, NFTs\nRate: 1% of consideration\nThreshold:—\n  — Specified persons (individual/HUF, non-audit): ₹50,000 aggregate per tax year\n  — Others: ₹10,000 aggregate per tax year\nPayer: Any person (exchange or buyer) responsible for paying the VDA consideration\nNote: Where VDA is transferred in exchange for another VDA (barter), the person receiving the VDA is responsible for TDS at FMV of the VDA given."
+      },
+      "change_type": "consolidated",
+      "change_summary": "Barter/exchange of VDAs now explicitly covered — TDS obligation on the person receiving VDA at FMV. Rates and thresholds unchanged. Section consolidated into §393."
+    },
+    {
+      "id": "s270A",
+      "old": {
+        "section": "270A",
+        "heading": "Penalty for under-reporting and misreporting of income",
+        "chapter": "Chapter XXI — Penalties",
+        "text": "(1) The Assessing Officer or the Commissioner (Appeals) or the Principal Commissioner or the Commissioner may, during the course of any proceedings under this Act, direct that any person who has under-reported his income shall be liable to pay a penalty in addition to tax, if any, payable by him.\n(7) The penalty payable by any person for under-reporting of income shall be a sum equal to fifty per cent of the amount of tax payable on under-reported income.\n(8) The penalty payable by any person for misreporting of income shall be a sum equal to two hundred per cent of the amount of tax payable on misreported income.\nExplanation.— A person shall be considered to have under-reported his income if the income assessed is greater than the income determined in the return processed under section 143(1)."
+      },
+      "new": {
+        "section": "356",
+        "heading": "Penalty for under-reporting and misreporting of income",
+        "chapter": "Chapter XIV — Penalties",
+        "text": "(1) Where an assessee has under-reported income, penalty shall be levied by the Assessing Officer or Appellate Authority at:—\n(a) 50% of tax on under-reported income (for under-reporting); or\n(b) 200% of tax on misreported income (for misreporting — false entries, suppression, use of forged documents).\n(2) Under-reporting means the income assessed exceeds the income declared.\n(3) Misreporting includes:—\n  (a) misrepresentation or suppression of facts;\n  (b) failure to record investments in books;\n  (c) claim of expenditure not substantiated;\n  (d) recording false entries.\n(4) No penalty for under-reporting where:—\n  (a) the assessee offers a bona fide explanation;\n  (b) the assessee discloses the income in the updated return (ITR-U) filed before issuing the notice.\n(5) [New] Immunity from penalty on payment of tax and interest on undisclosed income detected during search, if disclosed in the updated return within the prescribed period."
+      },
+      "change_type": "moved",
+      "change_summary": "Immunity from penalty now available if undisclosed income is disclosed in ITR-U before penalty proceedings are initiated. Definitions of misreporting expanded. Section renumbered from 270A to 356."
+    },
+    {
+      "id": "s276C",
+      "old": {
+        "section": "276C",
+        "heading": "Wilful attempt to evade tax",
+        "chapter": "Chapter XXII — Prosecution",
+        "text": "(1) If a person wilfully attempts in any manner whatsoever to evade any tax, penalty or interest chargeable or imposable, or the payment thereof, under this Act, he shall, without prejudice to any penalty that may be imposable on him under any other provision of this Act, be punishable,—\n(i) in a case where the amount sought to be evaded exceeds twenty-five lakh rupees, with rigorous imprisonment for a term which shall not be less than six months but which may extend to seven years and with fine;\n(ii) in any other case, with rigorous imprisonment for a term which shall not be less than three months but which may extend to two years and with fine."
+      },
+      "new": {
+        "section": "375",
+        "heading": "Prosecution — wilful attempt to evade tax",
+        "chapter": "Chapter XV — Prosecution",
+        "text": "(1) Any person who wilfully attempts to evade any tax, penalty or interest payable under this Act shall be punishable with:—\n(a) where the amount sought to be evaded exceeds ₹25 lakh: rigorous imprisonment from 6 months to 7 years, and fine;\n(b) in other cases: rigorous imprisonment from 3 months to 2 years, and fine.\n(2) [New] Where prosecution is compounded, the person shall pay the compounding fee prescribed (typically 100–300% of tax evaded), and prosecution shall be dropped upon payment.\n(3) [New] No prosecution shall be initiated where the income was disclosed in an updated return (ITR-U) before detection, and full tax and interest was paid.\n(4) Sanction of the Principal Chief Commissioner or Chief Commissioner is required before initiating prosecution."
+      },
+      "change_type": "moved",
+      "change_summary": "Safe harbour: No prosecution if income is proactively disclosed in ITR-U before detection. Compounding provisions now part of the main prosecution section. Section renumbered from 276C to 375."
+    },
+    {
+      "id": "s90",
+      "old": {
+        "section": "90",
+        "heading": "Agreement with foreign countries or specified territories",
+        "chapter": "Chapter IX — Double Taxation Relief",
+        "text": "(1) The Central Government may enter into an agreement with the Government of any country outside India or specified territory outside India,—\n(a) for the granting of relief in respect of—\n(i) income on which have been paid both income-tax under this Act and income-tax in that country or specified territory, as the case may be; or\n(ii) income-tax chargeable under this Act and under the corresponding law in force in that country or specified territory, as the case may be, to promote mutual economic relations, trade and investment;\n(b) for the avoidance of double taxation of income under this Act and under the corresponding law in force in that country or specified territory;\n(c) for exchange of information for the prevention of evasion or avoidance of income-tax chargeable under this Act or under the corresponding law in force in that country or specified territory.\n(2) Where the Central Government has entered into an agreement with the Government of any country outside India or specified territory outside India under sub-section (1) for granting relief of tax, or as the case may be, avoidance of double taxation, then, in relation to the assessee to whom such agreement applies, the provisions of this Act shall apply to the extent they are more beneficial to that assessee."
+      },
+      "new": {
+        "section": "213",
+        "heading": "Agreement with foreign countries — DTAA",
+        "chapter": "Chapter IX — Relief of Tax and DTAA",
+        "text": "(1) The Central Government may enter into agreements (DTAAs) with foreign governments or specified territories for:—\n(a) relief from double taxation on income taxed in both India and the treaty country;\n(b) avoidance of double taxation;\n(c) exchange of information for prevention of tax evasion;\n(d) recovery of taxes.\n(2) Where a DTAA applies, the provisions of this Act shall apply to the extent more beneficial to the assessee.\n(3) [Codified] A non-resident shall be entitled to the benefit of the DTAA only if they furnish a Tax Residency Certificate (TRC) from the foreign tax authority.\n(4) [Codified] The assessee shall also furnish such additional information in Form 10F as prescribed.\n(5) The Principal Purpose Test (PPT) applies: DTAA benefits shall not be available where the main purpose of an arrangement is to obtain DTAA benefits — consistent with OECD/BEPS Action 6."
+      },
+      "change_type": "moved",
+      "change_summary": "TRC requirement and Form 10F now codified in the main section. Principal Purpose Test (PPT) aligned with BEPS Action 6 now explicitly in the Act. Section renumbered from 90 to 213."
+    }
+  ]
+}
