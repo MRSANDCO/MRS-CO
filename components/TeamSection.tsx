@@ -287,15 +287,15 @@ export default function TeamSection() {
               experience: "20+",
               specialization: "Corporate Law & Direct and Indirect taxes specialisation"
             },
-            {
-              name: "CA Rajeev Kumar",
-              role: "Senior Partner",
-              image: "/assets/team/member2.jpg",
-              imagePosition: "object-top",
-              qualification: "FCA, MBA",
-              experience: "20+",
-              specialization: "Corporate Advisory & Taxation"
-            },
+            // {
+            //   name: "CA Rajeev Kumar",
+            //   role: "Senior Partner",
+            //   image: "/assets/team/member2.jpg",
+            //   imagePosition: "object-top",
+            //   qualification: "FCA, MBA",
+            //   experience: "20+",
+            //   specialization: "Corporate Advisory & Taxation"
+            // },
             {
               name: "CA Shruti Dang",
               role: "Partner",

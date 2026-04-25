@@ -676,7 +676,7 @@ export default function MRSCoSite() {
       {/* REFINED PROFESSIONAL HERO with Meticulous Advisory Theme */}
       <section
         id="home"
-        className="relative pb-16 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center"
+        className="relative py-20 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center"
       >
         {/* Themed Background Image - Pen, Paper, and Strategic Planning */}
         <div className="absolute inset-0 z-0">
@@ -778,53 +778,121 @@ export default function MRSCoSite() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="relative group p-[1px] rounded-[2.5rem] bg-gradient-to-b from-white/10 to-transparent"
-            >
-              <div className="absolute -inset-10 bg-cyan-500/5 blur-[100px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8, ease: "easeOut" }}
+  className="relative group p-[1px] rounded-[2.5rem] bg-gradient-to-b from-white/10 to-transparent mt-8 lg:mt-0"
+>
+  <div className="absolute -inset-10 bg-cyan-500/5 blur-[100px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
 
-              <div className="relative bg-[#0B0F1A]/80 backdrop-blur-3xl p-10 rounded-[2.4rem] overflow-hidden border border-white/10 shadow-2xl">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-gradient-to-b from-cyan-500/10 to-transparent pointer-events-none" />
+  <div className="relative bg-[#0B0F1A]/80 backdrop-blur-3xl p-10 rounded-[2.4rem] overflow-hidden border border-white/10 shadow-2xl">
+    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[70%] h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-                  <StatItem
-                    value="500+"
-                    label="Global Clients"
-                    gradient="from-white to-cyan-400"
-                    delay={0.1}
-                  />
-                  <StatItem
-                    value="25+"
-                    label="Years of Mastery"
-                    gradient="from-cyan-300 to-blue-500"
-                    delay={0.2}
-                  />
-                  <StatItem
-                    value="40+"
-                    label="Industries Impacted"
-                    gradient="from-blue-400 to-indigo-500"
-                    delay={0.3}
-                  />
-                  <StatItem
-                    value="98%"
-                    label="Retention Rate"
-                    gradient="from-emerald-400 to-teal-500"
-                    delay={0.4}
-                  />
-                </div>
-                {/* Income Tax Mapper Section */}
-<section className="py-16 px-6 max-w-6xl mx-auto">
-  <h2 className="text-2xl font-semibold text-slate-900 mb-2">
-    Tax Law Navigator
-  </h2>
-  <p className="text-slate-500 mb-8">
-    Transition guide for the new Income Tax Act 2025
-  </p>
-  <IncomeTaxNavigatorCard />
-</section>
+    {/* 2×2 Stats Grid */}
+    <div className="grid grid-cols-2 gap-4 relative z-10">
+      {[
+        { value: "500+", label: "Global Clients",      gradient: "from-white to-cyan-400" },
+        { value: "25+",  label: "Years of Mastery",    gradient: "from-cyan-300 to-blue-500" },
+        { value: "40+",  label: "Industries Impacted", gradient: "from-blue-400 to-indigo-500" },
+        { value: "98%",  label: "Retention Rate",      gradient: "from-emerald-400 to-teal-500" },
+      ].map(({ value, label, gradient }) => (
+        <div
+          key={label}
+          className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 hover:bg-white/[0.045] hover:border-white/[0.12] hover:-translate-y-1 transition-all duration-300"
+        >
+          <div className={`text-4xl font-extrabold tracking-tight bg-gradient-to-br ${gradient} bg-clip-text text-transparent mb-1.5`}>
+            {value}
+          </div>
+          <div className="text-[10px] font-medium tracking-widest uppercase text-slate-400/60">
+            {label}
+          </div>
+        </div>
+      ))}
+    </div>
 
+    {/* Divider */}
+    <div className="h-px bg-white/[0.05] my-5" />
+
+   {/* ── TAX NAVIGATOR HIGHLIGHT ── */}
+<div className="mx-5 mb-5 p-[1px] rounded-[20px] bg-gradient-to-br from-cyan-400/50 via-indigo-400/40 to-cyan-400/20">
+  <div className="relative bg-gradient-to-br from-[#0d1829] to-[#0f1a2e] rounded-[19px] p-6 overflow-hidden">
+
+    {/* Glow blobs */}
+    <div className="absolute -top-10 -left-10 w-48 h-48 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none" />
+    <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-indigo-400/10 rounded-full blur-2xl pointer-events-none" />
+
+    {/* Top row */}
+    <div className="flex items-start justify-between mb-4 relative z-10">
+      <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-cyan-400/20 to-indigo-400/15 border border-cyan-400/30 flex items-center justify-center">
+        <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <div className="flex flex-col items-end gap-1.5">
+        <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400 bg-emerald-400/12 border border-emerald-400/25 rounded-full px-2.5 py-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          Live Apr 2026
+        </span>
+        <span className="text-[9px] font-semibold text-cyan-400 bg-cyan-400/8 border border-cyan-400/18 rounded-full px-2.5 py-1">
+          ICAI Sourced
+        </span>
+      </div>
+    </div>
+
+    {/* Title */}
+    <div className="text-[17px] font-bold text-white leading-snug mb-1.5 relative z-10">
+      Income Tax Act Comparison Tool
+    </div>
+    <div className="text-[12px] text-white/45 leading-relaxed mb-5 relative z-10">
+      Navigate any provision from ITA 1961 to the new ITA 2025 — instantly, bidirectionally.
+    </div>
+
+    {/* 1961 vs 2025 compare */}
+    <div className="flex items-center gap-3 mb-5 relative z-10">
+      <div className="flex-1 text-center bg-white/[0.03] border border-white/[0.07] rounded-xl py-3">
+        <div className="text-xl font-extrabold tracking-tight bg-gradient-to-br from-slate-300 to-slate-400 bg-clip-text text-transparent">1961</div>
+        <div className="text-[9px] uppercase tracking-widest text-white/30 mt-0.5">Old Act</div>
+        <div className="text-[10px] text-white/40 mt-0.5">819 sections</div>
+      </div>
+      <div className="flex flex-col items-center gap-1">
+        <ArrowRight className="w-4 h-4 text-cyan-400" />
+        <ArrowLeft className="w-4 h-4 text-cyan-400" />
+        <span className="text-[9px] text-cyan-400/50">map</span>
+      </div>
+      <div className="flex-1 text-center bg-white/[0.03] border border-white/[0.07] rounded-xl py-3">
+        <div className="text-xl font-extrabold tracking-tight bg-gradient-to-br from-cyan-300 to-indigo-400 bg-clip-text text-transparent">2025</div>
+        <div className="text-[9px] uppercase tracking-widest text-white/30 mt-0.5">New Act</div>
+        <div className="text-[10px] text-white/40 mt-0.5">536 sections</div>
+      </div>
+    </div>
+
+    {/* Feature pills */}
+    <div className="flex flex-wrap gap-2 mb-5 relative z-10">
+      {["Bidirectional lookup","Section-wise search","Provision mapping","Side-by-side view"].map((f) => (
+        <span key={f} className="flex items-center gap-1.5 text-[11px] text-white/55 bg-white/[0.04] border border-white/[0.08] rounded-full px-3 py-1.5">
+          <CheckCircle className="w-3 h-3 text-cyan-400" />
+          {f}
+        </span>
+      ))}
+    </div>
+
+    {/* CTA */}
+    <a
+      href="https://share.google/ltDlm59gGOrMEStoX"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group/nav relative z-10 flex items-center justify-center gap-2.5 w-full py-3.5 rounded-[14px] bg-gradient-to-br from-[#1e4a7a] to-[#1a3a6a] border border-cyan-400/30 hover:border-cyan-400/50 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(103,190,255,0.15)] transition-all duration-300 overflow-hidden"
+    >
+      <span className="absolute inset-0 bg-gradient-to-br from-cyan-400/15 to-indigo-400/10 opacity-0 group-hover/nav:opacity-100 transition-opacity" />
+      <span className="relative text-[13px] font-semibold text-white">Open Tax Law Navigator</span>
+      <ArrowRight className="relative w-4 h-4 text-cyan-400 group-hover/nav:translate-x-0.5 transition-transform" />
+    </a>
+
+  </div>
+</div>
               </div>
             </motion.div>
           </div>
