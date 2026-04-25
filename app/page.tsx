@@ -62,9 +62,10 @@ const newsItems = [
   "🔔  Major Relief for CAs: Supreme Court rules Form 15CB issuance is not abetment of money laundering",
   "💼 MRS & Co. Recognized Among North India's Top 50 CA Firms & Empanelled as an RBI Category–I Firm",
   // "📊 ",
+  "💡 Govt. mulls CAG-like independent body to appoint auditors for listed firms, private banks, and NBFCs to ensure financial transparency",
   "🚀 Tax Update: Section 115BAC new regime continues as default for AY 2025–26; revised simplified regime starts April 1, 2026.",
   "⚖️ We're hiring! Senior Tax Consultants and CA Articleship positions open",
-  "💡 MCA Extends Deadline for filling forms AOC-4 and MGT-7/7A to December 31,2025",
+  
   // "📈 Major Relief for CAs: Supreme Court rules Form 15CB issuance is not abetment of money laundering.",
   "🎯 Successfully helped 50+ startups with fundraising in Q1 2025",
 ];
