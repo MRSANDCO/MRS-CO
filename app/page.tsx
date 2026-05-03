@@ -5,6 +5,7 @@ import NextImage from "next/image";
 import Link from "next/link";
 // import AchievementSection from "@/components/AchievementSection";
 // import TeamSection from "@/components/TeamSection";
+import BlogSection from "./BlogSection/page";
 import { motion, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,7 +62,6 @@ function useDebounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
 const newsItems = [
   "🔔  Major Relief for CAs: Supreme Court rules Form 15CB issuance is not abetment of money laundering",
   "💼 MRS & Co. Recognized Among North India's Top 50 CA Firms & Empanelled as an RBI Category–I Firm",
-  // "📊 ",
   "💡 Govt. mulls CAG-like independent body to appoint auditors for listed firms, private banks, and NBFCs to ensure financial transparency",
   "🚀 Tax Update: Section 115BAC new regime continues as default for AY 2025–26; revised simplified regime starts April 1, 2026.",
   "⚖️ We're hiring! Senior Tax Consultants and CA Articleship positions open",
@@ -222,6 +222,61 @@ const StatItem: React.FC<StatItemProps> = ({ value, label, gradient, delay }) =>
 // ------------------------
 // Main Component
 // ------------------------
+function LatestInsightsButton() {
+  const [hovered, setHovered] = React.useState(false);
+ 
+  const scrollToBlog = () => {
+    const el = document.getElementById("blog");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+ 
+  return (
+    <motion.button
+      onClick={scrollToBlog}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.98 }}
+      className="relative w-full max-w-xl overflow-hidden rounded-2xl group text-left cursor-pointer transition-all duration-300 shadow-xl border border-white/20 bg-white/10 backdrop-blur-md"
+    >
+      {/* Inner Content */}
+      <div className="relative p-5 sm:p-6 flex items-center gap-5 sm:gap-6 h-full w-full overflow-hidden">
+        
+        {/* Icon Container */}
+        <div 
+          className="relative flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center transition-all duration-300 bg-white/10 group-hover:bg-blue-600 border border-white/20"
+        >
+          <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+        </div>
+
+        {/* Text Details */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="flex h-2 w-2 rounded-full bg-blue-400 group-hover:bg-white transition-colors duration-300" />
+            <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-blue-200 group-hover:text-blue-100 transition-colors duration-300">
+              News & Updates
+            </p>
+          </div>
+          <h3 className="text-xl sm:text-2xl font-bold text-white mb-1 tracking-tight group-hover:text-blue-50 transition-colors duration-300">
+            Latest Insights
+          </h3>
+          <p className="text-sm text-slate-300 font-medium truncate group-hover:text-white transition-colors duration-300">
+            Tax guides, GST limits & expert compliance advice
+          </p>
+        </div>
+
+        {/* Arrow */}
+        <div className="hidden sm:flex flex-shrink-0 w-10 h-10 rounded-full bg-white/5 border border-white/10 items-center justify-center group-hover:bg-blue-600 group-hover:border-blue-500 transition-all duration-300">
+          <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform duration-300" />
+        </div>
+      </div>
+      
+      {/* Subtle Bottom Accent Line */}
+      <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-blue-500 to-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+    </motion.button>
+  );
+}
+
 export default function MRSCoSite() {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -393,285 +448,156 @@ export default function MRSCoSite() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
-      {/* ENHANCED NAVBAR WITH COLORFUL BACKGROUND */}
-      <div className="sticky top-0 z-50">
-        <div className="relative overflow-hidden">
-          {/* Background Image for Navbar */}
-          <div className="absolute inset-0">
-            {/* <img
-              src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop"
-              alt="Modern office background"
-              className="w-full h-full object-cover"
-            /> */}
-            <NextImage
-              src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop"
-              alt="Modern office background"
-              fill
-              priority={true}
-              // quality={80}
-              sizes="100vw"
-              className="object-cover"
-            />
-            {/* Refined Colorful Gradient Overlays */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/12 via-indigo-400/8 to-blue-600/12"></div>
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-500/5 via-transparent to-cyan-400/8"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-white/88 via-white/82 to-white/88 backdrop-blur-sm"></div>
-          </div>
-
-          {/* Refined Animated Elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <motion.div
-              animate={{
-                x: [0, 90, 0],
-                y: [0, -8, 0],
-                opacity: [0.25, 0.5, 0.25],
-                scale: [1, 1.15, 1],
+      {/* ENHANCED GLASSMORPHISM NAVBAR */}
+      <header className="sticky top-0 z-[100] bg-[#e2e8f0] border-b border-slate-300 shadow-sm transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-[72px]">
+            {/* Logo */}
+            <button
+              suppressHydrationWarning
+              onClick={() => {
+                const homeSection = document.getElementById("home");
+                if (homeSection) {
+                  homeSection.scrollIntoView({ behavior: "smooth" });
+                }
               }}
-              transition={{
-                duration: 12,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="absolute top-3 right-24 w-12 h-12 bg-gradient-to-br from-blue-400/40 to-indigo-500/40 rounded-full shadow-md shadow-blue-400/20"
-            />
-            <motion.div
-              animate={{
-                x: [0, -70, 0],
-                rotate: [0, 120, 240, 360],
-                opacity: [0.2, 0.45, 0.2],
-                scale: [1, 1.2, 1],
-              }}
-              transition={{
-                duration: 16,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 3,
-              }}
-              className="absolute bottom-2 left-12 w-8 h-8 bg-gradient-to-br from-cyan-400/45 to-blue-500/45 rounded-lg shadow-sm shadow-cyan-300/25"
-            />
-            <motion.div
-              animate={{
-                x: [0, 60, 0],
-                y: [0, 12, 0],
-                opacity: [0.15, 0.4, 0.15],
-                rotate: [0, -60, 0],
-              }}
-              transition={{
-                duration: 14,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 6,
-              }}
-              className="absolute top-1/2 left-1/3 w-6 h-6 bg-gradient-to-br from-indigo-300/50 to-purple-400/50 rounded-full shadow-sm shadow-indigo-300/30"
-            />
-            <motion.div
-              animate={{
-                x: [0, -45, 0],
-                y: [0, -15, 0],
-                opacity: [0.2, 0.4, 0.2],
-                scale: [1, 1.08, 1],
-              }}
-              transition={{
-                duration: 18,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 2,
-              }}
-              className="absolute top-4 right-1/2 w-4 h-4 bg-gradient-to-br from-slate-400/40 to-blue-400/40 rounded-lg shadow-sm shadow-slate-300/20"
-            />
-          </div>
-
-          <div className="relative z-10 border-b border-white/50">
-            <div className="max-w-7xl mx-auto px-4 md:px-6">
-              <div className="flex items-center justify-between h-16">
-                {/* Logo */}
-                <button
-                  suppressHydrationWarning
-                  onClick={() => {
-                    const homeSection = document.getElementById("home");
-                    if (homeSection) {
-                      homeSection.scrollIntoView({ behavior: "smooth" });
-                    }
-                  }}
-                  className="flex items-center gap-3 group hover:opacity-80 transition-opacity"
-                >
-                  {/* Rectangular Logo */}
-                  <div className="relative w-14 h-14 group-hover:scale-105 transition-transform duration-300">
-                    <img
-                      src="https://education21.in/wp-content/uploads/2023/12/CA-India-Logo-1024x762.png"
-                      alt="CA India Logo"
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <div>
-                    <div className="text-base md:text-lg font-bold tracking-tight">
-                      MRS & Co.
-                    </div>
-                    <div className="text-[10px] md:text-xs text-blue-700 font-semibold -mt-0.5 tracking-wide">
-                      Chartered Accountants
-                    </div>
-                  </div>
-                </button>
-                {/* Desktop Nav */}
-                <nav className="hidden md:flex items-center gap-2">
-                  {[
-                    // ["Home", "home"],
-                    ["About", "about"],
-                    ["Services", "services"],
-                    ["News", "news"],
-                    ["Team", "team"],
-                    // ["Testimonials", "testimonials"],
-                    ["Careers", "careers"],
-                    ["Startup Advisory", "startup-advisory"],
-                    ["Contact", "contact"],
-                  ].map(([label, id]) => (
-                    <a
-                      key={id}
-                      href={`#${id}`}
-                      className="px-3 py-2 rounded-xl hover:bg-white/60 hover:shadow-sm text-sm font-medium transition-all duration-500 hover:text-indigo-700"
-                    >
-                      {label}
-                    </a>
-                  ))}
-                  <Button
-                    asChild
-                    className="rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:via-indigo-700 hover:to-blue-800 shadow-md hover:shadow-indigo-500/30 transform hover:scale-105 transition-all duration-500"
-                  >
-                    <a href="#consult">Book a Call</a>
-                  </Button>
-                  <Button
-                    asChild
-                    className="rounded-2xl border-2 border-blue-500/40 bg-transparent hover:bg-blue-600/10 text-blue-700 hover:text-blue-800 shadow-sm hover:shadow-blue-500/20 transform hover:scale-105 transition-all duration-500"
-                  >
-                    <Link href="/login">Client Login</Link>
-                  </Button>
-                </nav>
-
-                {/* Mobile */}
-                <button
-                  suppressHydrationWarning
-                  className="md:hidden p-2 rounded-xl hover:bg-white/60 hover:shadow-sm transition-all duration-500 hover:text-indigo-600"
-                  aria-label={menuOpen ? "Close menu" : "Open menu"}
-                  onClick={() => setMenuOpen((s) => !s)}
-                >
-                  {menuOpen ? <X /> : <Menu />}
-                </button>
+              className="flex items-center gap-3 group hover:opacity-80 transition-opacity"
+            >
+              <div className="relative w-12 h-12 md:w-14 md:h-14 group-hover:scale-105 transition-transform duration-300">
+                <img
+                  src="https://education21.in/wp-content/uploads/2023/12/CA-India-Logo-1024x762.png"
+                  alt="CA India Logo"
+                  className="w-full h-full object-contain"
+                />
               </div>
-            </div>
-
-            {/* Mobile Sheet */}
-            {menuOpen && (
-              <div className="md:hidden border-t bg-white/95 backdrop-blur-md">
-                <div className="max-w-7xl mx-auto px-4 py-4 grid gap-2">
-                  {[
-                    // ["Home", "home"],
-                    ["About", "about"],
-                    ["Services", "services"],
-                    ["News", "news"],
-                    ["Team", "team"],
-                    // ["Testimonials", "testimonials"],
-                    ["Careers", "careers"],
-                    ["Startup Advisory", "startup-advisory"],
-                    ["Contact", "contact"],
-                  ].map(([label, id]) => (
-                    <a
-                      key={id}
-                      href={`#${id}`}
-                      onClick={() => setMenuOpen(false)}
-                      className="px-3 py-3 rounded-xl hover:bg-slate-100 text-sm font-medium flex items-center justify-between"
-                    >
-                      <span>{label}</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </a>
-                  ))}
-                  <Link
-                    href="/login"
-                    onClick={() => setMenuOpen(false)}
-                    className="px-3 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white text-sm font-medium text-center"
-                  >
-                    Client Login
-                  </Link>
+              <div className="text-left">
+                <div className="text-base md:text-[19px] font-bold tracking-tight text-slate-800">
+                  MRS & Co.
+                </div>
+                <div className="text-[10px] md:text-xs text-blue-600 font-bold -mt-0.5 tracking-wide uppercase">
+                  Chartered Accountants
                 </div>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
-      
-      {/* NEWS TICKER */}
-      <section className="relative py-4 overflow-hidden">
-        <div className="absolute inset-0">
-          {/* <img
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
-            alt="Modern business background"
-            className="w-full h-full object-cover"
-          /> */}
-          <NextImage
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
-            alt="Modern business background"
-            fill
-            priority={false}  // Not above fold
-            quality={75}
-            sizes="100vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-700/95 via-indigo-700/95 to-blue-800/95"></div>
-        </div>
+            </button>
 
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            animate={{ x: [0, 100, 0], opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-0 right-10 w-16 h-16 bg-cyan-400/20 rounded-full blur-xl"
-          />
-          <motion.div
-            animate={{ x: [0, -80, 0], opacity: [0.2, 0.5, 0.2] }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2,
-            }}
-            className="absolute top-0 left-20 w-12 h-12 bg-blue-300/20 rounded-full blur-lg"
-          />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 z-10">
-          <div className="relative flex items-center z-10">
-            <div className="bg-white text-blue-700 px-5 py-2.5 font-bold text-sm uppercase tracking-wider flex-shrink-0 shadow-lg rounded-lg flex items-center gap-2">
-              <span className="text-lg">📢</span>
-              <span className="hidden sm:inline">Latest Updates</span>
-              <span className="sm:hidden">News</span>
-            </div>
-
-            <div className="flex-1 overflow-hidden relative max-w-5xl">
-              <motion.div
-                className="flex gap-12 whitespace-nowrap"
-                animate={{ x: [0, -2000] }}
-                transition={{
-                  x: {
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    duration: 40,
-                    ease: "linear",
-                  },
-                }}
+            {/* Desktop Nav */}
+            <nav className="hidden lg:flex items-center gap-1.5">
+              <Link
+                href="/about"
+                className="px-4 py-2 rounded-full hover:bg-blue-50 text-[14px] font-bold text-slate-700 hover:text-blue-700 transition-all duration-300"
               >
-                {[...newsItems, ...newsItems].map((news, idx) => (
-                  <span
-                    key={idx}
-                    className="text-white font-medium text-sm flex items-center gap-2"
-                  >
-                    {news}
-                    <span className="text-cyan-300 font-bold">•</span>
-                  </span>
-                ))}
-              </motion.div>
-            </div>
+                About
+              </Link>
+              {[
+                ["Services", "services"],
+                ["News", "news"],
+                ["Startup Advisory", "startup-advisory"],
+                ["Contact", "contact"],
+              ].map(([label, id]) => (
+                <a
+                  key={id}
+                  href={`#${id}`}
+                  className="px-4 py-2 rounded-full hover:bg-blue-50 text-[14px] font-bold text-slate-700 hover:text-blue-700 transition-all duration-300"
+                >
+                  {label}
+                </a>
+              ))}
+              <Link
+                href="/careers"
+                className="px-4 py-2 rounded-full hover:bg-blue-50 text-[14px] font-bold text-slate-700 hover:text-blue-700 transition-all duration-300"
+              >
+                Careers
+              </Link>
+              
+              <div className="h-5 w-px bg-slate-300 mx-2" />
+              
+              <Button
+                asChild
+                variant="ghost"
+                className="rounded-full text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-bold transition-all duration-300"
+              >
+                <Link href="/login">Client Login</Link>
+              </Button>
+              <Button
+                asChild
+                className="rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md hover:shadow-indigo-500/25 transform hover:-translate-y-0.5 transition-all duration-300 ml-1 px-6 font-bold"
+              >
+                <a href="#consult">Book a Call</a>
+              </Button>
+            </nav>
+
+            {/* Mobile Toggle */}
+            <button
+              suppressHydrationWarning
+              className="lg:hidden p-2.5 rounded-full hover:bg-slate-100 text-slate-600 hover:text-blue-600 transition-colors duration-300"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              onClick={() => setMenuOpen((s) => !s)}
+            >
+              {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
-      </section>
 
+        {/* Mobile Sheet */}
+        {menuOpen && (
+          <div className="lg:hidden absolute top-[72px] left-0 right-0 bg-white/95 backdrop-blur-2xl border-b border-slate-200/50 shadow-2xl">
+            <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col gap-2">
+              <Link
+                href="/about"
+                onClick={() => setMenuOpen(false)}
+                className="px-4 py-3.5 rounded-2xl hover:bg-blue-50/50 text-[15px] font-bold text-slate-700 flex items-center justify-between group"
+              >
+                <span>About</span>
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+              </Link>
+              {[
+                ["Services", "services"],
+                ["News", "news"],
+                ["Startup Advisory", "startup-advisory"],
+                ["Contact", "contact"],
+              ].map(([label, id]) => (
+                <a
+                  key={id}
+                  href={`#${id}`}
+                  onClick={() => setMenuOpen(false)}
+                  className="px-4 py-3.5 rounded-2xl hover:bg-blue-50/50 text-[15px] font-bold text-slate-700 flex items-center justify-between group"
+                >
+                  <span>{label}</span>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                </a>
+              ))}
+              <Link
+                href="/careers"
+                onClick={() => setMenuOpen(false)}
+                className="px-4 py-3.5 rounded-2xl hover:bg-blue-50/50 text-[15px] font-bold text-slate-700 flex items-center justify-between group"
+              >
+                <span>Careers</span>
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+              </Link>
+              
+              <div className="h-px bg-slate-100 my-4 mx-4" />
+              
+              <div className="flex flex-col gap-3 px-2">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full rounded-2xl border-2 border-blue-100 text-blue-600 py-6 font-bold"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <Link href="/login">Client Login</Link>
+                </Button>
+                <Button
+                  asChild
+                  className="w-full rounded-2xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 py-6 font-bold"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <a href="#consult">Book a Free Consultation</a>
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
 
       {/* REFINED PROFESSIONAL HERO with Meticulous Advisory Theme */}
       <section
@@ -775,14 +701,25 @@ export default function MRSCoSite() {
                   <span className="text-purple-400 font-medium">Startup Friendly</span>
                 </div>
               </div>
+             
+              <div className="mt-8 mb-4">
+                <LatestInsightsButton />
+              </div>
+ 
+ 
+   
+
+    
+              
             </motion.div>
 
             <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.8, ease: "easeOut" }}
-  className="relative group p-[1px] rounded-[2.5rem] bg-gradient-to-b from-white/10 to-transparent mt-8 lg:mt-0"
->
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                 viewport={{ once: true }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="relative group p-[1px] rounded-[2.5rem] bg-gradient-to-b from-white/10 to-transparent mt-8 lg:mt-0"
+            >
   <div className="absolute -inset-10 bg-cyan-500/5 blur-[100px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
 
   <div className="relative bg-[#0B0F1A]/80 backdrop-blur-3xl p-10 rounded-[2.4rem] overflow-hidden border border-white/10 shadow-2xl">
@@ -899,7 +836,83 @@ export default function MRSCoSite() {
         </div>
       </section>
       
-      {/* ABOUT SECTION */}
+    
+      {/* NEWS TICKER */}
+      <section className="relative py-4 overflow-hidden">
+        <div className="absolute inset-0">
+          {/* <img
+            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
+            alt="Modern business background"
+            className="w-full h-full object-cover"
+          /> */}
+          <NextImage
+            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
+            alt="Modern business background"
+            fill
+            priority={false}  // Not above fold
+            quality={75}
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-700/95 via-indigo-700/95 to-blue-800/95"></div>
+        </div>
+
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{ x: [0, 100, 0], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-0 right-10 w-16 h-16 bg-cyan-400/20 rounded-full blur-xl"
+          />
+          <motion.div
+            animate={{ x: [0, -80, 0], opacity: [0.2, 0.5, 0.2] }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2,
+            }}
+            className="absolute top-0 left-20 w-12 h-12 bg-blue-300/20 rounded-full blur-lg"
+          />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 z-10">
+          <div className="relative flex items-center z-10">
+            <div className="bg-white text-blue-700 px-5 py-2.5 font-bold text-sm uppercase tracking-wider flex-shrink-0 shadow-lg rounded-lg flex items-center gap-2">
+              <span className="text-lg">📢</span>
+              <span className="hidden sm:inline">Latest Updates</span>
+              <span className="sm:hidden">News</span>
+            </div>
+
+            <div className="flex-1 overflow-hidden relative max-w-5xl">
+              <motion.div
+                className="flex gap-12 whitespace-nowrap"
+                animate={{ x: [0, -2000] }}
+                transition={{
+                  x: {
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    duration: 40,
+                    ease: "linear",
+                  },
+                }}
+              >
+                {[...newsItems, ...newsItems].map((news, idx) => (
+                  <span
+                    key={idx}
+                    className="text-white font-medium text-sm flex items-center gap-2"
+                  >
+                    {news}
+                    <span className="text-cyan-300 font-bold">•</span>
+                  </span>
+                ))}
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* ABOUT SECTION — enhanced with firm details + Learn More button */}
       <section id="about" className="relative py-16 overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
@@ -908,59 +921,41 @@ export default function MRSCoSite() {
             alt="Professional team working in modern office"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-50/70 via-white/60 to-gray-100/65"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-50/75 via-white/65 to-gray-100/70" />
         </div>
 
-        {/* Floating Background Elements */}
+        {/* Floating elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
-            animate={{
-              y: [0, -30, 0],
-              rotate: [0, 180, 360],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 15,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+            animate={{ y: [0, -30, 0], rotate: [0, 180, 360], scale: [1, 1.2, 1] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
             className="absolute top-20 right-16 w-24 h-24 bg-gradient-to-br from-blue-200/20 to-indigo-200/20 rounded-full"
           />
           <motion.div
-            animate={{
-              x: [0, 50, 0],
-              y: [0, -20, 0],
-              rotate: [0, -90, 0],
-            }}
-            transition={{
-              duration: 12,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 3,
-            }}
+            animate={{ x: [0, 50, 0], y: [0, -20, 0], rotate: [0, -90, 0] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 3 }}
             className="absolute bottom-32 left-20 w-20 h-20 bg-gradient-to-br from-green-200/20 to-emerald-200/20 rounded-2xl"
-          />
-          <motion.div
-            animate={{
-              scale: [1, 1.5, 1],
-              opacity: [0.3, 0.7, 0.3],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1,
-            }}
-            className="absolute top-1/2 left-1/3 w-32 h-32 bg-gradient-to-br from-purple-200/15 to-pink-200/15 rounded-full"
           />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Header */}
           <div className="text-center mb-12">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 text-blue-700 text-sm font-bold uppercase tracking-wider mb-4 border border-blue-100"
+            >
+              <Award className="w-4 h-4 mr-2" />
+              ISO 9001:2008 Certified · Founded 1999
+            </motion.div>
             <motion.h2
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
               className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4"
             >
               About MRS & Co.
@@ -969,85 +964,108 @@ export default function MRSCoSite() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
               We are more than just Chartered Accountants — we are your trusted
-              financial advisors, helping businesses thrive with clarity and
-              confidence.
+              financial partners, empanelled with C&AG and RBI, serving 500+ clients across India for over 25 years.
             </motion.p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/50"
-              whileHover={{ scale: 1.05, y: -5 }}
-            >
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Expertise & Experience
-              </h3>
-              <p className="text-gray-600">
-                With over 27+ years in the industry and a team of experienced
-                CAs, we bring deep expertise across all financial domains.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/50"
-              whileHover={{ scale: 1.05, y: -5 }}
-            >
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <Target className="w-6 h-6 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Client-Centric Approach
-              </h3>
-              <p className="text-gray-600">
-                We prioritize understanding your unique needs and provide
-                tailored solutions that drive real business value.
-              </p>
-            </motion.div>
-
-            {/* FIX: Changed animate to whileInView */}
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/50"
-              whileHover={{ scale: 1.05, y: -5 }}
-              ref={growthRef}
-            >
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Growth Partnership
-              </h3>
-              <p className="text-gray-600">
-                From startups to established enterprises, we partner with you at
-                every stage of your business journey.
-              </p>
-            </motion.div>
+          {/* Three value cards */}
+          <div className="grid lg:grid-cols-3 gap-8 mb-12">
+            {[
+              {
+                icon: Shield,
+                color: "blue",
+                title: "Expertise & Empanelment",
+                desc: "C&AG empanelled (CR-3755) and RBI Category I firm (No. 334273). ISO 9001:2008 certified with 25+ years of practice across audit, tax and advisory.",
+              },
+              {
+                icon: Target,
+                color: "green",
+                title: "Client-Centric Approach",
+                desc: "We tailor every engagement to the client's unique needs — banishing one-size-fits-all standardisation. Our philosophy is partnership, not just service.",
+              },
+              {
+                icon: TrendingUp,
+                color: "purple",
+                title: "Growth Partnership",
+                desc: "From startups to PSU enterprises and scheduled banks — we partner at every stage. Recognised among North India's Top 50 CA Firms.",
+              },
+            ].map(({ icon: Icon, color, title, desc }, i) => (
+              <motion.div
+                key={title}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.05, y: -5 }}
+                className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/50"
+              >
+                <div className={`w-12 h-12 bg-${color}-100 rounded-lg flex items-center justify-center mb-4`}>
+                  <Icon className={`w-6 h-6 text-${color}-600`} />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{title}</h3>
+                <p className="text-gray-600">{desc}</p>
+              </motion.div>
+            ))}
           </div>
+
+          {/* Key stats row + Learn More button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/60 shadow-lg p-6 md:p-8"
+          >
+            <div className="flex flex-col lg:flex-row items-center gap-8">
+              {/* Stats */}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-8 flex-1">
+                {[
+                  { value: "6", label: "Partners" },
+                  { value: "11", label: "Associate Partners" },
+                  { value: "40+", label: "Team Members" },
+                  { value: "500+", label: "Clients Served" },
+                  { value: "3", label: "Office Locations" },
+                ].map(({ value, label }) => (
+                  <div key={label} className="text-center">
+                    <div className="text-3xl font-extrabold bg-gradient-to-br from-blue-600 to-indigo-600 bg-clip-text text-transparent">{value}</div>
+                    <div className="text-xs uppercase tracking-widest text-gray-400 mt-0.5 font-medium">{label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Divider */}
+              <div className="hidden lg:block w-px h-16 bg-gray-200" />
+
+              {/* CTA */}
+              <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+                <Button
+                  asChild
+                  className="group rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:via-indigo-700 hover:to-blue-800 shadow-md hover:shadow-indigo-500/30 transform hover:scale-105 transition-all duration-300 px-6 py-5"
+                >
+                  <Link href="/about">
+                    About Us
+                    <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="rounded-2xl border-2 border-blue-500/30 hover:border-blue-500/60 hover:bg-blue-50 text-blue-700 px-6 py-5 transition-all duration-300"
+                >
+                  <Link href="/about#partners">Meet Our Team</Link>
+                </Button>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
 
-      {/* <TeamSection /> */}
-
-      {/* Lazy load below-the-fold */}
-      <Suspense fallback={<div className="min-h-screen" />}>
-        <TeamSection />
-      </Suspense>
-
+     
 
       {/* UMBRELLA OF OUR SERVICES with Enhanced Background */}
       <section className="relative py-16 overflow-hidden">
@@ -1191,6 +1209,8 @@ export default function MRSCoSite() {
           </div>
         </div>
       </section>
+ 
+       <BlogSection />
 
       {/* SERVICES SLIDER */}
       <Section id="services" className="pt-2">
@@ -2306,6 +2326,8 @@ export default function MRSCoSite() {
           </div>
         </div>
       </section>
+
+     
 
       {/* Footer */}
       <footer
