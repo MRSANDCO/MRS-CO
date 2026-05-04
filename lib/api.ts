@@ -213,3 +213,44 @@ export async function deleteDocument(documentId: string): Promise<{ message: str
     });
     return handleResponse<{ message: string; documentId: string }>(res);
 }
+
+/**
+ * Download a document by its ID.
+ * Calls GET /api/admin/documents/{documentId}/download with the admin JWT token.
+ * Triggers a browser file-save dialog using the Content-Disposition filename or a fallback.
+ */
+export async function downloadDocument(documentId: string, fallbackFileName = 'document'): Promise<void> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/documents/${documentId}/download`, {
+        method: 'GET',
+        headers: authHeaders(),
+    });
+
+    if (!res.ok) {
+        // Try to parse a JSON error body; fall back to status text
+        let message = `Download failed (${res.status})`;
+        try {
+            const err = await res.json();
+            message = err.error || err.message || message;
+        } catch {
+            // non-JSON body — ignore
+        }
+        throw new Error(message);
+    }
+
+    // Derive filename from Content-Disposition header if available
+    const disposition = res.headers.get('content-disposition') || '';
+    const match = disposition.match(/filename[^;=\n]*=\s*["']?([^"';\n]+)["']?/i);
+    const fileName = match?.[1]?.trim() || fallbackFileName;
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+
+    // Programmatically click a temporary <a> to trigger the download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+}

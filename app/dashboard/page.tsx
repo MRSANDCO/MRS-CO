@@ -18,6 +18,7 @@ import {
     updateUser,
     deleteUser,
     deleteDocument,
+    downloadDocument,
     type UserProfile,
     type UserDocument,
     type CreateUserRequest,
@@ -168,6 +169,10 @@ export default function DashboardPage() {
     // Delete Doc state
     const [docToDelete, setDocToDelete] = useState<string | null>(null);
     const [deletingDoc, setDeletingDoc] = useState(false);
+
+    // Download Doc state
+    const [downloadingDocId, setDownloadingDocId] = useState<string | null>(null);
+    const [downloadError, setDownloadError] = useState('');
 
     // Document upload state
     const [uploadUserId, setUploadUserId] = useState('');
@@ -378,6 +383,18 @@ export default function DashboardPage() {
             alert(err instanceof Error ? err.message : 'Delete document failed');
         } finally {
             setDeletingDoc(false);
+        }
+    };
+
+    const handleDownloadDoc = async (doc: UserDocument) => {
+        setDownloadingDocId(doc.id);
+        setDownloadError('');
+        try {
+            await downloadDocument(doc.id, doc.originalFileName || doc.title || 'document');
+        } catch (err: unknown) {
+            setDownloadError(err instanceof Error ? err.message : 'Download failed');
+        } finally {
+            setDownloadingDocId(null);
         }
     };
 
@@ -1072,6 +1089,13 @@ export default function DashboardPage() {
                                         </div>
                                     </div>
 
+                                    {downloadError && (
+                                        <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                            {downloadError}
+                                            <button onClick={() => setDownloadError('')} className="ml-auto text-red-400/60 hover:text-red-400"><XCircle className="w-4 h-4" /></button>
+                                        </div>
+                                    )}
                                     {loadingDocs2 ? (
                                         <div className="flex items-center justify-center py-16">
                                             <Loader2 className="w-6 h-6 text-violet-400 animate-spin" />
@@ -1128,14 +1152,29 @@ export default function DashboardPage() {
                                                                 {doc.createdAt ? formatDate(doc.createdAt) : '—'}
                                                             </td>
                                                             <td className="py-3 px-3 text-right">
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    onClick={() => setDocToDelete(doc.id)}
-                                                                    className="h-8 px-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
-                                                                    title="Delete Document"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </Button>
+                                                                <div className="flex items-center justify-end gap-1">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        onClick={() => handleDownloadDoc(doc)}
+                                                                        disabled={downloadingDocId === doc.id}
+                                                                        className="h-8 px-2 text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
+                                                                        title="Download Document"
+                                                                    >
+                                                                        {downloadingDocId === doc.id ? (
+                                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                                        ) : (
+                                                                            <Download className="w-4 h-4" />
+                                                                        )}
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        onClick={() => setDocToDelete(doc.id)}
+                                                                        className="h-8 px-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                                                                        title="Delete Document"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </Button>
+                                                                </div>
                                                             </td>
                                                         </motion.tr>
                                                     ))}
