@@ -1209,6 +1209,117 @@ export default function MRSCoSite() {
           </div>
         </div>
       </section>
+
+      {/* ── FROM THE FOUNDER'S DESK ── */}
+<section className="relative grid lg:grid-cols-2 min-h-[620px] overflow-hidden"
+  style={{ background: "linear-gradient(135deg, #0B0F1A 0%, #0f1a2e 60%, #091525 100%)" }}>
+
+  {/* Blobs */}
+  <div className="absolute pointer-events-none" style={{ width: 420, height: 420, borderRadius: "50%", background: "radial-gradient(circle, rgba(34,102,179,0.14) 0%, transparent 70%)", top: -80, left: -60 }} />
+  <div className="absolute pointer-events-none" style={{ width: 350, height: 350, borderRadius: "50%", background: "radial-gradient(circle, rgba(14,165,233,0.09) 0%, transparent 70%)", bottom: -60, right: -40 }} />
+  {/* Top shimmer line */}
+  <div className="absolute top-0 h-px" style={{ left: "10%", right: "10%", background: "linear-gradient(90deg, transparent, rgba(56,189,248,0.3), transparent)" }} />
+
+  {/* ── LEFT: Text ── */}
+  <div className="relative z-10 flex flex-col justify-center px-10 py-20 lg:px-16">
+    {/* Eyebrow */}
+    <div className="flex items-center gap-2 mb-8">
+      <span className="w-1.5 h-1.5 rounded-full bg-sky-400 flex-shrink-0" />
+      <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-400">
+        From the founder's desk
+      </span>
+    </div>
+
+    {/* Heading */}
+    <h2 className="mb-6 leading-[1.06]" style={{
+      fontFamily: "'Playfair Display', Georgia, serif",
+      fontSize: "clamp(40px, 5vw, 64px)",
+      fontWeight: 700,
+      color: "#f0f6ff",
+      letterSpacing: "-1px"
+    }}>
+      Built on<br />trust,{" "}
+      <em style={{
+        fontStyle: "italic", fontWeight: 400,
+        background: "linear-gradient(90deg, #67e8f9, #38bdf8, #818cf8)",
+        WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent"
+      }}>guided<br />by principle</em>
+    </h2>
+
+    {/* Accent bar */}
+    <div className="mb-7 h-0.5 w-12 rounded-full" style={{ background: "linear-gradient(90deg, #38bdf8, #6366f1)" }} />
+
+    {/* Body */}
+    <p className="mb-10 leading-[1.85]" style={{ fontSize: 15, color: "rgba(200,220,255,0.65)", fontWeight: 300, maxWidth: 400 }}>
+      At MRS & Co., our commitment to excellence and a client-centric approach drives everything we do.
+      We partner with our clients — not as a distant service provider, but as true financial partners.
+      Since businesses are inherently different, we tailor every engagement to specific needs and banish
+      the one-size-fits-all approach.
+    </p>
+
+    {/* Credentials */}
+    <div className="flex flex-col gap-3">
+      {[
+        { bold: "M.Com, FCA, FAFD", rest: "— Fellow of ICAI since 1999" },
+        { bold: "25+ Years", rest: "of active professional practice" },
+        { bold: "C&AG CR-3755 · RBI Category I No. 334273" },
+        { rest: "Income Tax Search & Seizure · IPO/FDI · Forensic Audit" },
+      ].map(({ bold, rest }, i) => (
+        <div key={i} className="flex items-center gap-3">
+          <div className="w-4 h-px flex-shrink-0 opacity-70" style={{ background: "#38bdf8" }} />
+          <span className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>
+            {bold && <strong style={{ color: "rgba(255,255,255,0.85)", fontWeight: 500 }}>{bold}</strong>}
+            {bold && rest && " "}
+            {rest}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {/* ── RIGHT: Photo ── */}
+  <div className="relative z-10 flex flex-col justify-end">
+    {/* Photo fills top portion */}
+    <div className="absolute inset-0 overflow-hidden" style={{ bottom: 130, borderLeft: "1px solid rgba(255,255,255,0.06)" }}>
+      {/* Subtle grid overlay */}
+      <div className="absolute inset-0 z-10" style={{
+        backgroundImage: "linear-gradient(rgba(56,189,248,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(56,189,248,0.04) 1px, transparent 1px)",
+        backgroundSize: "40px 40px"
+      }} />
+      <NextImage
+        src="/assets/team/member1.jpg"   
+        alt="CA Ram Kumar Dhiman"
+        fill
+        className="object-cover object-top"
+        priority
+      />
+    </div>
+
+    {/* Glassmorphism name card */}
+    <div className="relative z-20 mx-8 mb-10 p-5 rounded-[18px] backdrop-blur-md"
+      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)" }}>
+      <div className="flex items-center gap-3">
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: "linear-gradient(135deg, #1e4a7a, #1a3a6a)", border: "1px solid rgba(56,189,248,0.25)" }}>
+          <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 700, color: "#38bdf8" }}>RK</span>
+        </div>
+        <div>
+          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 700, color: "#f0f6ff", lineHeight: 1.2 }}>
+            CA Ram Kumar Dhiman
+          </div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
+            Founder & Managing Partner · MRS & Co.
+          </div>
+          <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full"
+            style={{ background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.2)" }}>
+            <span className="w-1 h-1 rounded-full bg-sky-400" />
+            <span style={{ fontSize: 10, color: "#7dd3fc", fontWeight: 600, letterSpacing: "0.05em" }}>Trusted since 1999</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
  
        <BlogSection />
 
