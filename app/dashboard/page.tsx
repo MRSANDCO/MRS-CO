@@ -147,6 +147,25 @@ export default function DashboardPage() {
         phone: '',
     });
 
+    // Google Drive state
+const [driveLinks, setDriveLinks] = useState<any[]>([]);
+const [loadingDriveLinks, setLoadingDriveLinks] = useState(false);
+const [driveUserId, setDriveUserId] = useState('');
+const [driveYear, setDriveYear] = useState('');
+const [driveUrl, setDriveUrl] = useState('');
+const [driveTitle, setDriveTitle] = useState('');
+const [driveDescription, setDriveDescription] = useState('');
+const [driveSaving, setDriveSaving] = useState(false);
+const [driveSuccess, setDriveSuccess] = useState('');
+const [driveError, setDriveError] = useState('');
+const [clientDriveLinks, setClientDriveLinks] = useState<any[]>([]);
+const [loadingClientDriveLinks, setLoadingClientDriveLinks] = useState(false);
+
+const getToken = () => {
+    try {
+        return JSON.parse(localStorage.getItem('mrs_auth_user') || '{}')?.token || '';
+    } catch { return ''; }
+};
     // Password change state
     const [changingPasswordFor, setChangingPasswordFor] = useState<string | null>(null);
     const [newPasswordValue, setNewPasswordValue] = useState('');
@@ -338,7 +357,11 @@ export default function DashboardPage() {
     useEffect(() => {
         if (user?.role === 'admin') {
             fetchDocs();
+            fetchDriveLinks(); 
         }
+        if (user?.role === 'user') {
+        fetchClientDriveLinks(); 
+    }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.role, docsFilterUser]);
 
@@ -386,6 +409,81 @@ export default function DashboardPage() {
         }
     };
 
+    const fetchDriveLinks = async () => {
+    setLoadingDriveLinks(true);
+    try {
+        const res = await fetch('/backend/admin/drive-links', {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(localStorage.getItem('mrs_auth_user') || '{}')?.token}`,
+            },
+        });
+        const data = await res.json();
+        setDriveLinks(data);
+    } catch { }
+    finally { setLoadingDriveLinks(false); }
+};
+
+const handleSaveDriveLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDriveError('');
+    setDriveSuccess('');
+    setDriveSaving(true);
+    try {
+        const res = await fetch('/backend/admin/drive-links', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${JSON.parse(localStorage.getItem('mrs_auth_user') || '{}')?.token}`,
+            },
+            body: JSON.stringify({
+                userId: driveUserId,
+                year: driveYear,
+                driveUrl,
+                title: driveTitle,
+                description: driveDescription,
+            }),
+        });
+        if (!res.ok) throw new Error('Failed to save link');
+        setDriveSuccess(`Drive folder shared with "${driveUserId}" successfully!`);
+        setDriveUserId('');
+        setDriveYear('');
+        setDriveUrl('');
+        setDriveTitle('');
+        setDriveDescription('');
+        fetchDriveLinks();
+    } catch (err: unknown) {
+        setDriveError(err instanceof Error ? err.message : 'Failed to save link');
+    } finally {
+        setDriveSaving(false);
+    }
+};
+
+const handleDeleteDriveLink = async (id: string) => {
+    if (!confirm('Delete this Drive link?')) return;
+    try {
+        await fetch(`/backend/admin/drive-links/${id}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${JSON.parse(localStorage.getItem('mrs_auth_user') || '{}')?.token}`,
+            },
+        });
+        fetchDriveLinks();
+    } catch (err: unknown) {
+        alert(err instanceof Error ? err.message : 'Delete failed');
+    }
+};
+const fetchClientDriveLinks = async () => {
+    if (!user?.userId) return;
+    setLoadingClientDriveLinks(true);
+    try {
+        const res = await fetch(`/backend/api/user/${user.userId}/drive-links`, {
+            headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        const data = await res.json();
+        setClientDriveLinks(Array.isArray(data) ? data : []);
+    } catch { }
+    finally { setLoadingClientDriveLinks(false); }
+};
     const handleDownloadDoc = async (doc: UserDocument) => {
         setDownloadingDocId(doc.id);
         setDownloadError('');
@@ -1054,6 +1152,142 @@ export default function DashboardPage() {
                             </Card>
                         </motion.div>
 
+                        {/* Google Drive Link Section */}
+<motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: 0.35 }}
+>
+    <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl">
+        <CardContent className="p-6">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
+                <FolderOpen className="w-5 h-5 text-blue-400" />
+                Share Google Drive Folder
+            </h2>
+
+            {driveSuccess && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm"
+                >
+                    <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                    {driveSuccess}
+                    <button onClick={() => setDriveSuccess('')} className="ml-auto text-emerald-400/60 hover:text-emerald-400">
+                        <XCircle className="w-4 h-4" />
+                    </button>
+                </motion.div>
+            )}
+
+            {driveError && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm"
+                >
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    {driveError}
+                    <button onClick={() => setDriveError('')} className="ml-auto text-red-400/60 hover:text-red-400">
+                        <XCircle className="w-4 h-4" />
+                    </button>
+                </motion.div>
+            )}
+
+            <form onSubmit={handleSaveDriveLink} className="space-y-4">
+                {/* Client + Year */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                            Assign to Client *
+                        </label>
+                        <select
+                            required
+                            value={driveUserId}
+                            onChange={(e) => setDriveUserId(e.target.value)}
+                            className="w-full h-10 px-3 rounded-md bg-white/[0.04] border border-white/[0.08] text-white text-sm focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 outline-none appearance-none"
+                        >
+                            <option value="" className="bg-slate-900">Select a client...</option>
+                            {adminUsers.map(u => (
+                                <option key={u.userId} value={u.userId} className="bg-slate-900">
+                                    {u.fullName || u.userId} (@{u.userId})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                            Year *
+                        </label>
+                        <Input
+                            required
+                            placeholder="e.g. 2024"
+                            value={driveYear}
+                            onChange={(e) => setDriveYear(e.target.value)}
+                            className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50 focus:ring-cyan-500/20"
+                        />
+                    </div>
+                </div>
+
+                {/* Drive Link */}
+                <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                        Google Drive Link *
+                    </label>
+                    <Input
+                        required
+                        placeholder="https://drive.google.com/drive/folders/..."
+                        value={driveUrl}
+                        onChange={(e) => setDriveUrl(e.target.value)}
+                        className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50 focus:ring-cyan-500/20"
+                    />
+                </div>
+
+                {/* Title */}
+                <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                        Folder Name
+                    </label>
+                    <Input
+                        placeholder="e.g. Tax Documents 2024"
+                        value={driveTitle}
+                        onChange={(e) => setDriveTitle(e.target.value)}
+                        className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50 focus:ring-cyan-500/20"
+                    />
+                </div>
+
+                {/* Description */}
+                <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                        Description
+                    </label>
+                    <textarea
+                        rows={3}
+                        placeholder="Optional description for the client..."
+                        value={driveDescription}
+                        onChange={(e) => setDriveDescription(e.target.value)}
+                        className="w-full px-3 py-2 rounded-md bg-white/[0.04] border border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 outline-none text-sm resize-none"
+                    />
+                </div>
+
+                <div className="flex justify-end pt-2">
+                    <Button
+                        type="submit"
+                        disabled={driveSaving}
+                        className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white font-medium px-6 shadow-lg shadow-blue-500/20 transition-all disabled:opacity-40"
+                    >
+                        {driveSaving ? (
+                            <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving...</>
+                        ) : (
+                            <><FolderOpen className="w-4 h-4 mr-2" />Share Folder Link</>
+                        )}
+                    </Button>
+                </div>
+            </form>
+        </CardContent>
+    </Card>
+</motion.div>
+
                         {/* Documents List */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -1185,6 +1419,137 @@ export default function DashboardPage() {
                                 </CardContent>
                             </Card>
                         </motion.div>
+
+                        {/* Google Drive Link Section */}
+<motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: 0.35 }}
+>
+    <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl">
+        <CardContent className="p-6">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
+                <FolderOpen className="w-5 h-5 text-blue-400" />
+                Share Google Drive Folder
+            </h2>
+
+            {driveSuccess && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm"
+                >
+                    <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                    {driveSuccess}
+                    <button onClick={() => setDriveSuccess('')} className="ml-auto text-emerald-400/60 hover:text-emerald-400">
+                        <XCircle className="w-4 h-4" />
+                    </button>
+                </motion.div>
+            )}
+            {driveError && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm"
+                >
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    {driveError}
+                    <button onClick={() => setDriveError('')} className="ml-auto text-red-400/60 hover:text-red-400">
+                        <XCircle className="w-4 h-4" />
+                    </button>
+                </motion.div>
+            )}
+
+            <form onSubmit={handleSaveDriveLink} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                            Assign to Client *
+                        </label>
+                        <select
+                            required
+                            value={driveUserId}
+                            onChange={(e) => setDriveUserId(e.target.value)}
+                            className="w-full h-10 px-3 rounded-md bg-white/[0.04] border border-white/[0.08] text-white text-sm focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 outline-none appearance-none"
+                        >
+                            <option value="" className="bg-slate-900">Select a client...</option>
+                            {adminUsers.map(u => (
+                                <option key={u.userId} value={u.userId} className="bg-slate-900">
+                                    {u.fullName || u.userId} (@{u.userId})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                            Year *
+                        </label>
+                        <Input
+                            required
+                            placeholder="e.g. 2024"
+                            value={driveYear}
+                            onChange={(e) => setDriveYear(e.target.value)}
+                            className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50 focus:ring-cyan-500/20"
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                        Google Drive Link *
+                    </label>
+                    <Input
+                        required
+                        placeholder="https://drive.google.com/drive/folders/..."
+                        value={driveUrl}
+                        onChange={(e) => setDriveUrl(e.target.value)}
+                        className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50 focus:ring-cyan-500/20"
+                    />
+                </div>
+
+                <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                        Folder Name
+                    </label>
+                    <Input
+                        placeholder="e.g. Tax Documents 2024"
+                        value={driveTitle}
+                        onChange={(e) => setDriveTitle(e.target.value)}
+                        className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50 focus:ring-cyan-500/20"
+                    />
+                </div>
+
+                <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                        Description
+                    </label>
+                    <textarea
+                        rows={3}
+                        placeholder="Optional description for the client..."
+                        value={driveDescription}
+                        onChange={(e) => setDriveDescription(e.target.value)}
+                        className="w-full px-3 py-2 rounded-md bg-white/[0.04] border border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 outline-none text-sm resize-none"
+                    />
+                </div>
+
+                <div className="flex justify-end pt-2">
+                    <Button
+                        type="submit"
+                        disabled={driveSaving}
+                        className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white font-medium px-6 shadow-lg shadow-blue-500/20 transition-all disabled:opacity-40"
+                    >
+                        {driveSaving ? (
+                            <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving...</>
+                        ) : (
+                            <><FolderOpen className="w-4 h-4 mr-2" />Share Folder Link</>
+                        )}
+                    </Button>
+                </div>
+            </form>
+        </CardContent>
+    </Card>
+</motion.div>
+
                     </div>
                 )}
 
@@ -1267,6 +1632,7 @@ export default function DashboardPage() {
                             </Card>
                         </motion.div>
 
+                        
                         {/* Documents */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -1382,6 +1748,84 @@ export default function DashboardPage() {
                                 </CardContent>
                             </Card>
                         </motion.div>
+
+                        {/* Client - Shared Drive Folders */}
+<motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: 0.3 }}
+    className="lg:col-span-2"
+>
+    <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl">
+        <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-5">
+                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                    <FolderOpen className="w-5 h-5 text-blue-400" />
+                    Drive Folders
+                </h2>
+                {!loadingClientDriveLinks && (
+                    <span className="text-xs text-slate-500 bg-white/[0.04] px-2.5 py-1 rounded-full">
+                        {clientDriveLinks.length} {clientDriveLinks.length === 1 ? 'folder' : 'folders'}
+                    </span>
+                )}
+            </div>
+
+            {loadingClientDriveLinks ? (
+                <div className="flex items-center justify-center py-16">
+                    <Loader2 className="w-6 h-6 text-blue-400 animate-spin" />
+                </div>
+            ) : clientDriveLinks.length === 0 ? (
+                <div className="text-center py-16">
+                    <FolderOpen className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                    <p className="text-slate-400 font-medium">No shared folders yet</p>
+                    <p className="text-slate-500 text-sm mt-1">
+                        Folders shared by admin will appear here.
+                    </p>
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    {clientDriveLinks.map((link, index) => (
+                        <motion.div
+                            key={link.id || index}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: index * 0.05 }}
+                            className="group flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] hover:border-white/[0.1] transition-all duration-300"
+                        >
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
+                                <FolderOpen className="w-5 h-5 text-blue-400" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="text-white font-medium text-sm">
+                                    {link.title || 'Drive Folder'}
+                                </div>
+                                {link.description && (
+                                    <p className="text-slate-400 text-xs mt-0.5 line-clamp-2">
+                                        {link.description}
+                                    </p>
+                                )}
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-medium uppercase tracking-wider">
+                                        <Calendar className="w-2.5 h-2.5" />
+                                        {link.year}
+                                    </span>
+                                </div>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                onClick={() => window.open(link.driveUrl, '_blank')}
+                                className="text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all opacity-0 group-hover:opacity-100 px-3"
+                            >
+                                <Download className="w-4 h-4 mr-1" />
+                                <span className="text-xs">Open</span>
+                            </Button>
+                        </motion.div>
+                    ))}
+                </div>
+            )}
+        </CardContent>
+    </Card>
+</motion.div>
                     </div>
                 )}
             </main>
