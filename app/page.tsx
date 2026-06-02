@@ -1278,9 +1278,9 @@ export default function MRSCoSite() {
   </div>
 
   {/* ── RIGHT: Photo ── */}
-  <div className="relative z-10 flex flex-col justify-end">
+  <div className="relative z-10 flex flex-col justify-end min-h-[480px] lg:min-h-0">
     {/* Photo fills top portion */}
-    <div className="absolute inset-0 overflow-hidden" style={{ bottom: 130, borderLeft: "1px solid rgba(255,255,255,0.06)" }}>
+    <div className="absolute inset-0 overflow-hidden lg:border-l lg:border-white/[0.06]" style={{ bottom: 130 }}>
       {/* Subtle grid overlay */}
       <div className="absolute inset-0 z-10" style={{
         backgroundImage: "linear-gradient(rgba(56,189,248,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(56,189,248,0.04) 1px, transparent 1px)",
