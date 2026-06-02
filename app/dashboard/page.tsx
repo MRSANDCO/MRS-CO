@@ -508,7 +508,7 @@ export default function DashboardPage() {
         if (!user?.userId) return;
         setLoadingClientDriveLinks(true);
         try {
-            const res = await fetch(`/backend/api/user/${user.userId}/drive-links`, {
+            const res = await fetch(`/backend/user/${user.userId}/drive-links`, {
                 headers: { Authorization: `Bearer ${getToken()}` },
             });
             const data = await res.json();
