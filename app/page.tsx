@@ -493,7 +493,7 @@ export default function MRSCoSite() {
               {[
                 ["Services", "services"],
                 ["News", "news"],
-                ["Startup Advisory", "startup-advisory"],
+                ["Team", "team"],
                 ["Contact", "contact"],
               ].map(([label, id]) => (
                 <a
@@ -555,7 +555,7 @@ export default function MRSCoSite() {
               {[
                 ["Services", "services"],
                 ["News", "news"],
-                ["Startup Advisory", "startup-advisory"],
+                ["Team", "team"],
                 ["Contact", "contact"],
               ].map(([label, id]) => (
                 <a
@@ -614,7 +614,7 @@ export default function MRSCoSite() {
             alt="Fountain pen on financial planning documents"
             fill
             priority={true}
-            sizes="100vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 100vw"
             placeholder="blur"
             blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmQA//Z"
             className="object-cover opacity-50"
@@ -851,9 +851,9 @@ export default function MRSCoSite() {
             src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
             alt="Modern business background"
             fill
-            priority={false}  // Not above fold
+            priority={false}
             quality={75}
-            sizes="100vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 100vw"
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-blue-700/95 via-indigo-700/95 to-blue-800/95"></div>
@@ -1292,6 +1292,7 @@ export default function MRSCoSite() {
         src="/assets/team/member1.jpg"   
         alt="CA Ram Kumar Dhiman"
         fill
+        sizes="(max-width: 1024px) 100vw, 50vw"
         className="object-cover object-top"
         priority
       />
@@ -1379,7 +1380,7 @@ export default function MRSCoSite() {
                         src={s.img}
                         alt={s.title}
                         fill
-                        sizes="100vw"
+                        sizes="(max-width: 768px) 85vw, (max-width: 1024px) 45vw, 32vw"
                         className="object-cover w-full h-full"
                         style={{
                           objectFit: "cover",
