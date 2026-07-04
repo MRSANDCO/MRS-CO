@@ -432,6 +432,22 @@ const AchievementSection = memo(() => {
       height: 1600,
     },
     {
+      src: "/assets/certificates/IncometaxlawofUSA.png",
+      alt: "Certificate of Income Tax Law of USA",
+      title: "Certificate Course on Income Tax Law of USA",
+      issuer: "The Institute of Chartered Accountants of India (ICAI)",
+      badges: [
+        { text: "ICAI Certified", variant: "indigo" },
+        { text: "Specialized", variant: "purple" }
+      ],
+      gradientFrom: "from-indigo-500",
+      gradientTo: "to-purple-500",
+      icon: Shield,
+      iconColor: "text-indigo-400",
+      width: 1600,
+      height: 1200,
+    },
+    {
       src: "/assets/certificates/forensic-accounting-certificate.png",
       alt: "Forensic Accounting & Fraud Detection",
       title: "Forensic Accounting & Fraud Detection",
