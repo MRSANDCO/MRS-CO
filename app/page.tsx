@@ -60,7 +60,9 @@ function useDebounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
 
 
 const newsItems = [
+  
   "🔔  Major Relief for CAs: Supreme Court rules Form 15CB issuance is not abetment of money laundering",
+  "⚠️ Compliance Alert: Daily data backup mandatory for electronic books of account under Rule 46(8) effective April 1, 2026.",
   "💼 MRS & Co. Recognized Among North India's Top 50 CA Firms & Empanelled as an RBI Category–I Firm",
   "💡 Govt. mulls CAG-like independent body to appoint auditors for listed firms, private banks, and NBFCs to ensure financial transparency",
   "🚀 Tax Update: Section 115BAC new regime continues as default for AY 2025–26; revised simplified regime starts April 1, 2026.",

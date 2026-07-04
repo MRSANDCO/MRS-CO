@@ -117,10 +117,11 @@ const nextConfig: NextConfig = {
 
   // Proxy API calls to Spring Boot backend
   async rewrites() {
+    const backendUrl = process.env.BACKEND_API_URL || 'https://mrsbackend-production.up.railway.app/api';
     return [
       {
         source: '/backend/:path*',
-        destination: `${process.env.BACKEND_API_URL}/:path*`, // Proxy to Backend
+        destination: `${backendUrl}/:path*`, // Proxy to Backend
       },
     ];
   },
