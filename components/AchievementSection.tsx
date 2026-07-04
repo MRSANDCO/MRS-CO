@@ -432,7 +432,7 @@ const AchievementSection = memo(() => {
       height: 1600,
     },
     {
-      src: "/assets/certificates/IncometaxlawofUSA.png",
+      src: "/assets/certificates/IncometaxlawofUSA .png",
       alt: "Certificate of Income Tax Law of USA",
       title: "Certificate Course on Income Tax Law of USA",
       issuer: "The Institute of Chartered Accountants of India (ICAI)",
