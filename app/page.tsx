@@ -66,9 +66,6 @@ const newsItems = [
   "💼 MRS & Co. Recognized Among North India's Top 50 CA Firms & Empanelled as an RBI Category–I Firm",
   "💡 Govt. mulls CAG-like independent body to appoint auditors for listed firms, private banks, and NBFCs to ensure financial transparency",
   "🚀 Tax Update: Section 115BAC new regime continues as default for AY 2025–26; revised simplified regime starts April 1, 2026.",
-  "⚖️ We're hiring! Senior Tax Consultants and CA Articleship positions open",
-  
-  // "📈 Major Relief for CAs: Supreme Court rules Form 15CB issuance is not abetment of money laundering.",
   "🎯 Successfully helped 50+ startups with fundraising in Q1 2025",
 ];
 const services = [
@@ -1326,7 +1323,7 @@ export default function MRSCoSite() {
  
        <BlogSection />
 
-      {/* SERVICES SLIDER */}
+      
       <Section id="services" className="pt-2">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <SectionHeader
@@ -1336,7 +1333,7 @@ export default function MRSCoSite() {
             center
           />
 
-          <div className="relative">
+          <div className="relative px-2"> {/* Added slight padding so arrows don't clip cards */}
             <div className="absolute -left-2 top-1/2 -translate-y-1/2 z-10">
               <Button
                 suppressHydrationWarning
@@ -1364,17 +1361,19 @@ export default function MRSCoSite() {
 
             <div
               ref={sliderRef}
-              className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 px-1 scrollbar-thin scrollbar-thumb-slate-300"
+              /* Changed snap-mandatory to snap-proximity to prevent stuttering */
+              className="flex gap-5 overflow-x-auto snap-x snap-proximity scroll-smooth pb-4 px-1 scrollbar-thin scrollbar-thumb-slate-300"
+              style={{ WebkitOverflowScrolling: "touch" }}
             >
               {services.map((s, i) => (
                 <div
                   key={i}
-                  className="min-w-[85%] md:min-w-[45%] lg:min-w-[32%] snap-start"
+                  className="min-w-[85%] md:min-w-[45%] lg:min-w-[32%] snap-start flex-shrink-0"
                 >
                   <Card className="rounded-3xl overflow-hidden h-full">
                     <div
-                      className="relative w-full "
-                      style={{ height: "170px" }}
+                      className="relative w-full"
+                      style={{ height: "240px" }}
                     >
                       <NextImage
                         src={s.img}
@@ -1402,7 +1401,6 @@ export default function MRSCoSite() {
           </div>
         </div>
       </Section>
-
       {/* ACHIEVEMENT SECTION */}
       {/* <AchievementSection /> */}
 
