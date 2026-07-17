@@ -53,6 +53,10 @@ import {
     File,
     UploadCloud,
     Edit,
+    MessageSquarePlus,
+    MessageCircle,
+    Send,
+    ClipboardList,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -162,6 +166,20 @@ export default function DashboardPage() {
     const [editDriveTitle, setEditDriveTitle] = useState('');
     const [editDriveDescription, setEditDriveDescription] = useState('');
     const [editDriveSaving, setEditDriveSaving] = useState(false);
+
+    // Query state (admin)
+    const [queryUserId, setQueryUserId] = useState('');
+    const [querySubject, setQuerySubject] = useState('');
+    const [queryMessage, setQueryMessage] = useState('');
+    const [querySaving, setQuerySaving] = useState(false);
+    const [querySuccess, setQuerySuccess] = useState('');
+    const [queryError, setQueryError] = useState('');
+    const [adminQueries, setAdminQueries] = useState<any[]>([]);
+    const [loadingAdminQueries, setLoadingAdminQueries] = useState(false);
+
+    // Query state (client)
+    const [clientQueries, setClientQueries] = useState<any[]>([]);
+    const [loadingClientQueries, setLoadingClientQueries] = useState(false);
 
     const getToken = () => {
         try {
@@ -353,13 +371,74 @@ export default function DashboardPage() {
         }
     };
 
+    const fetchAdminQueries = async () => {
+        setLoadingAdminQueries(true);
+        try {
+            const res = await fetch('/backend/admin/queries', {
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            const data = await res.json();
+            setAdminQueries(Array.isArray(data) ? data : []);
+        } catch { }
+        finally { setLoadingAdminQueries(false); }
+    };
+
+    const handleRaiseQuery = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setQueryError('');
+        setQuerySuccess('');
+        setQuerySaving(true);
+        try {
+            const res = await fetch('/backend/admin/queries', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${getToken()}`,
+                },
+                body: JSON.stringify({
+                    userId: queryUserId,
+                    subject: querySubject,
+                    message: queryMessage,
+                }),
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || err.message || 'Failed to raise query');
+            }
+            setQuerySuccess(`Query raised for "${queryUserId}" successfully!`);
+            setQueryUserId('');
+            setQuerySubject('');
+            setQueryMessage('');
+            fetchAdminQueries();
+        } catch (err: unknown) {
+            setQueryError(err instanceof Error ? err.message : 'Failed to raise query');
+        } finally {
+            setQuerySaving(false);
+        }
+    };
+
+    const fetchClientQueries = async () => {
+        if (!user?.userId) return;
+        setLoadingClientQueries(true);
+        try {
+            const res = await fetch(`/backend/user/${user.userId}/queries`, {
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            const data = await res.json();
+            setClientQueries(Array.isArray(data) ? data : []);
+        } catch { }
+        finally { setLoadingClientQueries(false); }
+    };
+
     useEffect(() => {
         if (user?.role === 'admin') {
             fetchDocs();
             fetchDriveLinks();
+            fetchAdminQueries();
         }
         if (user?.role === 'user') {
             fetchClientDriveLinks();
+            fetchClientQueries();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.role, docsFilterUser]);
@@ -1270,6 +1349,122 @@ export default function DashboardPage() {
                             </Card>
                         </motion.div>
 
+                        {/* ── Raise a Query ── */}
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5 }}>
+                            <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl">
+                                <CardContent className="p-6">
+                                    <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-5">
+                                        <MessageSquarePlus className="w-5 h-5 text-rose-400" />Raise a Query
+                                    </h2>
+                                    {querySuccess && (
+                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                                            className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+                                            <CheckCircle className="w-4 h-4 flex-shrink-0" />{querySuccess}
+                                            <button onClick={() => setQuerySuccess('')} className="ml-auto text-emerald-400/60 hover:text-emerald-400"><XCircle className="w-4 h-4" /></button>
+                                        </motion.div>
+                                    )}
+                                    {queryError && (
+                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                                            className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                                            <AlertCircle className="w-4 h-4 flex-shrink-0" />{queryError}
+                                            <button onClick={() => setQueryError('')} className="ml-auto text-red-400/60 hover:text-red-400"><XCircle className="w-4 h-4" /></button>
+                                        </motion.div>
+                                    )}
+                                    <form onSubmit={handleRaiseQuery} className="space-y-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Send To Client *</label>
+                                                <select required value={queryUserId} onChange={(e) => setQueryUserId(e.target.value)}
+                                                    className="w-full h-10 px-3 rounded-md bg-white/[0.04] border border-white/[0.08] text-white text-sm focus:border-rose-500/50 focus:ring-1 focus:ring-rose-500/20 outline-none appearance-none">
+                                                    <option value="" className="bg-slate-900">Select a client...</option>
+                                                    {adminUsers.map(u => (
+                                                        <option key={u.userId} value={u.userId} className="bg-slate-900">{u.fullName || u.userId} (@{u.userId})</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Subject *</label>
+                                                <Input required placeholder="e.g. Missing GST Returns" value={querySubject}
+                                                    onChange={(e) => setQuerySubject(e.target.value)}
+                                                    className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-rose-500/50 focus:ring-rose-500/20" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Message *</label>
+                                            <textarea required rows={4} placeholder="Describe the query in detail..."
+                                                value={queryMessage} onChange={(e) => setQueryMessage(e.target.value)}
+                                                className="w-full px-3 py-2 rounded-md bg-white/[0.04] border border-white/[0.08] text-white placeholder:text-slate-600 focus:border-rose-500/50 focus:ring-1 focus:ring-rose-500/20 outline-none text-sm resize-none" />
+                                        </div>
+                                        <div className="flex justify-end pt-2">
+                                            <Button type="submit" disabled={querySaving}
+                                                className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-400 hover:to-pink-500 text-white font-medium px-6 shadow-lg shadow-rose-500/20 transition-all disabled:opacity-40">
+                                                {querySaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Sending...</> : <><Send className="w-4 h-4 mr-2" />Raise Query</>}
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </CardContent>
+                            </Card>
+                        </motion.div>
+
+                        {/* ── Admin: All Raised Queries ── */}
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.55 }}>
+                            <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl">
+                                <CardContent className="p-6">
+                                    <div className="flex items-center justify-between mb-5">
+                                        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                                            <ClipboardList className="w-5 h-5 text-rose-400" />Raised Queries
+                                        </h2>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs text-slate-500 bg-white/[0.04] px-2.5 py-1 rounded-full">
+                                                {adminQueries.length} {adminQueries.length === 1 ? 'query' : 'queries'}
+                                            </span>
+                                            <Button variant="ghost" onClick={fetchAdminQueries} disabled={loadingAdminQueries}
+                                                className="text-slate-400 hover:text-white hover:bg-white/[0.06] px-2">
+                                                <RefreshCw className={`w-4 h-4 ${loadingAdminQueries ? 'animate-spin' : ''}`} />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    {loadingAdminQueries ? (
+                                        <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 text-rose-400 animate-spin" /></div>
+                                    ) : adminQueries.length === 0 ? (
+                                        <div className="text-center py-16">
+                                            <MessageCircle className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                                            <p className="text-slate-400 font-medium">No queries raised yet</p>
+                                            <p className="text-slate-500 text-sm mt-1">Use the form above to raise a query for a client.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {adminQueries.map((q: any, index: number) => (
+                                                <motion.div key={q.id || index}
+                                                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ duration: 0.25, delay: index * 0.04 }}
+                                                    className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] hover:border-rose-500/20 transition-all duration-300">
+                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 border border-rose-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                        <MessageCircle className="w-5 h-5 text-rose-400" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <span className="text-white font-semibold text-sm">{q.subject || 'No Subject'}</span>
+                                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider border ${
+                                                                q.status === 'RESOLVED' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                                                                q.status === 'IN_PROGRESS' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
+                                                                'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                                                            }`}>{q.status || 'OPEN'}</span>
+                                                        </div>
+                                                        <p className="text-slate-400 text-xs mt-1 line-clamp-2">{q.message}</p>
+                                                        <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
+                                                            <span className="flex items-center gap-1"><User className="w-3 h-3" />{q.userId}</span>
+                                                            {q.createdAt && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDate(q.createdAt)}</span>}
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </motion.div>
+
                     </div>
                 )}
 
@@ -1463,6 +1658,70 @@ export default function DashboardPage() {
                                                         <Download className="w-4 h-4 mr-1" />
                                                         <span className="text-xs">Open</span>
                                                     </Button>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </motion.div>
+
+                        {/* Client: My Queries */}
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.35 }}
+                            className="lg:col-span-3">
+                            <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl">
+                                <CardContent className="p-6">
+                                    <div className="flex items-center justify-between mb-5">
+                                        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                                            <MessageCircle className="w-5 h-5 text-rose-400" />Queries from MRS &amp; Co.
+                                        </h2>
+                                        <div className="flex items-center gap-2">
+                                            {!loadingClientQueries && (
+                                                <span className="text-xs text-slate-500 bg-white/[0.04] px-2.5 py-1 rounded-full">
+                                                    {clientQueries.length} {clientQueries.length === 1 ? 'query' : 'queries'}
+                                                </span>
+                                            )}
+                                            <Button variant="ghost" onClick={fetchClientQueries} disabled={loadingClientQueries}
+                                                className="text-slate-400 hover:text-white hover:bg-white/[0.06] px-2">
+                                                <RefreshCw className={`w-4 h-4 ${loadingClientQueries ? 'animate-spin' : ''}`} />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    {loadingClientQueries ? (
+                                        <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 text-rose-400 animate-spin" /></div>
+                                    ) : clientQueries.length === 0 ? (
+                                        <div className="text-center py-16">
+                                            <MessageCircle className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                                            <p className="text-slate-400 font-medium">No queries yet</p>
+                                            <p className="text-slate-500 text-sm mt-1">Queries raised by MRS &amp; Co. will appear here.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {clientQueries.map((q: any, index: number) => (
+                                                <motion.div key={q.id || index}
+                                                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                                                    className="group flex items-start gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] hover:border-rose-500/20 transition-all duration-300">
+                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-600/20 border border-rose-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                        <MessageCircle className="w-5 h-5 text-rose-400" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <span className="text-white font-semibold text-sm">{q.subject || 'Query'}</span>
+                                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider border ${
+                                                                q.status === 'RESOLVED' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                                                                q.status === 'IN_PROGRESS' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
+                                                                'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                                                            }`}>{q.status || 'OPEN'}</span>
+                                                        </div>
+                                                        <p className="text-slate-300 text-sm mt-1.5 leading-relaxed">{q.message}</p>
+                                                        {q.createdAt && (
+                                                            <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-500">
+                                                                <Clock className="w-3 h-3" />
+                                                                <span>Raised on {formatDate(q.createdAt)}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </motion.div>
                                             ))}
                                         </div>
