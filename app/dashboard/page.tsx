@@ -459,7 +459,7 @@ export default function DashboardPage() {
     const handleRaiseQuery = async (e: React.FormEvent) => {
         e.preventDefault(); setQueryError(''); setQuerySuccess(''); setQuerySaving(true);
         try {
-            const res = await fetch('/backend/admin/queries', {
+            const res = await fetch('/backend/admin/queries/text', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
                 body: JSON.stringify({ userId: queryUserId, subject: querySubject, message: queryMessage }),
