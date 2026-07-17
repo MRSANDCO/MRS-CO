@@ -210,6 +210,9 @@ export default function DashboardPage() {
     const [queryError, setQueryError] = useState('');
     const [adminQueries, setAdminQueries] = useState<any[]>([]);
     const [loadingAdminQueries, setLoadingAdminQueries] = useState(false);
+    const [viewingQuery, setViewingQuery] = useState<any | null>(null);
+    const [queryToDelete, setQueryToDelete] = useState<string | null>(null);
+    const [deletingQuery, setDeletingQuery] = useState(false);
 
     // ── Client: queries ──
     const [clientQueries, setClientQueries] = useState<any[]>([]);
@@ -470,6 +473,21 @@ export default function DashboardPage() {
             fetchAdminQueries();
         } catch (err: unknown) { setQueryError(err instanceof Error ? err.message : 'Failed to raise query'); }
         finally { setQuerySaving(false); }
+    };
+
+    const handleDeleteQuery = async () => {
+        if (!queryToDelete) return;
+        setDeletingQuery(true);
+        try {
+            const res = await fetch(`/backend/admin/queries/${queryToDelete}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || err.message || 'Failed to delete query'); }
+            setQueryToDelete(null);
+            fetchAdminQueries();
+        } catch (err: unknown) { alert(err instanceof Error ? err.message : 'Failed to delete query'); }
+        finally { setDeletingQuery(false); }
     };
 
     const handleUpdateUser = async () => {
@@ -1121,20 +1139,32 @@ export default function DashboardPage() {
                             <div className="space-y-3">
                                 {adminQueries.map((q: any, index: number) => (
                                     <motion.div key={q.id || index} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }}
-                                        className="flex items-start gap-4 p-5 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] hover:border-rose-500/20 transition-all duration-300">
-                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 border border-rose-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                            <MessageCircle className="w-5 h-5 text-rose-400" />
+                                        className="p-5 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] hover:border-rose-500/20 transition-all duration-300">
+                                        <div className="flex items-start gap-4">
+                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 border border-rose-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                <MessageCircle className="w-5 h-5 text-rose-400" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <span className="text-white font-semibold">{q.subject || 'No Subject'}</span>
+                                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider border ${statusBadge(q.status)}`}>{q.status || 'OPEN'}</span>
+                                                </div>
+                                                <p className="text-slate-400 text-sm mt-1.5 leading-relaxed line-clamp-2">{q.messageText || <span className="italic text-slate-600">No message content</span>}</p>
+                                                <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                                                    <span className="flex items-center gap-1"><User className="w-3 h-3" />Sent to: <strong className="text-slate-400 ml-0.5">{q.targetUser?.userId || q.targetUser?.fullName || '—'}</strong></span>
+                                                    {q.createdAt && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDate(q.createdAt)}</span>}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 flex-wrap">
-                                                <span className="text-white font-semibold">{q.subject || 'No Subject'}</span>
-                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider border ${statusBadge(q.status)}`}>{q.status || 'OPEN'}</span>
-                                            </div>
-                                            <p className="text-slate-400 text-sm mt-1.5 leading-relaxed">{q.message}</p>
-                                            <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-                                                <span className="flex items-center gap-1"><User className="w-3 h-3" />{q.userId}</span>
-                                                {q.createdAt && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDate(q.createdAt)}</span>}
-                                            </div>
+                                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/[0.05]">
+                                            <Button size="sm" variant="ghost" onClick={() => setViewingQuery(q)}
+                                                className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5">
+                                                <Eye className="w-3.5 h-3.5" /> View Full Query
+                                            </Button>
+                                            <Button size="sm" variant="ghost" onClick={() => setQueryToDelete(q.id)}
+                                                className="text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5 ml-auto">
+                                                <Trash2 className="w-3.5 h-3.5" /> Delete
+                                            </Button>
                                         </div>
                                     </motion.div>
                                 ))}
@@ -1475,17 +1505,25 @@ export default function DashboardPage() {
                                                     <div className="space-y-3">
                                                         {clientQueries.map((q: any, index: number) => (
                                                             <motion.div key={q.id || index} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
-                                                                className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] hover:border-rose-500/20 transition-all">
-                                                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-600/20 border border-rose-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                                    <MessageCircle className="w-5 h-5 text-rose-400" />
-                                                                </div>
-                                                                <div className="flex-1 min-w-0">
-                                                                    <div className="flex items-center gap-2 flex-wrap">
-                                                                        <span className="text-white font-semibold text-sm">{q.subject || 'Query'}</span>
-                                                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider border ${statusBadge(q.status)}`}>{q.status || 'OPEN'}</span>
+                                                                className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] hover:border-rose-500/20 transition-all">
+                                                                <div className="flex items-start gap-4">
+                                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-600/20 border border-rose-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                                        <MessageCircle className="w-5 h-5 text-rose-400" />
                                                                     </div>
-                                                                    <p className="text-slate-300 text-sm mt-1.5 leading-relaxed">{q.message}</p>
-                                                                    {q.createdAt && <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-500"><Clock className="w-3 h-3" /><span>Raised on {formatDate(q.createdAt)}</span></div>}
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                                            <span className="text-white font-semibold text-sm">{q.subject || 'Query'}</span>
+                                                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider border ${statusBadge(q.status)}`}>{q.status || 'OPEN'}</span>
+                                                                        </div>
+                                                                        <p className="text-slate-300 text-sm mt-1.5 leading-relaxed line-clamp-2">{q.messageText || <span className="italic text-slate-500">No message content</span>}</p>
+                                                                        {q.createdAt && <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-500"><Clock className="w-3 h-3" /><span>Raised on {formatDate(q.createdAt)}</span></div>}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="mt-3 pt-3 border-t border-white/[0.05]">
+                                                                    <Button size="sm" variant="ghost" onClick={() => setViewingQuery(q)}
+                                                                        className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5">
+                                                                        <Eye className="w-3.5 h-3.5" /> View Full Query
+                                                                    </Button>
                                                                 </div>
                                                             </motion.div>
                                                         ))}
@@ -1573,6 +1611,65 @@ export default function DashboardPage() {
                             </Button>
                         </div>
                     </form>
+                </Modal>
+            )}
+
+            {/* View Query Detail Modal */}
+            {viewingQuery && (
+                <Modal onClose={() => setViewingQuery(null)} title={<><MessageCircle className="w-5 h-5 text-rose-400" /> Query Detail</>}>
+                    <div className="space-y-4">
+                        <div>
+                            <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Subject</p>
+                            <p className="text-white font-semibold text-base">{viewingQuery.subject || 'No Subject'}</p>
+                        </div>
+                        {user?.role === 'admin' && (
+                            <div>
+                                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Sent To</p>
+                                <p className="text-slate-200 text-sm">
+                                    {viewingQuery.targetUser?.fullName && <span className="font-medium">{viewingQuery.targetUser.fullName} — </span>}
+                                    <span className="text-slate-400">@{viewingQuery.targetUser?.userId || '—'}</span>
+                                </p>
+                            </div>
+                        )}
+                        <div>
+                            <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Status</p>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium uppercase tracking-wider border ${statusBadge(viewingQuery.status)}`}>
+                                {viewingQuery.status || 'OPEN'}
+                            </span>
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Message</p>
+                            <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-4">
+                                <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">
+                                    {viewingQuery.messageText || <span className="italic text-slate-500">No message content attached.</span>}
+                                </p>
+                            </div>
+                        </div>
+                        {viewingQuery.createdAt && (
+                            <div className="flex items-center gap-1.5 text-xs text-slate-500 pt-1">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span>Raised on {formatDate(viewingQuery.createdAt)}</span>
+                            </div>
+                        )}
+                    </div>
+                    <div className="flex justify-end mt-6">
+                        <Button onClick={() => setViewingQuery(null)} className="bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/10">Close</Button>
+                    </div>
+                </Modal>
+            )}
+
+            {/* Delete Query Confirmation Modal (admin only) */}
+            {queryToDelete && (
+                <Modal onClose={() => setQueryToDelete(null)} title={<><AlertCircle className="w-5 h-5 text-red-400" /> Delete Query</>} danger>
+                    <p className="text-slate-300 text-sm leading-relaxed">
+                        Are you sure you want to permanently delete this query? This action cannot be undone.
+                    </p>
+                    <div className="flex gap-3 justify-end mt-6">
+                        <Button variant="ghost" onClick={() => setQueryToDelete(null)} className="text-slate-400 hover:text-white">Cancel</Button>
+                        <Button variant="destructive" onClick={handleDeleteQuery} disabled={deletingQuery} className="bg-red-500 hover:bg-red-600 text-white">
+                            {deletingQuery ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}Delete Query
+                        </Button>
+                    </div>
                 </Modal>
             )}
         </div>
