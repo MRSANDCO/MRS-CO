@@ -529,6 +529,26 @@ export default function DashboardPage() {
         finally { setDownloadingDocId(null); }
     };
 
+    const handleViewQuery = async (q: any) => {
+        setViewingQuery(q);
+        if (user && user.role !== 'admin' && q.status === 'OPEN') {
+            try {
+                const res = await fetch(`/backend/user/${user.userId}/queries/${q.id}/seen`, {
+                    method: 'PUT',
+                    headers: { Authorization: `Bearer ${getToken()}` },
+                });
+                if (res.ok) {
+                    // Update local query status in clientQueries list
+                    setClientQueries(prev =>
+                        prev.map(item => (item.id === q.id ? { ...item, status: 'SEEN' } : item))
+                    );
+                }
+            } catch (err) {
+                console.error('Failed to mark query as seen:', err);
+            }
+        }
+    };
+
     const handleLogout = () => { logout(); router.push('/login'); };
 
     if (!isAuthenticated || !user) return null;
@@ -1491,7 +1511,17 @@ export default function DashboardPage() {
                                 <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl">
                                     <CardContent className="p-6">
                                         <div className="flex items-center justify-between mb-5">
-                                            <h2 className="text-lg font-semibold text-white flex items-center gap-2"><MessageCircle className="w-5 h-5 text-rose-400" />Queries from MRS &amp; Co.</h2>
+                                            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                                                <MessageCircle className="w-5 h-5 text-rose-400" />
+                                                Queries from MRS &amp; Co.
+                                                {/* OPEN badge — shown when there are unread/open queries */}
+                                                {!loadingClientQueries && clientQueries.filter((q: any) => q.status === 'OPEN').length > 0 && (
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/20 border border-rose-500/30 text-rose-400 animate-pulse">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400 inline-block"></span>
+                                                        {clientQueries.filter((q: any) => q.status === 'OPEN').length} new
+                                                    </span>
+                                                )}
+                                            </h2>
                                             <div className="flex items-center gap-2">
                                                 {!loadingClientQueries && <span className="text-xs text-slate-500 bg-white/[0.04] px-2.5 py-1 rounded-full">{clientQueries.length} {clientQueries.length === 1 ? 'query' : 'queries'}</span>}
                                                 <Button variant="ghost" onClick={fetchClientQueries} disabled={loadingClientQueries} className="text-slate-400 hover:text-white hover:bg-white/[0.06] px-2">
@@ -1505,7 +1535,18 @@ export default function DashboardPage() {
                                                     <div className="space-y-3">
                                                         {clientQueries.map((q: any, index: number) => (
                                                             <motion.div key={q.id || index} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
-                                                                className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] hover:border-rose-500/20 transition-all">
+                                                                className={`p-4 rounded-xl border transition-all relative ${
+                                                                    q.status === 'OPEN'
+                                                                        ? 'bg-rose-500/[0.04] border-rose-500/20 hover:bg-rose-500/[0.07] hover:border-rose-500/30'
+                                                                        : 'bg-white/[0.03] border-white/[0.05] hover:bg-white/[0.06] hover:border-rose-500/20'
+                                                                }`}>
+                                                                {/* Pulse dot for OPEN queries */}
+                                                                {q.status === 'OPEN' && (
+                                                                    <span className="absolute top-3 right-3 flex h-2.5 w-2.5">
+                                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                                                                    </span>
+                                                                )}
                                                                 <div className="flex items-start gap-4">
                                                                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-600/20 border border-rose-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                                                                         <MessageCircle className="w-5 h-5 text-rose-400" />
@@ -1520,7 +1561,7 @@ export default function DashboardPage() {
                                                                     </div>
                                                                 </div>
                                                                 <div className="mt-3 pt-3 border-t border-white/[0.05]">
-                                                                    <Button size="sm" variant="ghost" onClick={() => setViewingQuery(q)}
+                                                                    <Button size="sm" variant="ghost" onClick={() => handleViewQuery(q)}
                                                                         className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5">
                                                                         <Eye className="w-3.5 h-3.5" /> View Full Query
                                                                     </Button>

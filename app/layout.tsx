@@ -41,7 +41,7 @@ export default function RootLayout({
           as="image"
           href="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
         />
-
+         <meta name="facebook-domain-verification" content="1qflkmn7oa2sezvt38m5h15al4wdtt" />
         {/* Establish early connection to Unsplash */}
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
