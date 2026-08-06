@@ -496,9 +496,10 @@ export default function DashboardPage() {
     };
 
     const handleDownloadQueryAttachment = async (queryId: string, fileName: string) => {
+        if (!user) return;
         setDownloadingQueryId(queryId);
         try {
-            const path = user?.role === 'admin'
+            const path = user.role === 'admin'
                 ? `/backend/admin/queries/${queryId}/download`
                 : `/backend/user/${user.userId}/queries/${queryId}/download`;
             const res = await fetch(path, {
