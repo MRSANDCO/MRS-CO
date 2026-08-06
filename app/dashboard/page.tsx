@@ -498,7 +498,10 @@ export default function DashboardPage() {
     const handleDownloadQueryAttachment = async (queryId: string, fileName: string) => {
         setDownloadingQueryId(queryId);
         try {
-            const res = await fetch(`/backend/admin/queries/${queryId}/download`, {
+            const path = user?.role === 'admin'
+                ? `/backend/admin/queries/${queryId}/download`
+                : `/backend/user/${user.userId}/queries/${queryId}/download`;
+            const res = await fetch(path, {
                 headers: { Authorization: `Bearer ${getToken()}` },
             });
             if (!res.ok) throw new Error('Download failed');
@@ -1670,16 +1673,29 @@ export default function DashboardPage() {
                                                                         <div className="flex items-center gap-2 flex-wrap">
                                                                             <span className="text-white font-semibold text-sm">{q.subject || 'Query'}</span>
                                                                             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider border ${statusBadge(q.status)}`}>{q.status || 'OPEN'}</span>
+                                                                            {q.fileName && (
+                                                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                                                                                    <Paperclip className="w-2.5 h-2.5" /> Attachment
+                                                                                </span>
+                                                                            )}
                                                                         </div>
-                                                                        <p className="text-slate-300 text-sm mt-1.5 leading-relaxed line-clamp-2">{q.messageText || <span className="italic text-slate-500">No message content</span>}</p>
+                                                                        <p className="text-slate-300 text-sm mt-1.5 leading-relaxed line-clamp-2">{q.messageText || <span className="italic text-slate-500">{q.fileName ? 'See attachment' : 'No message content'}</span>}</p>
                                                                         {q.createdAt && <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-500"><Clock className="w-3 h-3" /><span>Raised on {formatDate(q.createdAt)}</span></div>}
                                                                     </div>
                                                                 </div>
-                                                                <div className="mt-3 pt-3 border-t border-white/[0.05]">
+                                                                <div className="mt-3 pt-3 border-t border-white/[0.05] flex items-center gap-2">
                                                                     <Button size="sm" variant="ghost" onClick={() => handleViewQuery(q)}
                                                                         className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5">
                                                                         <Eye className="w-3.5 h-3.5" /> View Full Query
                                                                     </Button>
+                                                                    {q.fileName && (
+                                                                        <Button size="sm" variant="ghost"
+                                                                            onClick={() => handleDownloadQueryAttachment(q.id, q.fileName)}
+                                                                            disabled={downloadingQueryId === q.id}
+                                                                            className="text-xs text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5">
+                                                                            {downloadingQueryId === q.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} Download Attachment
+                                                                        </Button>
+                                                                    )}
                                                                 </div>
                                                             </motion.div>
                                                         ))}
@@ -1801,6 +1817,23 @@ export default function DashboardPage() {
                                 </p>
                             </div>
                         </div>
+                        {viewingQuery.fileName && (
+                            <div>
+                                <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Attachment</p>
+                                <div className="flex items-center justify-between p-3 bg-amber-500/5 border border-amber-500/10 rounded-xl">
+                                    <div className="flex items-center gap-2 text-amber-400 text-sm font-medium min-w-0">
+                                        <Paperclip className="w-4 h-4 flex-shrink-0" />
+                                        <span className="truncate">{viewingQuery.fileName}</span>
+                                    </div>
+                                    <Button size="sm" variant="ghost"
+                                        onClick={() => handleDownloadQueryAttachment(viewingQuery.id, viewingQuery.fileName)}
+                                        disabled={downloadingQueryId === viewingQuery.id}
+                                        className="text-xs text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5">
+                                        {downloadingQueryId === viewingQuery.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} Download
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                         {viewingQuery.createdAt && (
                             <div className="flex items-center gap-1.5 text-xs text-slate-500 pt-1">
                                 <Clock className="w-3.5 h-3.5" />
