@@ -60,6 +60,7 @@ import {
     X,
     ChevronRight,
     LayoutDashboard,
+    Paperclip,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -205,6 +206,8 @@ export default function DashboardPage() {
     const [queryUserId, setQueryUserId] = useState('');
     const [querySubject, setQuerySubject] = useState('');
     const [queryMessage, setQueryMessage] = useState('');
+    const [queryAttachment, setQueryAttachment] = useState<File | null>(null);
+    const [queryAttachmentDragOver, setQueryAttachmentDragOver] = useState(false);
     const [querySaving, setQuerySaving] = useState(false);
     const [querySuccess, setQuerySuccess] = useState('');
     const [queryError, setQueryError] = useState('');
@@ -213,6 +216,7 @@ export default function DashboardPage() {
     const [viewingQuery, setViewingQuery] = useState<any | null>(null);
     const [queryToDelete, setQueryToDelete] = useState<string | null>(null);
     const [deletingQuery, setDeletingQuery] = useState(false);
+    const [downloadingQueryId, setDownloadingQueryId] = useState<string | null>(null);
 
     // ── Client: queries ──
     const [clientQueries, setClientQueries] = useState<any[]>([]);
@@ -462,17 +466,49 @@ export default function DashboardPage() {
     const handleRaiseQuery = async (e: React.FormEvent) => {
         e.preventDefault(); setQueryError(''); setQuerySuccess(''); setQuerySaving(true);
         try {
-            const res = await fetch('/backend/admin/queries/text', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
-                body: JSON.stringify({ userId: queryUserId, subject: querySubject, message: queryMessage }),
-            });
+            let res: Response;
+            if (queryAttachment) {
+                // Multipart request when a file is attached
+                const fd = new FormData();
+                fd.append('userId', queryUserId);
+                fd.append('subject', querySubject);
+                if (queryMessage.trim()) fd.append('message', queryMessage);
+                fd.append('file', queryAttachment);
+                res = await fetch('/backend/admin/queries/mixed', {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${getToken()}` },
+                    body: fd,
+                });
+            } else {
+                // Plain JSON when no file
+                res = await fetch('/backend/admin/queries/text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+                    body: JSON.stringify({ userId: queryUserId, subject: querySubject, message: queryMessage }),
+                });
+            }
             if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || err.message || 'Failed to raise query'); }
             setQuerySuccess(`Query raised for "${queryUserId}"!`);
-            setQueryUserId(''); setQuerySubject(''); setQueryMessage('');
+            setQueryUserId(''); setQuerySubject(''); setQueryMessage(''); setQueryAttachment(null);
             fetchAdminQueries();
         } catch (err: unknown) { setQueryError(err instanceof Error ? err.message : 'Failed to raise query'); }
         finally { setQuerySaving(false); }
+    };
+
+    const handleDownloadQueryAttachment = async (queryId: string, fileName: string) => {
+        setDownloadingQueryId(queryId);
+        try {
+            const res = await fetch(`/backend/admin/queries/${queryId}/download`, {
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            if (!res.ok) throw new Error('Download failed');
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = fileName; a.click();
+            URL.revokeObjectURL(url);
+        } catch (err: unknown) { alert(err instanceof Error ? err.message : 'Download failed'); }
+        finally { setDownloadingQueryId(null); }
     };
 
     const handleDeleteQuery = async () => {
@@ -1118,10 +1154,76 @@ export default function DashboardPage() {
                                                 className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-rose-500/50" />
                                         </Field>
                                     </div>
-                                    <Field label="Message *">
-                                        <textarea required rows={5} placeholder="Describe the query in detail..." value={queryMessage} onChange={e => setQueryMessage(e.target.value)}
+                                    <Field label={`Message${queryAttachment ? '' : ' *'}`}>
+                                        <textarea
+                                            required={!queryAttachment}
+                                            rows={5}
+                                            placeholder="Describe the query in detail..."
+                                            value={queryMessage}
+                                            onChange={e => setQueryMessage(e.target.value)}
                                             className="w-full px-3 py-2 rounded-md bg-white/[0.04] border border-white/[0.08] text-white placeholder:text-slate-600 focus:border-rose-500/50 focus:ring-1 focus:ring-rose-500/20 outline-none text-sm resize-none" />
                                     </Field>
+
+                                    {/* ── Optional Attachment ── */}
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                            <Paperclip className="w-3.5 h-3.5" /> Attachment <span className="normal-case font-normal text-slate-600">(optional · PDF, JPEG, PNG)</span>
+                                        </label>
+
+                                        {queryAttachment ? (
+                                            /* Selected file chip */
+                                            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-rose-500/10 border border-rose-500/25">
+                                                <div className="w-8 h-8 rounded-lg bg-rose-500/20 border border-rose-500/30 flex items-center justify-center flex-shrink-0">
+                                                    <Paperclip className="w-4 h-4 text-rose-400" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm text-white font-medium truncate">{queryAttachment.name}</p>
+                                                    <p className="text-xs text-slate-500">{(queryAttachment.size / 1024).toFixed(1)} KB</p>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setQueryAttachment(null)}
+                                                    className="flex-shrink-0 text-slate-500 hover:text-red-400 transition-colors p-1 rounded"
+                                                    title="Remove attachment">
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            /* Drop zone */
+                                            <div
+                                                onDragOver={e => { e.preventDefault(); setQueryAttachmentDragOver(true); }}
+                                                onDragLeave={() => setQueryAttachmentDragOver(false)}
+                                                onDrop={e => {
+                                                    e.preventDefault(); setQueryAttachmentDragOver(false);
+                                                    const f = e.dataTransfer.files[0];
+                                                    if (f) setQueryAttachment(f);
+                                                }}
+                                                onClick={() => document.getElementById('query-attachment-input')?.click()}
+                                                className={`relative border-2 border-dashed rounded-xl p-5 text-center transition-all cursor-pointer ${
+                                                    queryAttachmentDragOver
+                                                        ? 'border-rose-400 bg-rose-500/10 scale-[1.01]'
+                                                        : 'border-white/[0.1] bg-white/[0.02] hover:border-rose-500/40 hover:bg-rose-500/5'
+                                                }`}>
+                                                <input
+                                                    id="query-attachment-input"
+                                                    type="file"
+                                                    accept="application/pdf,image/jpeg,image/png"
+                                                    className="hidden"
+                                                    onChange={e => {
+                                                        const f = e.target.files?.[0];
+                                                        if (f) setQueryAttachment(f);
+                                                        e.target.value = '';
+                                                    }}
+                                                />
+                                                <Paperclip className={`w-8 h-8 mx-auto mb-2 transition-colors ${queryAttachmentDragOver ? 'text-rose-400' : 'text-slate-600'}`} />
+                                                <p className="text-sm text-slate-400">
+                                                    {queryAttachmentDragOver ? 'Drop file here!' : 'Drag & drop or click to attach'}
+                                                </p>
+                                                <p className="text-xs text-slate-600 mt-0.5">PDF, JPEG, PNG</p>
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <div className="flex justify-end pt-2">
                                         <Button type="submit" disabled={querySaving}
                                             className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-400 hover:to-pink-500 text-white font-medium px-6 shadow-lg shadow-rose-500/20 disabled:opacity-40">
@@ -1168,8 +1270,13 @@ export default function DashboardPage() {
                                                 <div className="flex items-center gap-2 flex-wrap">
                                                     <span className="text-white font-semibold">{q.subject || 'No Subject'}</span>
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider border ${statusBadge(q.status)}`}>{q.status || 'OPEN'}</span>
+                                                    {q.fileName && (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                                                            <Paperclip className="w-2.5 h-2.5" /> Attachment
+                                                        </span>
+                                                    )}
                                                 </div>
-                                                <p className="text-slate-400 text-sm mt-1.5 leading-relaxed line-clamp-2">{q.messageText || <span className="italic text-slate-600">No message content</span>}</p>
+                                                <p className="text-slate-400 text-sm mt-1.5 leading-relaxed line-clamp-2">{q.messageText || <span className="italic text-slate-600">{q.fileName ? 'See attachment' : 'No message content'}</span>}</p>
                                                 <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
                                                     <span className="flex items-center gap-1"><User className="w-3 h-3" />Sent to: <strong className="text-slate-400 ml-0.5">{q.targetUser?.userId || q.targetUser?.fullName || '—'}</strong></span>
                                                     {q.createdAt && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDate(q.createdAt)}</span>}
@@ -1181,6 +1288,14 @@ export default function DashboardPage() {
                                                 className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5">
                                                 <Eye className="w-3.5 h-3.5" /> View Full Query
                                             </Button>
+                                            {q.fileName && (
+                                                <Button size="sm" variant="ghost"
+                                                    onClick={() => handleDownloadQueryAttachment(q.id, q.fileName)}
+                                                    disabled={downloadingQueryId === q.id}
+                                                    className="text-xs text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5">
+                                                    {downloadingQueryId === q.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} Download
+                                                </Button>
+                                            )}
                                             <Button size="sm" variant="ghost" onClick={() => setQueryToDelete(q.id)}
                                                 className="text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5 ml-auto">
                                                 <Trash2 className="w-3.5 h-3.5" /> Delete
