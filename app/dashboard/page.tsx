@@ -221,6 +221,13 @@ export default function DashboardPage() {
     // ── Client: queries ──
     const [clientQueries, setClientQueries] = useState<any[]>([]);
     const [loadingClientQueries, setLoadingClientQueries] = useState(false);
+    const [queryResponses, setQueryResponses] = useState<any[]>([]);
+    const [loadingQueryResponses, setLoadingQueryResponses] = useState(false);
+    const [queryReplyMessage, setQueryReplyMessage] = useState('');
+    const [submittingQueryReply, setSubmittingQueryReply] = useState(false);
+    const [queryReplySuccess, setQueryReplySuccess] = useState('');
+    const [queryReplyError, setQueryReplyError] = useState('');
+    const [updatingQueryStatus, setUpdatingQueryStatus] = useState(false);
 
     // ── Password change ──
     const [changingPasswordFor, setChangingPasswordFor] = useState<string | null>(null);
@@ -569,8 +576,40 @@ export default function DashboardPage() {
         finally { setDownloadingDocId(null); }
     };
 
+    const loadQueryConversation = async (queryId: string) => {
+        setLoadingQueryResponses(true);
+        try {
+            const url = user?.role === 'admin'
+                ? `/backend/admin/queries/${queryId}/conversation`
+                : `/backend/user/${user?.userId}/queries/${queryId}/conversation`;
+            const res = await fetch(url, {
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setQueryResponses(data.responses || []);
+                if (data.query) {
+                    setViewingQuery(data.query);
+                }
+            } else {
+                setQueryResponses([]);
+            }
+        } catch (err) {
+            console.error('Failed to load query conversation:', err);
+            setQueryResponses([]);
+        } finally {
+            setLoadingQueryResponses(false);
+        }
+    };
+
     const handleViewQuery = async (q: any) => {
         setViewingQuery(q);
+        setQueryResponses([]);
+        setQueryReplyMessage('');
+        setQueryReplySuccess('');
+        setQueryReplyError('');
+        loadQueryConversation(q.id);
+
         if (user && user.role !== 'admin' && q.status === 'OPEN') {
             try {
                 const res = await fetch(`/backend/user/${user.userId}/queries/${q.id}/seen`, {
@@ -586,6 +625,79 @@ export default function DashboardPage() {
             } catch (err) {
                 console.error('Failed to mark query as seen:', err);
             }
+        }
+    };
+
+    const handleSendQueryReply = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        if (!viewingQuery || !queryReplyMessage.trim()) return;
+
+        setSubmittingQueryReply(true);
+        setQueryReplyError('');
+        setQueryReplySuccess('');
+
+        try {
+            const url = user?.role === 'admin'
+                ? `/backend/admin/queries/${viewingQuery.id}/responses`
+                : `/backend/user/${user?.userId}/queries/${viewingQuery.id}/responses`;
+
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${getToken()}`,
+                },
+                body: JSON.stringify({ message: queryReplyMessage.trim() }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to submit response');
+            }
+
+            if (data.response) {
+                setQueryResponses(prev => [...prev, data.response]);
+            }
+
+            const newStatus = user?.role === 'admin' ? 'ADMIN_RESPONDED' : 'CLIENT_RESPONDED';
+            setViewingQuery((prev: any) => prev ? { ...prev, status: newStatus } : prev);
+
+            if (user?.role === 'admin') {
+                setAdminQueries(prev => prev.map(item => item.id === viewingQuery.id ? { ...item, status: newStatus } : item));
+            } else {
+                setClientQueries(prev => prev.map(item => item.id === viewingQuery.id ? { ...item, status: newStatus } : item));
+            }
+
+            setQueryReplyMessage('');
+            setQueryReplySuccess(user?.role === 'admin' ? 'Reply sent to client!' : 'Response submitted! Admin received notification at camrsandco@gmail.com.');
+            setTimeout(() => setQueryReplySuccess(''), 5000);
+        } catch (err: any) {
+            setQueryReplyError(err.message || 'Failed to send response');
+        } finally {
+            setSubmittingQueryReply(false);
+        }
+    };
+
+    const handleUpdateQueryStatus = async (status: string) => {
+        if (!viewingQuery) return;
+        setUpdatingQueryStatus(true);
+        try {
+            const res = await fetch(`/backend/admin/queries/${viewingQuery.id}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${getToken()}`,
+                },
+                body: JSON.stringify({ status }),
+            });
+            if (res.ok) {
+                setViewingQuery((prev: any) => prev ? { ...prev, status } : prev);
+                setAdminQueries(prev => prev.map(item => item.id === viewingQuery.id ? { ...item, status } : item));
+            }
+        } catch (err) {
+            console.error('Failed to update query status:', err);
+        } finally {
+            setUpdatingQueryStatus(false);
         }
     };
 
@@ -620,7 +732,12 @@ export default function DashboardPage() {
     const statusBadge = (status: string) => {
         const map: Record<string, string> = {
             RESOLVED: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+            CLOSED: 'bg-slate-500/10 border-slate-500/20 text-slate-400',
             IN_PROGRESS: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
+            CLIENT_RESPONDED: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
+            ADMIN_RESPONDED: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
+            SEEN: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
+            OPEN: 'bg-rose-500/10 border-rose-500/20 text-rose-400',
         };
         return map[status] || 'bg-rose-500/10 border-rose-500/20 text-rose-400';
     };
@@ -1288,9 +1405,9 @@ export default function DashboardPage() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/[0.05]">
-                                            <Button size="sm" variant="ghost" onClick={() => setViewingQuery(q)}
+                                            <Button size="sm" variant="ghost" onClick={() => handleViewQuery(q)}
                                                 className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5">
-                                                <Eye className="w-3.5 h-3.5" /> View Full Query
+                                                <MessageCircle className="w-3.5 h-3.5" /> View & Reply
                                             </Button>
                                             {q.fileName && (
                                                 <Button size="sm" variant="ghost"
@@ -1684,10 +1801,14 @@ export default function DashboardPage() {
                                                                         {q.createdAt && <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-500"><Clock className="w-3 h-3" /><span>Raised on {formatDate(q.createdAt)}</span></div>}
                                                                     </div>
                                                                 </div>
-                                                                <div className="mt-3 pt-3 border-t border-white/[0.05] flex items-center gap-2">
+                                                                <div className="mt-3 pt-3 border-t border-white/[0.05] flex items-center gap-2 flex-wrap">
+                                                                    <Button size="sm" onClick={() => handleViewQuery(q)}
+                                                                        className="text-xs bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-400 hover:to-pink-500 text-white shadow-md shadow-rose-500/20 px-3.5 py-1.5 h-auto flex items-center gap-1.5 font-medium rounded-lg">
+                                                                        <Send className="w-3.5 h-3.5" /> Respond to Query
+                                                                    </Button>
                                                                     <Button size="sm" variant="ghost" onClick={() => handleViewQuery(q)}
-                                                                        className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5">
-                                                                        <Eye className="w-3.5 h-3.5" /> View Full Query
+                                                                        className="text-xs text-slate-300 hover:text-white hover:bg-white/[0.06] px-3 py-1.5 h-auto flex items-center gap-1.5">
+                                                                        <Eye className="w-3.5 h-3.5" /> View History
                                                                     </Button>
                                                                     {q.fileName && (
                                                                         <Button size="sm" variant="ghost"
@@ -1787,63 +1908,180 @@ export default function DashboardPage() {
                 </Modal>
             )}
 
-            {/* View Query Detail Modal */}
+            {/* View Query & Interactive Conversation Thread Modal */}
             {viewingQuery && (
-                <Modal onClose={() => setViewingQuery(null)} title={<><MessageCircle className="w-5 h-5 text-rose-400" /> Query Detail</>}>
-                    <div className="space-y-4">
-                        <div>
-                            <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Subject</p>
-                            <p className="text-white font-semibold text-base">{viewingQuery.subject || 'No Subject'}</p>
-                        </div>
-                        {user?.role === 'admin' && (
-                            <div>
-                                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Sent To</p>
-                                <p className="text-slate-200 text-sm">
-                                    {viewingQuery.targetUser?.fullName && <span className="font-medium">{viewingQuery.targetUser.fullName} — </span>}
-                                    <span className="text-slate-400">@{viewingQuery.targetUser?.userId || '—'}</span>
-                                </p>
-                            </div>
-                        )}
-                        <div>
-                            <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Status</p>
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium uppercase tracking-wider border ${statusBadge(viewingQuery.status)}`}>
-                                {viewingQuery.status || 'OPEN'}
-                            </span>
-                        </div>
-                        <div>
-                            <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Message</p>
-                            <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-4">
-                                <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">
-                                    {viewingQuery.messageText || <span className="italic text-slate-500">No message content attached.</span>}
-                                </p>
-                            </div>
-                        </div>
-                        {viewingQuery.fileName && (
-                            <div>
-                                <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Attachment</p>
-                                <div className="flex items-center justify-between p-3 bg-amber-500/5 border border-amber-500/10 rounded-xl">
-                                    <div className="flex items-center gap-2 text-amber-400 text-sm font-medium min-w-0">
-                                        <Paperclip className="w-4 h-4 flex-shrink-0" />
-                                        <span className="truncate">{viewingQuery.fileName}</span>
-                                    </div>
-                                    <Button size="sm" variant="ghost"
-                                        onClick={() => handleDownloadQueryAttachment(viewingQuery.id, viewingQuery.fileName)}
-                                        disabled={downloadingQueryId === viewingQuery.id}
-                                        className="text-xs text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5">
-                                        {downloadingQueryId === viewingQuery.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} Download
-                                    </Button>
+                <Modal onClose={() => setViewingQuery(null)} maxWidth="max-w-2xl" title={<><MessageCircle className="w-5 h-5 text-rose-400" /> Query #{viewingQuery.id || ''}</>}>
+                    <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
+                        {/* Query Header Info */}
+                        <div className="p-4 bg-white/[0.03] border border-white/[0.08] rounded-xl flex flex-col gap-3">
+                            <div className="flex items-start justify-between gap-2 flex-wrap">
+                                <div>
+                                    <p className="text-xs text-slate-500 uppercase tracking-wider mb-0.5">Subject</p>
+                                    <p className="text-white font-semibold text-base">{viewingQuery.subject || 'No Subject'}</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium uppercase tracking-wider border ${statusBadge(viewingQuery.status)}`}>
+                                        {viewingQuery.status || 'OPEN'}
+                                    </span>
                                 </div>
                             </div>
-                        )}
-                        {viewingQuery.createdAt && (
-                            <div className="flex items-center gap-1.5 text-xs text-slate-500 pt-1">
-                                <Clock className="w-3.5 h-3.5" />
-                                <span>Raised on {formatDate(viewingQuery.createdAt)}</span>
+
+                            <div className="flex items-center gap-4 text-xs text-slate-400 flex-wrap pt-1 border-t border-white/[0.05]">
+                                {user?.role === 'admin' ? (
+                                    <span>Sent to: <strong className="text-slate-200">{viewingQuery.targetUser?.fullName || viewingQuery.targetUser?.userId || 'Client'}</strong></span>
+                                ) : (
+                                    <span>Raised by: <strong className="text-slate-200">Admin ({viewingQuery.raisedByAdmin || 'MRS & Co.'})</strong></span>
+                                )}
+                                {viewingQuery.createdAt && (
+                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDate(viewingQuery.createdAt)}</span>
+                                )}
                             </div>
-                        )}
-                    </div>
-                    <div className="flex justify-end mt-6">
-                        <Button onClick={() => setViewingQuery(null)} className="bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/10">Close</Button>
+
+                            {/* Admin Status Quick Actions */}
+                            {user?.role === 'admin' && (
+                                <div className="flex items-center gap-2 pt-2 border-t border-white/[0.05] flex-wrap">
+                                    <span className="text-xs text-slate-500 font-medium">Change Status:</span>
+                                    <button
+                                        type="button"
+                                        disabled={updatingQueryStatus || viewingQuery.status === 'RESOLVED'}
+                                        onClick={() => handleUpdateQueryStatus('RESOLVED')}
+                                        className="text-xs px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 disabled:opacity-40 transition-colors">
+                                        Mark Resolved
+                                    </button>
+                                    <button
+                                        type="button"
+                                        disabled={updatingQueryStatus || viewingQuery.status === 'CLOSED'}
+                                        onClick={() => handleUpdateQueryStatus('CLOSED')}
+                                        className="text-xs px-2.5 py-1 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-slate-300 border border-slate-600 disabled:opacity-40 transition-colors">
+                                        Close Query
+                                    </button>
+                                    {viewingQuery.status !== 'OPEN' && (
+                                        <button
+                                            type="button"
+                                            disabled={updatingQueryStatus}
+                                            onClick={() => handleUpdateQueryStatus('OPEN')}
+                                            className="text-xs px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 disabled:opacity-40 transition-colors">
+                                            Reopen
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Conversation Thread */}
+                        <div className="space-y-2">
+                            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Conversation History</p>
+                            
+                            <div className="space-y-3 p-3.5 bg-black/25 border border-white/[0.08] rounded-xl max-h-72 overflow-y-auto">
+                                {/* Initial Query by Admin */}
+                                <div className="p-3.5 bg-white/[0.04] border border-white/[0.08] rounded-xl">
+                                    <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
+                                        <span className="font-semibold text-cyan-400">Admin ({viewingQuery.raisedByAdmin || 'MRS & Co.'})</span>
+                                        {viewingQuery.createdAt && <span>{formatDate(viewingQuery.createdAt)}</span>}
+                                    </div>
+                                    <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">
+                                        {viewingQuery.messageText || <span className="italic text-slate-500">No message content attached.</span>}
+                                    </p>
+                                    {viewingQuery.fileName && (
+                                        <div className="mt-2.5 pt-2 border-t border-white/[0.05] flex items-center justify-between">
+                                            <span className="text-xs text-amber-400 flex items-center gap-1 truncate"><Paperclip className="w-3.5 h-3.5" />{viewingQuery.fileName}</span>
+                                            <Button size="sm" variant="ghost"
+                                                onClick={() => handleDownloadQueryAttachment(viewingQuery.id, viewingQuery.fileName)}
+                                                disabled={downloadingQueryId === viewingQuery.id}
+                                                className="text-xs text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 px-2.5 py-1 h-auto flex items-center gap-1">
+                                                {downloadingQueryId === viewingQuery.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} Download
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Loading responses indicator */}
+                                {loadingQueryResponses && (
+                                    <div className="text-center py-3 text-xs text-slate-400 flex items-center justify-center gap-2">
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-400" /> Loading replies...
+                                    </div>
+                                )}
+
+                                {/* Replies list */}
+                                {!loadingQueryResponses && queryResponses.map((r: any) => {
+                                    const isClient = r.senderRole === 'CLIENT';
+                                    return (
+                                        <div
+                                            key={r.id}
+                                            className={`p-3.5 rounded-xl border ${
+                                                isClient
+                                                    ? 'bg-blue-600/15 border-blue-500/30 text-white ml-4'
+                                                    : 'bg-cyan-600/15 border-cyan-500/30 text-white mr-4'
+                                            }`}
+                                        >
+                                            <div className="flex items-center justify-between text-xs mb-1">
+                                                <span className={`font-semibold ${isClient ? 'text-blue-400' : 'text-cyan-400'}`}>
+                                                    {isClient
+                                                        ? (user?.role === 'admin' ? `Client (${r.senderName || r.senderId})` : 'You')
+                                                        : (user?.role === 'admin' ? 'You (Admin)' : `Admin (${r.senderName || 'MRS & Co.'})`)}
+                                                </span>
+                                                {r.createdAt && <span className="text-slate-400 text-[11px]">{formatDate(r.createdAt)}</span>}
+                                            </div>
+                                            <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-200">{r.message}</p>
+                                        </div>
+                                    );
+                                })}
+
+                                {!loadingQueryResponses && queryResponses.length === 0 && (
+                                    <p className="text-center py-2 text-xs text-slate-500 italic">No responses recorded yet.</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Reply Input Box */}
+                        <form onSubmit={handleSendQueryReply} className="space-y-3 pt-2">
+                            <div className="flex justify-between items-center">
+                                <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Send className="w-3.5 h-3.5 text-rose-400" />
+                                    {user?.role === 'admin' ? 'Reply as Admin' : 'Write your response'}
+                                </label>
+                                <span className="text-[11px] text-slate-500">{queryReplyMessage.length} / 5000</span>
+                            </div>
+
+                            <textarea
+                                rows={3}
+                                value={queryReplyMessage}
+                                onChange={(e) => setQueryReplyMessage(e.target.value)}
+                                placeholder={user?.role === 'admin' ? 'Type admin reply to client...' : 'Write your response to MRS & Co. here...'}
+                                disabled={submittingQueryReply}
+                                className="w-full p-3 bg-white/[0.04] text-white text-sm border border-white/10 rounded-xl focus:outline-none focus:border-rose-500/50 resize-none transition"
+                            />
+
+                            {queryReplySuccess && (
+                                <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-center gap-2">
+                                    <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                                    <span>{queryReplySuccess}</span>
+                                </div>
+                            )}
+
+                            {queryReplyError && (
+                                <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center gap-2">
+                                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                    <span>{queryReplyError}</span>
+                                </div>
+                            )}
+
+                            <div className="flex justify-between items-center pt-1">
+                                <Button type="button" variant="ghost" onClick={() => setViewingQuery(null)} className="text-slate-400 hover:text-white text-xs">
+                                    Close
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={submittingQueryReply || !queryReplyMessage.trim()}
+                                    className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-400 hover:to-pink-500 text-white text-xs font-semibold shadow-lg shadow-rose-500/20 px-5">
+                                    {submittingQueryReply ? (
+                                        <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> Sending...</>
+                                    ) : (
+                                        <><Send className="w-3.5 h-3.5 mr-1.5" /> Send Response</>
+                                    )}
+                                </Button>
+                            </div>
+                        </form>
                     </div>
                 </Modal>
             )}
@@ -1899,11 +2137,11 @@ function EmptyState({ icon, title, subtitle }: { icon: React.ReactNode; title: s
     );
 }
 
-function Modal({ children, onClose, title, danger }: { children: React.ReactNode; onClose: () => void; title: React.ReactNode; danger?: boolean }) {
+function Modal({ children, onClose, title, danger, maxWidth = 'max-w-md' }: { children: React.ReactNode; onClose: () => void; title: React.ReactNode; danger?: boolean; maxWidth?: string }) {
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 overflow-y-auto">
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                className={`bg-slate-900 border rounded-2xl p-6 w-full max-w-md ${danger ? 'border-red-500/20' : 'border-white/10'}`}>
+                className={`bg-slate-900 border rounded-2xl p-6 w-full ${maxWidth} ${danger ? 'border-red-500/20' : 'border-white/10'} shadow-2xl my-8`}>
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-bold text-white flex items-center gap-2">{title}</h3>
                     <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-all">
