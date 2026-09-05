@@ -15,6 +15,7 @@ import {
     verifyEmployeeDocument,
     rejectEmployeeDocument,
     downloadEmployeeDocument,
+    deleteAdminEmployee,
     type EmployeeProfile,
     type CreateEmployeeRequest,
     type UpdateProfileRequest,
@@ -26,6 +27,7 @@ import {
     Filter,
     Eye,
     Edit,
+    Trash2,
     FileText,
     CheckCircle2,
     XCircle,
@@ -47,6 +49,7 @@ import {
     ChevronLeft,
     ChevronRight,
     SlidersHorizontal,
+    ExternalLink,
 } from 'lucide-react';
 
 function maskAadhaar(aadhaar?: string): string {
@@ -86,6 +89,7 @@ export function AdminEmployeeManagement() {
 
     const [viewingEmployee, setViewingEmployee] = useState<EmployeeProfile | null>(null);
     const [editingEmployee, setEditingEmployee] = useState<EmployeeProfile | null>(null);
+    const [deletingEmployee, setDeletingEmployee] = useState<EmployeeProfile | null>(null);
     const [rejectingDocId, setRejectingDocId] = useState<string | null>(null);
     const [rejectionReason, setRejectionReason] = useState('');
     const [resettingPasswordId, setResettingPasswordId] = useState<string | null>(null);
@@ -208,11 +212,13 @@ export function AdminEmployeeManagement() {
             name: emp.name || '',
             fatherName: emp.fatherName || '',
             mobileNumber: emp.mobileNumber || '',
+            fatherMobileNumber: emp.fatherMobileNumber || '',
             aadhaarNumber: emp.aadhaarNumber || '',
             panNumber: emp.panNumber || '',
             dateOfJoining: emp.dateOfJoining ? String(emp.dateOfJoining).split('T')[0] : '',
             permanentAddress: emp.permanentAddress || '',
             currentAddress: emp.currentAddress || '',
+            resumeGoogleDriveLink: emp.resumeGoogleDriveLink || '',
         });
     };
 
@@ -232,6 +238,31 @@ export function AdminEmployeeManagement() {
             }
         } catch (err: unknown) {
             setFeedback({ type: 'error', text: err instanceof Error ? err.message : 'Failed to update employee.' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    // Delete employee
+    const handleConfirmDeleteEmployee = async () => {
+        if (!deletingEmployee) return;
+        setActionLoading(true);
+        try {
+            const res = await deleteAdminEmployee(deletingEmployee.employeeId);
+            setFeedback({
+                type: 'success',
+                text: res.message || `Employee ${deletingEmployee.employeeId} deleted successfully.`,
+            });
+            setDeletingEmployee(null);
+            if (viewingEmployee?.employeeId === deletingEmployee.employeeId) {
+                setViewingEmployee(null);
+            }
+            fetchEmployees();
+        } catch (err: unknown) {
+            setFeedback({
+                type: 'error',
+                text: err instanceof Error ? err.message : 'Failed to delete employee.',
+            });
         } finally {
             setActionLoading(false);
         }
@@ -696,6 +727,15 @@ export function AdminEmployeeManagement() {
                                                     >
                                                         <KeyRound className="w-3.5 h-3.5" />
                                                     </button>
+
+                                                    {/* Delete Employee */}
+                                                    <button
+                                                        onClick={() => setDeletingEmployee(emp)}
+                                                        className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-colors"
+                                                        title="Delete Employee"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -989,11 +1029,31 @@ export function AdminEmployeeManagement() {
                                             </span>
                                         </div>
                                         <div>
+                                            <span className="text-slate-500 block mb-1">Father&apos;s Mobile</span>
+                                            <span className="font-mono text-white">
+                                                {viewingEmployee.fatherMobileNumber || '—'}
+                                            </span>
+                                        </div>
+                                        <div>
                                             <span className="text-slate-500 block mb-1">Account Status</span>
                                             <span className={viewingEmployee.active !== false ? 'text-emerald-400' : 'text-rose-400'}>
                                                 {viewingEmployee.active !== false ? 'Active' : 'Inactive / Deactivated'}
                                             </span>
                                         </div>
+                                        {viewingEmployee.resumeGoogleDriveLink && (
+                                            <div className="col-span-2 sm:col-span-3">
+                                                <span className="text-slate-500 block mb-1">Resume / Drive Link</span>
+                                                <a
+                                                    href={viewingEmployee.resumeGoogleDriveLink}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 underline underline-offset-2 break-all"
+                                                >
+                                                    <span>{viewingEmployee.resumeGoogleDriveLink}</span>
+                                                    <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                                                </a>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -1224,6 +1284,43 @@ export function AdminEmployeeManagement() {
                                             className="h-10 bg-white/[0.04] border-white/[0.1] text-white rounded-xl text-xs font-mono uppercase"
                                         />
                                     </div>
+
+                                    <div>
+                                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                                            Father&apos;s Mobile Number
+                                        </label>
+                                        <Input
+                                            type="tel"
+                                            maxLength={10}
+                                            placeholder="10-digit mobile"
+                                            value={editFormData.fatherMobileNumber || ''}
+                                            onChange={(e) =>
+                                                setEditFormData((p) => ({
+                                                    ...p,
+                                                    fatherMobileNumber: e.target.value,
+                                                }))
+                                            }
+                                            className="h-10 bg-white/[0.04] border-white/[0.1] text-white rounded-xl text-xs font-mono"
+                                        />
+                                    </div>
+
+                                    <div className="sm:col-span-2">
+                                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                                            Resume Google Drive Link
+                                        </label>
+                                        <Input
+                                            type="url"
+                                            placeholder="https://drive.google.com/..."
+                                            value={editFormData.resumeGoogleDriveLink || ''}
+                                            onChange={(e) =>
+                                                setEditFormData((p) => ({
+                                                    ...p,
+                                                    resumeGoogleDriveLink: e.target.value,
+                                                }))
+                                            }
+                                            className="h-10 bg-white/[0.04] border-white/[0.1] text-white rounded-xl text-xs"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div>
@@ -1427,6 +1524,69 @@ export function AdminEmployeeManagement() {
                             >
                                 Done
                             </Button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ── Modal: Confirm Delete Employee ── */}
+            <AnimatePresence>
+                {deletingEmployee && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-slate-900 border border-rose-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl relative"
+                        >
+                            <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mx-auto mb-4">
+                                <Trash2 className="w-6 h-6" />
+                            </div>
+
+                            <h3 className="text-lg font-bold text-white text-center mb-2">Delete Employee</h3>
+                            <p className="text-xs sm:text-sm text-slate-300 text-center mb-5 leading-relaxed">
+                                Are you sure you want to permanently delete employee{' '}
+                                <strong className="text-white font-mono">{deletingEmployee.employeeId}</strong> (
+                                <span className="text-slate-100 font-semibold">{deletingEmployee.name}</span>)?
+                            </p>
+
+                            <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-200 text-xs mb-6 space-y-1">
+                                <div className="font-semibold flex items-center gap-1.5 text-rose-300">
+                                    <AlertCircle className="w-4 h-4 text-rose-400" />
+                                    Permanent & Irreversible Action
+                                </div>
+                                <p className="text-[11px] text-rose-300/80 leading-normal pl-5">
+                                    This will delete their employee profile record, remove their login account, and purge all uploaded Aadhaar documents from the database.
+                                </p>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-3">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    disabled={actionLoading}
+                                    onClick={() => setDeletingEmployee(null)}
+                                    className="text-slate-400 hover:text-white text-xs h-10 px-4"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="button"
+                                    onClick={handleConfirmDeleteEmployee}
+                                    disabled={actionLoading}
+                                    className="bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-xl h-10 px-5 gap-2 shadow-lg shadow-rose-600/30"
+                                >
+                                    {actionLoading ? (
+                                        <>
+                                            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Deleting...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Trash2 className="w-3.5 h-3.5" /> Yes, Delete Employee
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
                         </motion.div>
                     </div>
                 )}

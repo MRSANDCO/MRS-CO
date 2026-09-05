@@ -266,11 +266,13 @@ export interface EmployeeProfile {
     name: string;
     fatherName?: string;
     mobileNumber: string;
+    fatherMobileNumber?: string;
     aadhaarNumber?: string;
     panNumber?: string;
     dateOfJoining?: string;
     permanentAddress?: string;
     currentAddress?: string;
+    resumeGoogleDriveLink?: string;
     aadhaarDocumentUrl?: string;
     aadhaarFileName?: string;
     aadhaarFileSize?: number;
@@ -286,11 +288,13 @@ export interface UpdateProfileRequest {
     name?: string;
     fatherName?: string;
     mobileNumber?: string;
+    fatherMobileNumber?: string;
     aadhaarNumber?: string;
     panNumber?: string;
     dateOfJoining?: string;
     permanentAddress?: string;
     currentAddress?: string;
+    resumeGoogleDriveLink?: string;
 }
 
 export interface CreateEmployeeRequest {
@@ -492,5 +496,13 @@ export async function rejectEmployeeDocument(employeeId: string, reason?: string
         body: JSON.stringify(reason ? { reason } : {}),
     });
     return handleResponse<{ message: string; employeeId: string; documentStatus: string; rejectionReason?: string }>(res);
+}
+
+export async function deleteAdminEmployee(employeeId: string): Promise<{ message: string; employeeId: string }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+    });
+    return handleResponse<{ message: string; employeeId: string }>(res);
 }
 

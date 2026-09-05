@@ -41,6 +41,7 @@ import {
     Loader2,
     AlertCircle,
     Copy,
+    ExternalLink,
 } from 'lucide-react';
 
 function maskAadhaar(aadhaar?: string): string {
@@ -110,11 +111,13 @@ export default function AdminSingleEmployeePage({ params }: PageProps) {
                 name: data.name || '',
                 fatherName: data.fatherName || '',
                 mobileNumber: data.mobileNumber || '',
+                fatherMobileNumber: data.fatherMobileNumber || '',
                 aadhaarNumber: data.aadhaarNumber || '',
                 panNumber: data.panNumber || '',
                 dateOfJoining: data.dateOfJoining ? String(data.dateOfJoining).split('T')[0] : '',
                 permanentAddress: data.permanentAddress || '',
                 currentAddress: data.currentAddress || '',
+                resumeGoogleDriveLink: data.resumeGoogleDriveLink || '',
             });
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Failed to load employee details');
@@ -412,6 +415,26 @@ export default function AdminSingleEmployeePage({ params }: PageProps) {
                                                     className="h-10 bg-white/[0.04] border-white/[0.1] text-white rounded-xl text-xs font-mono uppercase"
                                                 />
                                             </div>
+                                            <div>
+                                                <label className="block text-xs text-slate-400 mb-1">Father&apos;s Mobile</label>
+                                                <Input
+                                                    type="tel"
+                                                    maxLength={10}
+                                                    value={editFormData.fatherMobileNumber || ''}
+                                                    onChange={(e) => setEditFormData((p) => ({ ...p, fatherMobileNumber: e.target.value }))}
+                                                    className="h-10 bg-white/[0.04] border-white/[0.1] text-white rounded-xl text-xs font-mono"
+                                                />
+                                            </div>
+                                            <div className="sm:col-span-2">
+                                                <label className="block text-xs text-slate-400 mb-1">Resume Google Drive Link</label>
+                                                <Input
+                                                    type="url"
+                                                    placeholder="https://drive.google.com/..."
+                                                    value={editFormData.resumeGoogleDriveLink || ''}
+                                                    onChange={(e) => setEditFormData((p) => ({ ...p, resumeGoogleDriveLink: e.target.value }))}
+                                                    className="h-10 bg-white/[0.04] border-white/[0.1] text-white rounded-xl text-xs"
+                                                />
+                                            </div>
                                         </div>
 
                                         <div>
@@ -477,6 +500,10 @@ export default function AdminSingleEmployeePage({ params }: PageProps) {
                                                 <span className="font-medium text-white">{employee.fatherName || '—'}</span>
                                             </div>
                                             <div className="flex justify-between py-1.5 border-b border-white/[0.04]">
+                                                <span className="text-slate-500">Father&apos;s Mobile</span>
+                                                <span className="font-mono text-white">{employee.fatherMobileNumber || '—'}</span>
+                                            </div>
+                                            <div className="flex justify-between py-1.5 border-b border-white/[0.04]">
                                                 <span className="text-slate-500">Mobile</span>
                                                 <span className="font-mono text-white">{employee.mobileNumber}</span>
                                             </div>
@@ -488,6 +515,20 @@ export default function AdminSingleEmployeePage({ params }: PageProps) {
                                                 <span className="text-slate-500">PAN (Masked)</span>
                                                 <span className="font-mono text-cyan-300">{maskPAN(employee.panNumber)}</span>
                                             </div>
+                                            {employee.resumeGoogleDriveLink && (
+                                                <div className="flex justify-between py-1.5 border-b border-white/[0.04]">
+                                                    <span className="text-slate-500">Resume Link</span>
+                                                    <a
+                                                        href={employee.resumeGoogleDriveLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 underline underline-offset-2 break-all max-w-[200px] truncate"
+                                                    >
+                                                        <span>Google Drive</span>
+                                                        <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                                                    </a>
+                                                </div>
+                                            )}
                                             <div className="flex justify-between py-1.5">
                                                 <span className="text-slate-500">Profile Status</span>
                                                 <span className={employee.profileStatus === 'SUBMITTED' ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}>

@@ -40,6 +40,7 @@ import {
     AlertTriangle,
     RefreshCw,
     X,
+    ExternalLink,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -75,11 +76,13 @@ export default function EmployeeDashboardPage() {
         name: '',
         fatherName: '',
         mobileNumber: '',
+        fatherMobileNumber: '',
         aadhaarNumber: '',
         panNumber: '',
         dateOfJoining: '',
         permanentAddress: '',
         currentAddress: '',
+        resumeGoogleDriveLink: '',
     });
 
     const [sameAddress, setSameAddress] = useState(false);
@@ -125,11 +128,13 @@ export default function EmployeeDashboardPage() {
                 name: data.name || '',
                 fatherName: data.fatherName || '',
                 mobileNumber: data.mobileNumber || '',
+                fatherMobileNumber: data.fatherMobileNumber || '',
                 aadhaarNumber: data.aadhaarNumber || '',
                 panNumber: data.panNumber || '',
                 dateOfJoining: data.dateOfJoining ? String(data.dateOfJoining).split('T')[0] : '',
                 permanentAddress: data.permanentAddress || '',
                 currentAddress: data.currentAddress || '',
+                resumeGoogleDriveLink: data.resumeGoogleDriveLink || '',
             });
 
             if (data.permanentAddress && data.permanentAddress === data.currentAddress) {
@@ -201,6 +206,15 @@ export default function EmployeeDashboardPage() {
             errors.mobileNumber = 'Please enter a valid 10-digit mobile number';
         }
 
+        const cleanedFatherMobile = formData.fatherMobileNumber.replace(/\D/g, '');
+        if (!cleanedFatherMobile) {
+            if (isFullSubmission) {
+                errors.fatherMobileNumber = "Father's mobile number is required";
+            }
+        } else if (cleanedFatherMobile.length !== 10) {
+            errors.fatherMobileNumber = "Please enter a valid 10-digit mobile number for father";
+        }
+
         if (formData.aadhaarNumber) {
             const cleanedAadhaar = formData.aadhaarNumber.replace(/\D/g, '');
             if (cleanedAadhaar.length !== 12) {
@@ -229,6 +243,14 @@ export default function EmployeeDashboardPage() {
 
         if (!formData.currentAddress.trim()) {
             errors.currentAddress = 'Current address is required';
+        }
+
+        if (formData.resumeGoogleDriveLink.trim()) {
+            const link = formData.resumeGoogleDriveLink.trim();
+            const driveRegex = /^https?:\/\/(drive\.google\.com|docs\.google\.com)\/.+$/i;
+            if (!driveRegex.test(link)) {
+                errors.resumeGoogleDriveLink = 'Must be a valid Google Drive or Google Docs link (e.g., https://drive.google.com/...)';
+            }
         }
 
         if (isFullSubmission && !profile?.aadhaarFileName && !selectedFile) {
@@ -298,11 +320,13 @@ export default function EmployeeDashboardPage() {
                 name: formData.name.trim(),
                 fatherName: formData.fatherName.trim(),
                 mobileNumber: formData.mobileNumber.trim(),
+                fatherMobileNumber: formData.fatherMobileNumber.trim(),
                 aadhaarNumber: formData.aadhaarNumber.trim(),
                 panNumber: formData.panNumber.trim().toUpperCase(),
                 dateOfJoining: formData.dateOfJoining,
                 permanentAddress: formData.permanentAddress.trim(),
                 currentAddress: formData.currentAddress.trim(),
+                resumeGoogleDriveLink: formData.resumeGoogleDriveLink.trim(),
             };
 
             const res = await updateEmployeeProfile(payload);
@@ -332,11 +356,13 @@ export default function EmployeeDashboardPage() {
                 name: formData.name.trim(),
                 fatherName: formData.fatherName.trim(),
                 mobileNumber: formData.mobileNumber.trim(),
+                fatherMobileNumber: formData.fatherMobileNumber.trim(),
                 aadhaarNumber: formData.aadhaarNumber.trim(),
                 panNumber: formData.panNumber.trim().toUpperCase(),
                 dateOfJoining: formData.dateOfJoining,
                 permanentAddress: formData.permanentAddress.trim(),
                 currentAddress: formData.currentAddress.trim(),
+                resumeGoogleDriveLink: formData.resumeGoogleDriveLink.trim(),
             };
             await updateEmployeeProfile(payload);
 
@@ -743,6 +769,15 @@ export default function EmployeeDashboardPage() {
 
                                             <div>
                                                 <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+                                                    Father&apos;s Mobile
+                                                </label>
+                                                <div className="text-sm font-mono text-white">
+                                                    {profile.fatherMobileNumber || '—'}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
                                                     Date of Joining
                                                 </label>
                                                 <div className="text-sm font-medium text-white">
@@ -751,6 +786,23 @@ export default function EmployeeDashboardPage() {
                                                         : '—'}
                                                 </div>
                                             </div>
+
+                                            {profile.resumeGoogleDriveLink && (
+                                                <div className="sm:col-span-2 lg:col-span-3">
+                                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+                                                        Resume / Portfolio (Google Drive)
+                                                    </label>
+                                                    <a
+                                                        href={profile.resumeGoogleDriveLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 underline underline-offset-2 break-all"
+                                                    >
+                                                        <span>{profile.resumeGoogleDriveLink}</span>
+                                                        <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                                                    </a>
+                                                </div>
+                                            )}
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -999,6 +1051,53 @@ export default function EmployeeDashboardPage() {
                                                     />
                                                 </div>
                                                 {fieldErrors.dateOfJoining && <p className="text-xs text-rose-400 mt-1">{fieldErrors.dateOfJoining}</p>}
+                                            </div>
+
+                                            {/* Father's Mobile Number */}
+                                            <div>
+                                                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                                                    Father&apos;s Mobile Number <span className="text-rose-400">*</span>
+                                                </label>
+                                                <div className="relative">
+                                                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                                    <Input
+                                                        type="tel"
+                                                        maxLength={10}
+                                                        placeholder="10-digit father's mobile"
+                                                        value={formData.fatherMobileNumber}
+                                                        onChange={(e) => handleInputChange('fatherMobileNumber', e.target.value)}
+                                                        required
+                                                        className={`pl-10 h-11 bg-white/[0.04] border-white/[0.1] text-white placeholder:text-slate-600 rounded-xl ${
+                                                            fieldErrors.fatherMobileNumber ? 'border-rose-500 ring-1 ring-rose-500' : ''
+                                                        }`}
+                                                    />
+                                                </div>
+                                                {fieldErrors.fatherMobileNumber && (
+                                                    <p className="text-xs text-rose-400 mt-1">{fieldErrors.fatherMobileNumber}</p>
+                                                )}
+                                            </div>
+
+                                            {/* Resume Google Drive Link */}
+                                            <div className="sm:col-span-2">
+                                                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                                                    Resume / Portfolio (Google Drive Link) <span className="text-slate-500 font-normal">(Optional)</span>
+                                                </label>
+                                                <div className="relative">
+                                                    <ExternalLink className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                                    <Input
+                                                        type="url"
+                                                        placeholder="https://drive.google.com/file/d/..."
+                                                        value={formData.resumeGoogleDriveLink}
+                                                        onChange={(e) => handleInputChange('resumeGoogleDriveLink', e.target.value)}
+                                                        className={`pl-10 h-11 bg-white/[0.04] border-white/[0.1] text-white placeholder:text-slate-600 rounded-xl ${
+                                                            fieldErrors.resumeGoogleDriveLink ? 'border-rose-500 ring-1 ring-rose-500' : ''
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <p className="text-[11px] text-slate-500 mt-1">Make sure the link sharing setting is set to &ldquo;Anyone with the link can view&rdquo;.</p>
+                                                {fieldErrors.resumeGoogleDriveLink && (
+                                                    <p className="text-xs text-rose-400 mt-1">{fieldErrors.resumeGoogleDriveLink}</p>
+                                                )}
                                             </div>
                                         </div>
                                     </CardContent>
