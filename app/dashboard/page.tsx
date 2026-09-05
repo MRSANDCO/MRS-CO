@@ -402,6 +402,13 @@ export default function DashboardPage() {
         finally { setLoadingClientQueries(false); }
     };
 
+    const handleOpenDriveUrl = (url?: string) => {
+        if (!url) return;
+        const trimmed = url.trim();
+        const target = trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`;
+        window.open(target, '_blank', 'noopener,noreferrer');
+    };
+
     // ─── Handlers ────────────────────────────────────────────────────────────
 
     const handleCreateUser = async (e: React.FormEvent) => {
@@ -692,8 +699,10 @@ export default function DashboardPage() {
 
             if (user?.role === 'admin') {
                 setAdminQueries(prev => prev.map(item => item.id === viewingQuery.id ? { ...item, status: newStatus } : item));
+                fetchAdminQueries();
             } else {
                 setClientQueries(prev => prev.map(item => item.id === viewingQuery.id ? { ...item, status: newStatus } : item));
+                fetchClientQueries();
             }
 
             setQueryReplyMessage('');
@@ -1536,8 +1545,8 @@ export default function DashboardPage() {
     // ═══════════════════════════════════════════════════════════════════════════
 
     return (
-        <div className={`bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 relative selection:bg-cyan-500/30 ${
-            user.role === 'admin' ? 'min-h-screen flex overflow-x-hidden' : 'h-screen overflow-hidden flex flex-col'
+        <div className={`bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 relative selection:bg-cyan-500/30 min-h-screen ${
+            user.role === 'admin' ? 'flex overflow-x-hidden' : 'lg:h-screen lg:overflow-hidden flex flex-col'
         }`}>
             {/* Animated Canvas Mesh & Particle Background */}
             <AmbientParticleCanvas />
@@ -1610,72 +1619,78 @@ export default function DashboardPage() {
             )}
 
             {/* ── CLIENT / USER SINGLE-SCREEN WORKSPACE ── */}
-            {user.role === 'user' && (
-                <div className="flex-1 flex flex-col relative z-10 h-screen overflow-hidden">
-                    {/* Compact Top Header */}
-                    <motion.header
-                        initial={{ opacity: 0, y: -12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.35, ease: 'easeOut' }}
-                        className="border-b border-white/[0.08] bg-slate-950/60 backdrop-blur-2xl flex-shrink-0 z-30 shadow-md shadow-black/30"
-                    >
-                        <div className="max-w-[1700px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <Link href="/" className="flex items-center gap-2.5 group">
-                                    <div className="relative w-8 h-8 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
-                                        style={{ background: 'linear-gradient(145deg, #ffffff 0%, #dceeff 100%)', border: '1.5px solid rgba(255,255,255,0.85)', boxShadow: '0 0 0 1px rgba(59,130,246,0.3), 0 3px 12px rgba(59,130,246,0.3)' }}>
-                                        <img src="https://education21.in/wp-content/uploads/2023/12/CA-India-Logo-1024x762.png" alt="CA India Logo" className="w-5 h-5 object-contain" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-white font-bold text-xs sm:text-sm tracking-wide leading-tight" style={{ fontFamily: 'Georgia, serif' }}>MRS & Co.</span>
-                                        <span className="text-[9px] text-cyan-400 font-medium tracking-wider uppercase leading-none">Chartered Accountants</span>
-                                    </div>
-                                </Link>
-                                <div className="hidden sm:block h-5 w-px bg-white/10" />
-                                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium text-slate-300 bg-white/[0.04] border border-white/[0.06]">
-                                    <Sparkles className="w-3 h-3 text-cyan-400" /> Client Workspace
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-2.5">
-                                <Link href="/" className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs text-slate-300 hover:text-white hover:bg-white/[0.06] transition-all">
-                                    <Home className="w-3.5 h-3.5" />Home
-                                </Link>
-                                <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] shadow-inner text-xs">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                                    <User className="w-3.5 h-3.5 text-cyan-400" />
-                                    <span className="text-white font-medium truncate max-w-[130px] sm:max-w-[180px]">{user.fullName || user.userId}</span>
-                                </div>
-                                <Tactile3DButton onClick={handleLogout} variant="ghost" size="sm" className="text-slate-400 hover:text-red-400 hover:bg-red-500/10 h-8 px-2.5 text-xs">
-                                    <LogOut className="w-3.5 h-3.5" /><span className="hidden sm:inline ml-1">Logout</span>
-                                </Tactile3DButton>
-                            </div>
-                        </div>
-                    </motion.header>
+            {user.role === 'user' && (() => {
+                const openQueriesCount = clientQueries.filter((q: any) => {
+                    const s = String(q?.status || 'OPEN').toUpperCase();
+                    return s === 'OPEN' || s === 'PENDING' || s === 'SEEN';
+                }).length;
 
-                    {/* Single-Screen Workspace Layout */}
-                    <div className="flex-1 max-w-[1700px] w-full mx-auto p-3 sm:p-4 flex flex-col gap-3 min-h-0 overflow-hidden">
-                        
-                        {/* Zone 1: Top Pill Stats Bar (Zero vertical height waste) */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
+                return (
+                    <div className="flex-1 flex flex-col relative z-10 w-full min-h-screen lg:min-h-0 lg:h-screen lg:overflow-hidden">
+                        {/* Compact Top Header */}
+                        <motion.header
+                            initial={{ opacity: 0, y: -12 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.35, delay: 0.05 }}
-                            className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 flex-shrink-0"
+                            transition={{ duration: 0.35, ease: 'easeOut' }}
+                            className="border-b border-white/[0.08] bg-slate-950/70 backdrop-blur-2xl flex-shrink-0 z-30 shadow-md shadow-black/30"
                         >
-                            {/* Stat 1: Pending Queries */}
-                            <CardTilt3D intensity={5} spotlightColor="rgba(244, 63, 94, 0.2)">
+                            <div className="max-w-[1700px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <Link href="/" className="flex items-center gap-2.5 group">
+                                        <div className="relative w-8 h-8 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
+                                            style={{ background: 'linear-gradient(145deg, #ffffff 0%, #dceeff 100%)', border: '1.5px solid rgba(255,255,255,0.85)', boxShadow: '0 0 0 1px rgba(59,130,246,0.3), 0 3px 12px rgba(59,130,246,0.3)' }}>
+                                            <img src="https://education21.in/wp-content/uploads/2023/12/CA-India-Logo-1024x762.png" alt="CA India Logo" className="w-5 h-5 object-contain" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-white font-bold text-xs sm:text-sm tracking-wide leading-tight" style={{ fontFamily: 'Georgia, serif' }}>MRS & Co.</span>
+                                            <span className="text-[9px] text-cyan-400 font-medium tracking-wider uppercase leading-none">Chartered Accountants</span>
+                                        </div>
+                                    </Link>
+                                    <div className="hidden sm:block h-5 w-px bg-white/10" />
+                                    <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium text-slate-300 bg-white/[0.04] border border-white/[0.06]">
+                                        <Sparkles className="w-3 h-3 text-cyan-400" /> Client Workspace
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-2.5">
+                                    <Link href="/" className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs text-slate-300 hover:text-white hover:bg-white/[0.06] transition-all">
+                                        <Home className="w-3.5 h-3.5" />Home
+                                    </Link>
+                                    <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] shadow-inner text-xs">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                                        <User className="w-3.5 h-3.5 text-cyan-400" />
+                                        <span className="text-white font-medium truncate max-w-[130px] sm:max-w-[180px]">{user.fullName || user.userId}</span>
+                                    </div>
+                                    <Tactile3DButton onClick={handleLogout} variant="ghost" size="sm" className="text-slate-400 hover:text-red-400 hover:bg-red-500/10 h-8 px-2.5 text-xs">
+                                        <LogOut className="w-3.5 h-3.5" /><span className="hidden sm:inline ml-1">Logout</span>
+                                    </Tactile3DButton>
+                                </div>
+                            </div>
+                        </motion.header>
+
+                        {/* Responsive Workspace Layout (Scrollable on mobile/tablet, single-screen on desktop) */}
+                        <div className="flex-1 max-w-[1700px] w-full mx-auto p-3 sm:p-4 flex flex-col gap-3 min-h-0 lg:overflow-hidden overflow-y-auto">
+                            
+                            {/* Zone 1: Top Pill Stats Bar */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.35, delay: 0.05 }}
+                                className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 flex-shrink-0"
+                            >
+                                {/* Stat 1: Pending Queries */}
                                 <button
+                                    type="button"
                                     onClick={() => setClientActiveTab('queries')}
-                                    className={`w-full text-left p-3 sm:py-2.5 sm:px-4 rounded-xl border transition-all duration-300 flex items-center justify-between ${
+                                    className={`w-full text-left p-3 sm:py-2.5 sm:px-4 rounded-xl border transition-all duration-200 flex items-center justify-between cursor-pointer group ${
                                         clientActiveTab === 'queries'
-                                            ? 'bg-rose-500/15 border-rose-500/40 shadow-[0_0_16px_rgba(244,63,94,0.18)]'
+                                            ? 'bg-rose-500/15 border-rose-500/40 shadow-[0_0_16px_rgba(244,63,94,0.2)] ring-1 ring-rose-500/30'
                                             : 'bg-white/[0.03] border-white/[0.08] hover:bg-white/[0.06] hover:border-rose-500/30'
                                     }`}
                                 >
                                     <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-1.5">
                                             <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Queries</p>
-                                            {clientQueries.filter((q: any) => q.status === 'OPEN').length > 0 && (
+                                            {openQueriesCount > 0 && (
                                                 <span className="relative flex h-2 w-2">
                                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
@@ -1683,23 +1698,26 @@ export default function DashboardPage() {
                                             )}
                                         </div>
                                         <div className="text-lg sm:text-xl font-bold text-white mt-0.5 flex items-baseline gap-1.5">
-                                            {loadingClientQueries ? <Loader2 className="w-4 h-4 animate-spin text-rose-400 inline" /> : clientQueries.filter((q: any) => q.status === 'OPEN').length}
+                                            {loadingClientQueries ? (
+                                                <Loader2 className="w-4 h-4 animate-spin text-rose-400 inline" />
+                                            ) : (
+                                                <span className={openQueriesCount > 0 ? 'text-rose-400' : 'text-white'}>{openQueriesCount}</span>
+                                            )}
                                             <span className="text-[10px] text-slate-400 font-normal">({clientQueries.length} total)</span>
                                         </div>
                                     </div>
-                                    <div className="w-8 h-8 rounded-lg bg-rose-500/20 border border-rose-500/30 flex items-center justify-center flex-shrink-0 ml-2 shadow-[0_0_12px_rgba(244,63,94,0.2)]">
+                                    <div className="w-8 h-8 rounded-lg bg-rose-500/20 border border-rose-500/30 flex items-center justify-center flex-shrink-0 ml-2 shadow-[0_0_12px_rgba(244,63,94,0.2)] group-hover:scale-105 transition-transform">
                                         <MessageCircle className="w-4 h-4 text-rose-400" />
                                     </div>
                                 </button>
-                            </CardTilt3D>
 
-                            {/* Stat 2: Verified Documents */}
-                            <CardTilt3D intensity={5} spotlightColor="rgba(6, 182, 212, 0.2)">
+                                {/* Stat 2: Verified Documents */}
                                 <button
+                                    type="button"
                                     onClick={() => setClientActiveTab('documents')}
-                                    className={`w-full text-left p-3 sm:py-2.5 sm:px-4 rounded-xl border transition-all duration-300 flex items-center justify-between ${
+                                    className={`w-full text-left p-3 sm:py-2.5 sm:px-4 rounded-xl border transition-all duration-200 flex items-center justify-between cursor-pointer group ${
                                         clientActiveTab === 'documents'
-                                            ? 'bg-cyan-500/15 border-cyan-500/40 shadow-[0_0_16px_rgba(6,182,212,0.18)]'
+                                            ? 'bg-cyan-500/15 border-cyan-500/40 shadow-[0_0_16px_rgba(6,182,212,0.2)] ring-1 ring-cyan-500/30'
                                             : 'bg-white/[0.03] border-white/[0.08] hover:bg-white/[0.06] hover:border-cyan-500/30'
                                     }`}
                                 >
@@ -1710,19 +1728,18 @@ export default function DashboardPage() {
                                             <span className="text-[10px] text-slate-400 font-normal">verified files</span>
                                         </div>
                                     </div>
-                                    <div className="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0 ml-2 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
+                                    <div className="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0 ml-2 shadow-[0_0_12px_rgba(6,182,212,0.2)] group-hover:scale-105 transition-transform">
                                         <FileText className="w-4 h-4 text-cyan-400" />
                                     </div>
                                 </button>
-                            </CardTilt3D>
 
-                            {/* Stat 3: Drive Folders */}
-                            <CardTilt3D intensity={5} spotlightColor="rgba(59, 130, 246, 0.2)">
+                                {/* Stat 3: Drive Folders */}
                                 <button
+                                    type="button"
                                     onClick={() => setClientActiveTab('drive')}
-                                    className={`w-full text-left p-3 sm:py-2.5 sm:px-4 rounded-xl border transition-all duration-300 flex items-center justify-between ${
+                                    className={`w-full text-left p-3 sm:py-2.5 sm:px-4 rounded-xl border transition-all duration-200 flex items-center justify-between cursor-pointer group ${
                                         clientActiveTab === 'drive'
-                                            ? 'bg-blue-500/15 border-blue-500/40 shadow-[0_0_16px_rgba(59,130,246,0.18)]'
+                                            ? 'bg-blue-500/15 border-blue-500/40 shadow-[0_0_16px_rgba(59,130,246,0.2)] ring-1 ring-blue-500/30'
                                             : 'bg-white/[0.03] border-white/[0.08] hover:bg-white/[0.06] hover:border-blue-500/30'
                                     }`}
                                 >
@@ -1733,14 +1750,12 @@ export default function DashboardPage() {
                                             <span className="text-[10px] text-slate-400 font-normal">cloud folders</span>
                                         </div>
                                     </div>
-                                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0 ml-2 shadow-[0_0_12px_rgba(59,130,246,0.2)]">
+                                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0 ml-2 shadow-[0_0_12px_rgba(59,130,246,0.2)] group-hover:scale-105 transition-transform">
                                         <FolderOpen className="w-4 h-4 text-blue-400" />
                                     </div>
                                 </button>
-                            </CardTilt3D>
 
-                            {/* Stat 4: Account Status */}
-                            <CardTilt3D intensity={5} spotlightColor="rgba(16, 185, 129, 0.2)">
+                                {/* Stat 4: Account Status */}
                                 <div className="p-3 sm:py-2.5 sm:px-4 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-between">
                                     <div className="min-w-0 flex-1">
                                         <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Status</p>
@@ -1753,25 +1768,23 @@ export default function DashboardPage() {
                                         <ShieldCheck className="w-4 h-4 text-emerald-400" />
                                     </div>
                                 </div>
-                            </CardTilt3D>
-                        </motion.div>
+                            </motion.div>
 
-                        {/* Zone 2: Single-Viewport Split (Left Profile Dock + Right Tabbed Workspace) */}
-                        <div className="flex-1 grid grid-cols-12 gap-3 min-h-0 overflow-hidden">
-                            
-                            {/* Left Column: Compact Profile & Controls Dock (col-span-3) */}
-                            <motion.div
-                                initial={{ opacity: 0, x: -15 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.4, delay: 0.1 }}
-                                className="col-span-12 lg:col-span-3 flex flex-col h-full min-h-0"
-                            >
-                                <CardTilt3D intensity={6} spotlightColor="rgba(59, 130, 246, 0.15)" className="h-full">
-                                    <Card className="border-0 bg-white/[0.03] backdrop-blur-xl h-full flex flex-col justify-between p-4 overflow-hidden border border-white/[0.06]">
-                                        <div className="space-y-3.5 min-h-0 overflow-y-auto micro-scroll pr-1">
+                            {/* Zone 2: Viewport Grid Split (Left Profile Dock + Right Tabbed Workspace) */}
+                            <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 min-h-0 lg:overflow-hidden pb-4 lg:pb-0">
+                                
+                                {/* Left Column: Compact Profile & Controls Dock */}
+                                <motion.div
+                                    initial={{ opacity: 0, x: -12 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.35, delay: 0.1 }}
+                                    className="col-span-1 lg:col-span-3 flex flex-col lg:h-full min-h-0"
+                                >
+                                    <div className="border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl rounded-2xl h-full flex flex-col justify-between p-4 overflow-hidden shadow-lg">
+                                        <div className="space-y-3 min-h-0 lg:overflow-y-auto micro-scroll pr-0.5">
                                             {/* Avatar & User Details */}
                                             <div className="flex items-center gap-3 pb-3 border-b border-white/[0.06]">
-                                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-600 to-violet-600 flex items-center justify-center text-white text-lg font-bold shadow-md shadow-blue-500/30 border border-white/20 flex-shrink-0">
+                                                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-600 to-violet-600 flex items-center justify-center text-white text-base font-bold shadow-md shadow-blue-500/30 border border-white/20 flex-shrink-0">
                                                     {(profile?.fullName || user.fullName || user.userId).charAt(0).toUpperCase()}
                                                 </div>
                                                 <div className="min-w-0 flex-1">
@@ -1800,19 +1813,19 @@ export default function DashboardPage() {
                                                 )}
                                                 <div className="flex items-center gap-2.5 p-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
                                                     <Calendar className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
-                                                    <span className="text-slate-300">Joined {profile?.createdAt ? formatDate(profile.createdAt) : 'Recently'}</span>
+                                                    <span className="text-slate-300 truncate">Joined {profile?.createdAt ? formatDate(profile.createdAt) : 'Recently'}</span>
                                                 </div>
                                             </div>
 
                                             {/* Quick Status Card */}
-                                            <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500/[0.05] to-blue-500/[0.05] border border-cyan-500/15">
+                                            <div className="p-2.5 rounded-xl bg-gradient-to-br from-cyan-500/[0.05] to-blue-500/[0.05] border border-cyan-500/15">
                                                 <div className="flex items-center justify-between text-[11px] mb-1">
                                                     <span className="text-slate-400 font-medium flex items-center gap-1">
                                                         <Shield className="w-3 h-3 text-cyan-400" /> Account Security
                                                     </span>
                                                     <span className="text-cyan-400 font-bold">256-bit SSL</span>
                                                 </div>
-                                                <p className="text-[10px] text-slate-400 leading-snug">All tax files &amp; financial queries are end-to-end encrypted.</p>
+                                                <p className="text-[10px] text-slate-400 leading-snug">All documents &amp; audit queries are encrypted end-to-end.</p>
                                             </div>
                                         </div>
 
@@ -1821,7 +1834,7 @@ export default function DashboardPage() {
                                             <Tactile3DButton
                                                 variant="glass"
                                                 size="sm"
-                                                className="w-full text-xs text-slate-300 hover:text-white"
+                                                className="w-full text-xs text-slate-300 hover:text-white h-8"
                                                 onClick={() => {
                                                     fetchClientProfile();
                                                     fetchClientDocs();
@@ -1833,33 +1846,32 @@ export default function DashboardPage() {
                                                 Sync All Data
                                             </Tactile3DButton>
                                         </div>
-                                    </Card>
-                                </CardTilt3D>
-                            </motion.div>
+                                    </div>
+                                </motion.div>
 
-                            {/* Right Column: Tabbed Section Workspace Container (col-span-9) */}
-                            <motion.div
-                                initial={{ opacity: 0, x: 15 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.4, delay: 0.1 }}
-                                className="col-span-12 lg:col-span-9 flex flex-col h-full min-h-0"
-                            >
-                                <CardTilt3D intensity={4} spotlightColor="rgba(6, 182, 212, 0.12)" className="h-full">
-                                    <Card className="border-0 bg-white/[0.03] backdrop-blur-xl h-full flex flex-col p-3 sm:p-4 overflow-hidden border border-white/[0.06]">
+                                {/* Right Column: Tabbed Section Workspace Container */}
+                                <motion.div
+                                    initial={{ opacity: 0, x: 12 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.35, delay: 0.1 }}
+                                    className="col-span-1 lg:col-span-9 flex flex-col min-h-[480px] lg:min-h-0 lg:h-full"
+                                >
+                                    <div className="border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl rounded-2xl h-full flex flex-col p-3 sm:p-4 overflow-hidden shadow-xl">
                                         
-                                        {/* Tab Navigation Dock with Framer Motion layoutId */}
+                                        {/* Tab Navigation Bar with Framer Motion layoutId */}
                                         <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-white/[0.08] flex-shrink-0">
-                                            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-950/40 border border-white/[0.06] backdrop-blur-md">
+                                            <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-950/50 border border-white/[0.06]">
                                                 {/* Tab 1: Documents */}
                                                 <button
+                                                    type="button"
                                                     onClick={() => setClientActiveTab('documents')}
-                                                    className={`relative px-3 sm:px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 z-10 ${
+                                                    className={`relative px-3 sm:px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 cursor-pointer z-10 ${
                                                         clientActiveTab === 'documents' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
                                                     }`}
                                                 >
                                                     {clientActiveTab === 'documents' && (
                                                         <motion.div
-                                                            layoutId="activeTabBadge"
+                                                            layoutId="clientActiveTabIndicator"
                                                             className="absolute inset-0 rounded-lg bg-gradient-to-r from-cyan-500/25 via-blue-500/25 to-indigo-500/25 border border-cyan-400/40 shadow-[0_0_14px_rgba(6,182,212,0.25)]"
                                                             transition={{ type: 'spring', stiffness: 450, damping: 35 }}
                                                         />
@@ -1875,14 +1887,15 @@ export default function DashboardPage() {
 
                                                 {/* Tab 2: Drive Folders */}
                                                 <button
+                                                    type="button"
                                                     onClick={() => setClientActiveTab('drive')}
-                                                    className={`relative px-3 sm:px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 z-10 ${
+                                                    className={`relative px-3 sm:px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 cursor-pointer z-10 ${
                                                         clientActiveTab === 'drive' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
                                                     }`}
                                                 >
                                                     {clientActiveTab === 'drive' && (
                                                         <motion.div
-                                                            layoutId="activeTabBadge"
+                                                            layoutId="clientActiveTabIndicator"
                                                             className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/25 via-indigo-500/25 to-cyan-500/25 border border-blue-400/40 shadow-[0_0_14px_rgba(59,130,246,0.25)]"
                                                             transition={{ type: 'spring', stiffness: 450, damping: 35 }}
                                                         />
@@ -1898,23 +1911,24 @@ export default function DashboardPage() {
 
                                                 {/* Tab 3: Queries */}
                                                 <button
+                                                    type="button"
                                                     onClick={() => setClientActiveTab('queries')}
-                                                    className={`relative px-3 sm:px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 z-10 ${
+                                                    className={`relative px-3 sm:px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 cursor-pointer z-10 ${
                                                         clientActiveTab === 'queries' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
                                                     }`}
                                                 >
                                                     {clientActiveTab === 'queries' && (
                                                         <motion.div
-                                                            layoutId="activeTabBadge"
+                                                            layoutId="clientActiveTabIndicator"
                                                             className="absolute inset-0 rounded-lg bg-gradient-to-r from-rose-500/25 via-pink-500/25 to-orange-500/25 border border-rose-400/40 shadow-[0_0_14px_rgba(244,63,94,0.25)]"
                                                             transition={{ type: 'spring', stiffness: 450, damping: 35 }}
                                                         />
                                                     )}
                                                     <MessageCircle className={`w-3.5 h-3.5 relative z-10 ${clientActiveTab === 'queries' ? 'text-rose-400' : 'text-slate-400'}`} />
                                                     <span className="relative z-10">Queries</span>
-                                                    {clientQueries.filter((q: any) => q.status === 'OPEN').length > 0 ? (
+                                                    {openQueriesCount > 0 ? (
                                                         <span className="relative z-10 text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-rose-500/30 text-rose-300 border border-rose-400/50 animate-pulse">
-                                                            {clientQueries.filter((q: any) => q.status === 'OPEN').length} new
+                                                            {openQueriesCount} new
                                                         </span>
                                                     ) : (
                                                         <span className={`relative z-10 text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
@@ -1926,7 +1940,7 @@ export default function DashboardPage() {
                                                 </button>
                                             </div>
 
-                                            {/* Tab-Specific Quick Action */}
+                                            {/* Tab-Specific Refresh Action */}
                                             <div className="flex items-center gap-2">
                                                 {clientActiveTab === 'documents' && (
                                                     <Tactile3DButton
@@ -1967,8 +1981,8 @@ export default function DashboardPage() {
                                             </div>
                                         </div>
 
-                                        {/* Tab Panels Area with AnimatePresence cross-fade and micro-scrollbar */}
-                                        <div className="flex-1 min-h-0 overflow-hidden relative">
+                                        {/* Tab Panels Area */}
+                                        <div className="flex-1 min-h-0 overflow-hidden relative mt-2">
                                             <AnimatePresence mode="wait">
                                                 {/* TAB 1: DOCUMENTS */}
                                                 {clientActiveTab === 'documents' && (
@@ -1978,7 +1992,7 @@ export default function DashboardPage() {
                                                         animate={{ opacity: 1, scale: 1 }}
                                                         exit={{ opacity: 0, scale: 0.98 }}
                                                         transition={{ duration: 0.2 }}
-                                                        className="h-full overflow-y-auto micro-scroll pr-1.5 space-y-2.5"
+                                                        className="h-full overflow-y-auto micro-scroll pr-1 sm:pr-1.5 space-y-2.5"
                                                     >
                                                         {loadingDocs ? (
                                                             <div className="flex flex-col items-center justify-center py-20 gap-2">
@@ -2059,7 +2073,7 @@ export default function DashboardPage() {
                                                         animate={{ opacity: 1, scale: 1 }}
                                                         exit={{ opacity: 0, scale: 0.98 }}
                                                         transition={{ duration: 0.2 }}
-                                                        className="h-full overflow-y-auto micro-scroll pr-1.5 space-y-2.5"
+                                                        className="h-full overflow-y-auto micro-scroll pr-1 sm:pr-1.5 space-y-2.5"
                                                     >
                                                         {loadingClientDriveLinks ? (
                                                             <div className="flex flex-col items-center justify-center py-20 gap-2">
@@ -2088,7 +2102,12 @@ export default function DashboardPage() {
                                                                             <FolderOpen className="w-4 h-4 text-blue-400" />
                                                                         </div>
                                                                         <div className="flex-1 min-w-0">
-                                                                            <div className="text-white font-medium text-xs sm:text-sm group-hover:text-blue-300 transition-colors truncate">{link.title || 'Drive Folder'}</div>
+                                                                            <div
+                                                                                onClick={() => handleOpenDriveUrl(link.driveUrl)}
+                                                                                className="text-white font-medium text-xs sm:text-sm group-hover:text-blue-300 transition-colors truncate cursor-pointer"
+                                                                            >
+                                                                                {link.title || 'Drive Folder'}
+                                                                            </div>
                                                                             {link.description && <p className="text-slate-400 text-[11px] truncate mt-0.5">{link.description}</p>}
                                                                             <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-blue-500/15 border border-blue-500/30 text-blue-300 text-[9px] font-medium uppercase tracking-wider mt-1">
                                                                                 <Calendar className="w-2 h-2" />{link.year}
@@ -2097,7 +2116,7 @@ export default function DashboardPage() {
                                                                         <Tactile3DButton
                                                                             variant="cyan"
                                                                             size="sm"
-                                                                            onClick={() => window.open(link.driveUrl, '_blank')}
+                                                                            onClick={() => handleOpenDriveUrl(link.driveUrl)}
                                                                             icon={<ArrowUpRight className="w-3.5 h-3.5" />}
                                                                             className="text-xs h-8 px-2.5"
                                                                         >
@@ -2118,7 +2137,7 @@ export default function DashboardPage() {
                                                         animate={{ opacity: 1, scale: 1 }}
                                                         exit={{ opacity: 0, scale: 0.98 }}
                                                         transition={{ duration: 0.2 }}
-                                                        className="h-full overflow-y-auto micro-scroll pr-1.5 space-y-2.5"
+                                                        className="h-full overflow-y-auto micro-scroll pr-1 sm:pr-1.5 space-y-2.5"
                                                     >
                                                         {loadingClientQueries ? (
                                                             <div className="flex flex-col items-center justify-center py-20 gap-2">
@@ -2135,101 +2154,109 @@ export default function DashboardPage() {
                                                             />
                                                         ) : (
                                                             <div className="space-y-2.5">
-                                                                {clientQueries.map((q: any, index: number) => (
-                                                                    <motion.div
-                                                                        key={q.id || index}
-                                                                        initial={{ opacity: 0, y: 8 }}
-                                                                        animate={{ opacity: 1, y: 0 }}
-                                                                        transition={{ delay: index * 0.03 }}
-                                                                        className={`p-3.5 rounded-xl border transition-all duration-200 relative ${
-                                                                            q.status === 'OPEN'
-                                                                                ? 'bg-gradient-to-r from-rose-500/[0.08] to-pink-500/[0.04] border-rose-500/30 hover:border-rose-400/50 shadow-[0_2px_14px_rgba(244,63,94,0.08)]'
-                                                                                : 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/15'
-                                                                        }`}
-                                                                    >
-                                                                        {q.status === 'OPEN' && (
-                                                                            <span className="absolute top-3 right-3 flex h-2.5 w-2.5">
-                                                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                                                                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]"></span>
-                                                                            </span>
-                                                                        )}
+                                                                {clientQueries.map((q: any, index: number) => {
+                                                                    const isOpen = String(q?.status || 'OPEN').toUpperCase() === 'OPEN';
+                                                                    return (
+                                                                        <motion.div
+                                                                            key={q.id || index}
+                                                                            initial={{ opacity: 0, y: 8 }}
+                                                                            animate={{ opacity: 1, y: 0 }}
+                                                                            transition={{ delay: index * 0.03 }}
+                                                                            className={`p-3 sm:p-3.5 rounded-xl border transition-all duration-200 relative ${
+                                                                                isOpen
+                                                                                    ? 'bg-gradient-to-r from-rose-500/[0.08] to-pink-500/[0.04] border-rose-500/30 hover:border-rose-400/50 shadow-[0_2px_14px_rgba(244,63,94,0.08)]'
+                                                                                    : 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/15'
+                                                                            }`}
+                                                                        >
+                                                                            {isOpen && (
+                                                                                <span className="absolute top-3 right-3 flex h-2.5 w-2.5">
+                                                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                                                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]"></span>
+                                                                                </span>
+                                                                            )}
 
-                                                                        <div className="flex items-start gap-3">
-                                                                            <div className="w-9 h-9 rounded-lg bg-rose-500/20 border border-rose-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_10px_rgba(244,63,94,0.2)] mt-0.5">
-                                                                                <MessageCircle className="w-4 h-4 text-rose-400" />
-                                                                            </div>
-                                                                            <div className="flex-1 min-w-0 pr-6">
-                                                                                <div className="flex items-center gap-2 flex-wrap">
-                                                                                    <span className="text-white font-semibold text-xs sm:text-sm tracking-tight truncate">{q.subject || 'Query'}</span>
-                                                                                    <span className={`inline-flex items-center px-2 py-0.2 rounded-full text-[9px] font-semibold uppercase tracking-wider border ${statusBadge(q.status)}`}>
-                                                                                        {q.status || 'OPEN'}
-                                                                                    </span>
-                                                                                    {q.fileName && (
-                                                                                        <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[9px] font-medium bg-amber-500/15 border border-amber-500/30 text-amber-300">
-                                                                                            <Paperclip className="w-2.5 h-2.5" /> Attachment
+                                                                            <div className="flex items-start gap-3">
+                                                                                <div className="w-9 h-9 rounded-lg bg-rose-500/20 border border-rose-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_10px_rgba(244,63,94,0.2)] mt-0.5">
+                                                                                    <MessageCircle className="w-4 h-4 text-rose-400" />
+                                                                                </div>
+                                                                                <div className="flex-1 min-w-0 pr-6">
+                                                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                                                        <span
+                                                                                            onClick={() => handleViewQuery(q)}
+                                                                                            className="text-white font-semibold text-xs sm:text-sm tracking-tight truncate cursor-pointer hover:text-rose-300 transition-colors"
+                                                                                        >
+                                                                                            {q.subject || 'Query'}
                                                                                         </span>
+                                                                                        <span className={`inline-flex items-center px-2 py-0.2 rounded-full text-[9px] font-semibold uppercase tracking-wider border ${statusBadge(q.status)}`}>
+                                                                                            {q.status || 'OPEN'}
+                                                                                        </span>
+                                                                                        {q.fileName && (
+                                                                                            <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[9px] font-medium bg-amber-500/15 border border-amber-500/30 text-amber-300">
+                                                                                                <Paperclip className="w-2.5 h-2.5" /> Attachment
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                    <p className="text-slate-300 text-xs mt-1.5 leading-relaxed line-clamp-2">
+                                                                                        {q.messageText || <span className="italic text-slate-500">{q.fileName ? 'See attachment below' : 'No message content'}</span>}
+                                                                                    </p>
+                                                                                    {q.createdAt && (
+                                                                                        <div className="flex items-center gap-1 mt-1.5 text-[10px] text-slate-400">
+                                                                                            <Clock className="w-2.5 h-2.5 text-slate-500" />
+                                                                                            <span>Raised on {formatDate(q.createdAt)}</span>
+                                                                                        </div>
                                                                                     )}
                                                                                 </div>
-                                                                                <p className="text-slate-300 text-xs mt-1.5 leading-relaxed line-clamp-2">
-                                                                                    {q.messageText || <span className="italic text-slate-500">{q.fileName ? 'See attachment below' : 'No message content'}</span>}
-                                                                                </p>
-                                                                                {q.createdAt && (
-                                                                                    <div className="flex items-center gap-1 mt-1.5 text-[10px] text-slate-400">
-                                                                                        <Clock className="w-2.5 h-2.5 text-slate-500" />
-                                                                                        <span>Raised on {formatDate(q.createdAt)}</span>
-                                                                                    </div>
-                                                                                )}
                                                                             </div>
-                                                                        </div>
 
-                                                                        {/* Action Buttons */}
-                                                                        <div className="mt-3 pt-2.5 border-t border-white/[0.05] flex items-center gap-2 flex-wrap">
-                                                                            <Tactile3DButton
-                                                                                variant="rose"
-                                                                                size="sm"
-                                                                                onClick={() => handleViewQuery(q)}
-                                                                                icon={<Send className="w-3 h-3" />}
-                                                                                className="text-xs h-7 px-2.5"
-                                                                            >
-                                                                                Respond
-                                                                            </Tactile3DButton>
-                                                                            <Tactile3DButton
-                                                                                variant="glass"
-                                                                                size="sm"
-                                                                                onClick={() => handleViewQuery(q)}
-                                                                                icon={<Eye className="w-3 h-3" />}
-                                                                                className="text-xs h-7 px-2.5"
-                                                                            >
-                                                                                View History
-                                                                            </Tactile3DButton>
-                                                                            {q.fileName && (
+                                                                            {/* Action Buttons */}
+                                                                            <div className="mt-3 pt-2.5 border-t border-white/[0.05] flex items-center gap-2 flex-wrap">
+                                                                                <Tactile3DButton
+                                                                                    variant="rose"
+                                                                                    size="sm"
+                                                                                    onClick={() => handleViewQuery(q)}
+                                                                                    icon={<Send className="w-3 h-3" />}
+                                                                                    className="text-xs h-7 px-2.5 cursor-pointer"
+                                                                                >
+                                                                                    Respond
+                                                                                </Tactile3DButton>
                                                                                 <Tactile3DButton
                                                                                     variant="glass"
                                                                                     size="sm"
-                                                                                    onClick={() => handleDownloadQueryAttachment(q.id, q.fileName)}
-                                                                                    disabled={downloadingQueryId === q.id}
-                                                                                    icon={downloadingQueryId === q.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
-                                                                                    className="text-amber-300 hover:text-amber-200 text-xs h-7 px-2.5"
+                                                                                    onClick={() => handleViewQuery(q)}
+                                                                                    icon={<Eye className="w-3 h-3" />}
+                                                                                    className="text-xs h-7 px-2.5 cursor-pointer"
                                                                                 >
-                                                                                    Download File
+                                                                                    View History
                                                                                 </Tactile3DButton>
-                                                                            )}
-                                                                        </div>
-                                                                    </motion.div>
-                                                                ))}
+                                                                                {q.fileName && (
+                                                                                    <Tactile3DButton
+                                                                                        variant="glass"
+                                                                                        size="sm"
+                                                                                        onClick={() => handleDownloadQueryAttachment(q.id, q.fileName)}
+                                                                                        disabled={downloadingQueryId === q.id}
+                                                                                        icon={downloadingQueryId === q.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                                                                                        className="text-amber-300 hover:text-amber-200 text-xs h-7 px-2.5 cursor-pointer"
+                                                                                    >
+                                                                                        Download File
+                                                                                    </Tactile3DButton>
+                                                                                )}
+                                                                            </div>
+                                                                        </motion.div>
+                                                                    );
+                                                                })}
                                                             </div>
                                                         )}
                                                     </motion.div>
                                                 )}
                                             </AnimatePresence>
                                         </div>
-                                    </Card>
-                                </CardTilt3D>
-                            </motion.div>
+                                    </div>
+                                </motion.div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                );
+            })()}
 
             {/* ── MODALS ── */}
 
