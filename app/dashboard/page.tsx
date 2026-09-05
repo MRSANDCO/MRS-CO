@@ -72,6 +72,7 @@ import { CardTilt3D } from '@/components/dashboard/CardTilt3D';
 import { AmbientParticleCanvas } from '@/components/dashboard/AmbientParticleCanvas';
 import { Interactive3DEmptyState } from '@/components/dashboard/Interactive3DEmptyState';
 import { Tactile3DButton } from '@/components/dashboard/Tactile3DButton';
+import { AdminEmployeeManagement } from '@/components/dashboard/AdminEmployeeManagement';
 
 
 // ─── Logo ────────────────────────────────────────────────────────────────────
@@ -131,7 +132,8 @@ type AdminSection =
     | 'share-drive'
     | 'drive-list'
     | 'raise-query'
-    | 'queries-list';
+    | 'queries-list'
+    | 'employees';
 
 interface NavItem {
     id: AdminSection;
@@ -146,6 +148,7 @@ const adminNavItems: NavItem[] = [
     { id: 'upload-document', label: 'Upload Document', icon: <UploadCloud className="w-4 h-4" />, group: 'actions' },
     { id: 'share-drive', label: 'Share Drive Folder', icon: <FolderOpen className="w-4 h-4" />, group: 'actions' },
     { id: 'raise-query', label: 'Raise a Query', icon: <MessageSquarePlus className="w-4 h-4" />, group: 'actions' },
+    { id: 'employees', label: 'Employee Management', icon: <Users className="w-4 h-4" />, group: 'lists' },
     { id: 'clients-list', label: 'All Clients', icon: <Users className="w-4 h-4" />, group: 'lists' },
     { id: 'documents-list', label: 'Documents', icon: <FileText className="w-4 h-4" />, group: 'lists' },
     { id: 'drive-list', label: 'Drive Links', icon: <FolderOpen className="w-4 h-4" />, group: 'lists' },
@@ -289,8 +292,15 @@ export default function DashboardPage() {
 
     // ── Auth guard ──
     useEffect(() => {
-        if (!isAuthenticated) router.push('/login');
-    }, [isAuthenticated, router]);
+        if (!isAuthenticated) {
+            router.push('/login');
+            return;
+        }
+        if (user?.role === 'employee') {
+            router.push('/employee/dashboard');
+            return;
+        }
+    }, [isAuthenticated, user, router]);
 
     // ── Initial data load ──
     useEffect(() => {
@@ -799,6 +809,7 @@ export default function DashboardPage() {
         'drive-list': 'text-indigo-400',
         'raise-query': 'text-rose-400',
         'queries-list': 'text-rose-400',
+        'employees': 'text-emerald-400',
     };
 
     const navItemAccent: Record<AdminSection, string> = {
@@ -811,6 +822,7 @@ export default function DashboardPage() {
         'drive-list': 'bg-indigo-500/10 border-indigo-500/20 text-indigo-300',
         'raise-query': 'bg-rose-500/10 border-rose-500/20 text-rose-300',
         'queries-list': 'bg-rose-500/10 border-rose-500/20 text-rose-300',
+        'employees': 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300',
     };
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -1465,6 +1477,10 @@ export default function DashboardPage() {
                         )}
                     </div>
                 );
+
+            // ── Employee Management ──────────────────────────────────────────
+            case 'employees':
+                return <AdminEmployeeManagement />;
 
             default:
                 return null;

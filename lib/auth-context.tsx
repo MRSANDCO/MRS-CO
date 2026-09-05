@@ -5,8 +5,10 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 export interface AuthUser {
     userId: string;
     fullName: string;
-    role: 'user' | 'admin';
+    role: 'user' | 'admin' | 'employee';
     token: string;
+    employeeId?: string;
+    profileStatus?: 'INCOMPLETE' | 'SUBMITTED' | string;
 }
 
 interface AuthContextType {
@@ -14,6 +16,7 @@ interface AuthContextType {
     isAuthenticated: boolean;
     login: (userData: AuthUser) => void;
     logout: () => void;
+    updateUser: (partial: Partial<AuthUser>) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -21,6 +24,7 @@ const AuthContext = createContext<AuthContextType>({
     isAuthenticated: false,
     login: () => { },
     logout: () => { },
+    updateUser: () => { },
 });
 
 const STORAGE_KEY = 'mrs_auth_user';
@@ -52,13 +56,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem(STORAGE_KEY);
     }, []);
 
+    const updateUser = useCallback((partial: Partial<AuthUser>) => {
+        setUser((prev) => {
+            if (!prev) return prev;
+            const updated = { ...prev, ...partial };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+            return updated;
+        });
+    }, []);
+
     // Don't render until hydrated to avoid SSR mismatch
     if (!mounted) {
         return <>{children}</>;
     }
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout, updateUser }}>
             {children}
         </AuthContext.Provider>
     );

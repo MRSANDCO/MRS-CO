@@ -254,3 +254,243 @@ export async function downloadDocument(documentId: string, fallbackFileName = 'd
     a.remove();
     URL.revokeObjectURL(url);
 }
+
+// ===================== Employee Management Types =====================
+
+export type ProfileStatus = 'INCOMPLETE' | 'SUBMITTED';
+export type DocumentVerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
+
+export interface EmployeeProfile {
+    id?: string;
+    employeeId: string;
+    name: string;
+    fatherName?: string;
+    mobileNumber: string;
+    aadhaarNumber?: string;
+    panNumber?: string;
+    dateOfJoining?: string;
+    permanentAddress?: string;
+    currentAddress?: string;
+    aadhaarDocumentUrl?: string;
+    aadhaarFileName?: string;
+    aadhaarFileSize?: number;
+    profileStatus: ProfileStatus;
+    documentStatus: DocumentVerificationStatus;
+    documentRejectionReason?: string;
+    active?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface UpdateProfileRequest {
+    name?: string;
+    fatherName?: string;
+    mobileNumber?: string;
+    aadhaarNumber?: string;
+    panNumber?: string;
+    dateOfJoining?: string;
+    permanentAddress?: string;
+    currentAddress?: string;
+}
+
+export interface CreateEmployeeRequest {
+    name: string;
+    mobileNumber: string;
+    initialPassword?: string;
+}
+
+export interface CreateEmployeeResponse {
+    employeeId: string;
+    name: string;
+    mobileNumber: string;
+    initialPassword?: string;
+    profileStatus?: ProfileStatus;
+    message: string;
+    error?: string;
+}
+
+export interface EmployeeLoginResponse {
+    message: string;
+    role: 'employee';
+    employeeId: string;
+    name: string;
+    profileStatus?: ProfileStatus;
+    token: string;
+    error?: string;
+}
+
+export interface PageResponse<T> {
+    content: T[];
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
+    first: boolean;
+    last: boolean;
+    empty: boolean;
+}
+
+// ===================== Employee Auth =====================
+
+export async function loginEmployee(employeeId: string, password: string): Promise<EmployeeLoginResponse> {
+    const res = await fetch(`${API_PROXY}/auth/employee/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ employeeId, password }),
+    });
+    return handleResponse<EmployeeLoginResponse>(res);
+}
+
+// ===================== Employee Profile APIs (token required) =====================
+
+export async function getEmployeeProfile(): Promise<EmployeeProfile> {
+    const res = await fetch(`${BACKEND_DIRECT}/employee/profile`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<EmployeeProfile>(res);
+}
+
+export async function updateEmployeeProfile(data: UpdateProfileRequest): Promise<{ message: string; profile: EmployeeProfile }> {
+    const res = await fetch(`${BACKEND_DIRECT}/employee/profile`, {
+        method: 'PUT',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(data),
+    });
+    return handleResponse<{ message: string; profile: EmployeeProfile }>(res);
+}
+
+export async function submitEmployeeProfile(): Promise<{ message: string; profileStatus: string; profile: EmployeeProfile }> {
+    const res = await fetch(`${BACKEND_DIRECT}/employee/profile/submit`, {
+        method: 'POST',
+        headers: authHeaders(),
+    });
+    return handleResponse<{ message: string; profileStatus: string; profile: EmployeeProfile }>(res);
+}
+
+export async function uploadEmployeeDocument(file: File): Promise<{ message: string; fileName: string; documentStatus: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch(`${BACKEND_DIRECT}/employee/profile/document`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: formData,
+    });
+    return handleResponse<{ message: string; fileName: string; documentStatus: string }>(res);
+}
+
+export async function downloadEmployeeDocument(employeeId?: string, fallbackFileName = 'aadhaar_document.pdf'): Promise<void> {
+    const url = employeeId
+        ? `${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/document`
+        : `${BACKEND_DIRECT}/employee/profile/document`;
+
+    const res = await fetch(url, {
+        method: 'GET',
+        headers: authHeaders(),
+    });
+
+    if (!res.ok) {
+        let message = `Document view/download failed (${res.status})`;
+        try {
+            const err = await res.json();
+            message = err.error || err.message || message;
+        } catch {
+            // non-json
+        }
+        throw new Error(message);
+    }
+
+    const disposition = res.headers.get('content-disposition') || '';
+    const match = disposition.match(/filename[^;=\n]*=\s*["']?([^"';\n]+)["']?/i);
+    const fileName = match?.[1]?.trim() || fallbackFileName;
+
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+
+    // If PDF, open in new browser window/tab for instant preview, with fallback to download
+    const win = window.open(blobUrl, '_blank');
+    if (!win) {
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    }
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+}
+
+// ===================== Admin Employee Management APIs (admin token required) =====================
+
+export async function createAdminEmployee(data: CreateEmployeeRequest): Promise<CreateEmployeeResponse> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/employees`, {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(data),
+    });
+    return handleResponse<CreateEmployeeResponse>(res);
+}
+
+export async function getAdminEmployees(search = '', page = 0, size = 20): Promise<PageResponse<EmployeeProfile>> {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    params.append('page', String(page));
+    params.append('size', String(size));
+
+    const res = await fetch(`${BACKEND_DIRECT}/admin/employees?${params.toString()}`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<PageResponse<EmployeeProfile>>(res);
+}
+
+export async function getAdminEmployeeById(employeeId: string): Promise<EmployeeProfile> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<EmployeeProfile>(res);
+}
+
+export async function updateAdminEmployee(employeeId: string, data: UpdateProfileRequest): Promise<{ message: string; employee: EmployeeProfile }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}`, {
+        method: 'PUT',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(data),
+    });
+    return handleResponse<{ message: string; employee: EmployeeProfile }>(res);
+}
+
+export async function resetEmployeePassword(employeeId: string, newPassword?: string): Promise<{ message: string; employeeId: string; newPassword?: string }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/reset-password`, {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(newPassword ? { newPassword } : {}),
+    });
+    return handleResponse<{ message: string; employeeId: string; newPassword?: string }>(res);
+}
+
+export async function setEmployeeActiveStatus(employeeId: string, active: boolean): Promise<{ message: string; employeeId: string; active: boolean }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/status`, {
+        method: 'PATCH',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ active }),
+    });
+    return handleResponse<{ message: string; employeeId: string; active: boolean }>(res);
+}
+
+export async function verifyEmployeeDocument(employeeId: string): Promise<{ message: string; employeeId: string; documentStatus: string }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/document/verify`, {
+        method: 'POST',
+        headers: authHeaders(),
+    });
+    return handleResponse<{ message: string; employeeId: string; documentStatus: string }>(res);
+}
+
+export async function rejectEmployeeDocument(employeeId: string, reason?: string): Promise<{ message: string; employeeId: string; documentStatus: string; rejectionReason?: string }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/document/reject`, {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(reason ? { reason } : {}),
+    });
+    return handleResponse<{ message: string; employeeId: string; documentStatus: string; rejectionReason?: string }>(res);
+}
+
