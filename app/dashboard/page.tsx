@@ -243,6 +243,15 @@ export default function DashboardPage() {
     const [queryReplyError, setQueryReplyError] = useState('');
     const [updatingQueryStatus, setUpdatingQueryStatus] = useState(false);
 
+    // ── Client: document upload (send to admin) ──
+    const [clientUploadExpanded, setClientUploadExpanded] = useState(false);
+    const [clientUploadFiles, setClientUploadFiles] = useState<File[]>([]);
+    const [clientUploadNote, setClientUploadNote] = useState('');
+    const [clientUploading, setClientUploading] = useState(false);
+    const [clientUploadSuccess, setClientUploadSuccess] = useState('');
+    const [clientUploadError, setClientUploadError] = useState('');
+    const [clientUploadDragOver, setClientUploadDragOver] = useState(false);
+
     // ── Password change ──
     const [changingPasswordFor, setChangingPasswordFor] = useState<string | null>(null);
     const [newPasswordValue, setNewPasswordValue] = useState('');
@@ -471,6 +480,40 @@ export default function DashboardPage() {
             fetchDocs();
         } catch (err: unknown) { setUploadError(err instanceof Error ? err.message : 'Upload failed'); }
         finally { setUploading(false); }
+    };
+
+    // ── Client: send document to MRS & Co. ──
+    const handleClientDocUpload = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user?.userId || clientUploadFiles.length === 0) return;
+        setClientUploadError(''); setClientUploadSuccess(''); setClientUploading(true);
+        try {
+            // Find the most recent open query to attach to
+            const openQuery = clientQueries.find((q: any) => String(q?.status || 'OPEN').toUpperCase() === 'OPEN');
+            if (!openQuery) {
+                throw new Error('No open query found. Please contact MRS & Co. to initiate a query first, then you can attach documents to it.');
+            }
+            let uploaded = 0;
+            for (const file of clientUploadFiles) {
+                const fd = new FormData();
+                if (clientUploadNote.trim()) fd.append('message', clientUploadNote.trim());
+                fd.append('file', file);
+                const res = await fetch(`/backend/user/${user.userId}/queries/${openQuery.id}/responses`, {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${getToken()}` },
+                    body: fd,
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.error || err.message || 'Upload failed');
+                }
+                uploaded++;
+            }
+            setClientUploadSuccess(`${uploaded} document${uploaded > 1 ? 's' : ''} sent to MRS & Co. successfully!`);
+            setClientUploadFiles([]); setClientUploadNote('');
+            fetchClientQueries();
+        } catch (err: unknown) { setClientUploadError(err instanceof Error ? err.message : 'Upload failed'); }
+        finally { setClientUploading(false); }
     };
 
     const handleSaveDriveLink = async (e: React.FormEvent) => {
@@ -2010,7 +2053,153 @@ export default function DashboardPage() {
                                                         transition={{ duration: 0.2 }}
                                                         className="h-full overflow-y-auto micro-scroll pr-1 sm:pr-1.5 space-y-2.5"
                                                     >
+                                                        {/* ── Client: Send Document Panel ── */}
+                                                        <div className="rounded-xl border border-dashed border-violet-500/40 bg-gradient-to-br from-violet-500/[0.06] to-purple-600/[0.04] overflow-hidden mb-1">
+                                                            {/* Header toggle */}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setClientUploadExpanded(v => !v);
+                                                                    setClientUploadSuccess('');
+                                                                    setClientUploadError('');
+                                                                }}
+                                                                className="w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-white/[0.03] transition-colors duration-150 group"
+                                                            >
+                                                                <div className="flex items-center gap-2.5">
+                                                                    <div className="w-7 h-7 rounded-lg bg-violet-500/20 border border-violet-500/30 flex items-center justify-center shadow-[0_0_10px_rgba(139,92,246,0.2)] group-hover:scale-105 transition-transform">
+                                                                        <Paperclip className="w-3.5 h-3.5 text-violet-400" />
+                                                                    </div>
+                                                                    <div className="text-left">
+                                                                        <p className="text-xs font-semibold text-violet-300 leading-none">Send Document to MRS & Co.</p>
+                                                                        <p className="text-[10px] text-slate-400 mt-0.5">Attach files to your open query</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className={`w-5 h-5 rounded-full border border-violet-500/30 bg-violet-500/10 flex items-center justify-center transition-transform duration-200 ${clientUploadExpanded ? 'rotate-180' : ''}`}>
+                                                                    <ChevronRight className="w-3 h-3 text-violet-400 rotate-90" />
+                                                                </div>
+                                                            </button>
+
+                                                            {/* Expandable Form */}
+                                                            <AnimatePresence>
+                                                                {clientUploadExpanded && (
+                                                                    <motion.div
+                                                                        key="client-upload-panel"
+                                                                        initial={{ height: 0, opacity: 0 }}
+                                                                        animate={{ height: 'auto', opacity: 1 }}
+                                                                        exit={{ height: 0, opacity: 0 }}
+                                                                        transition={{ duration: 0.22, ease: 'easeInOut' }}
+                                                                        className="overflow-hidden"
+                                                                    >
+                                                                        <form
+                                                                            onSubmit={handleClientDocUpload}
+                                                                            className="px-3.5 pb-3.5 pt-1 space-y-3"
+                                                                        >
+                                                                            {/* Dropzone */}
+                                                                            <div
+                                                                                onDragOver={e => { e.preventDefault(); setClientUploadDragOver(true); }}
+                                                                                onDragLeave={() => setClientUploadDragOver(false)}
+                                                                                onDrop={e => {
+                                                                                    e.preventDefault();
+                                                                                    setClientUploadDragOver(false);
+                                                                                    const files = Array.from(e.dataTransfer.files);
+                                                                                    setClientUploadFiles(prev => [...prev, ...files]);
+                                                                                }}
+                                                                                onClick={() => document.getElementById('client-doc-input')?.click()}
+                                                                                className={`relative cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 flex flex-col items-center justify-center py-5 gap-2 ${
+                                                                                    clientUploadDragOver
+                                                                                        ? 'border-violet-400 bg-violet-500/15 scale-[1.01]'
+                                                                                        : 'border-violet-500/30 bg-white/[0.02] hover:border-violet-400/60 hover:bg-violet-500/[0.07]'
+                                                                                }`}
+                                                                            >
+                                                                                <input
+                                                                                    id="client-doc-input"
+                                                                                    type="file"
+                                                                                    multiple
+                                                                                    className="hidden"
+                                                                                    onChange={e => {
+                                                                                        const files = Array.from(e.target.files || []);
+                                                                                        setClientUploadFiles(prev => [...prev, ...files]);
+                                                                                        e.target.value = '';
+                                                                                    }}
+                                                                                />
+                                                                                <div className="w-9 h-9 rounded-xl bg-violet-500/15 border border-violet-500/25 flex items-center justify-center">
+                                                                                    <UploadCloud className="w-4.5 h-4.5 text-violet-400" />
+                                                                                </div>
+                                                                                <div className="text-center">
+                                                                                    <p className="text-xs font-medium text-violet-300">
+                                                                                        {clientUploadDragOver ? 'Drop files here' : 'Click or drag files here'}
+                                                                                    </p>
+                                                                                    <p className="text-[10px] text-slate-500 mt-0.5">PDF, Excel, Word, Images — any format</p>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {/* File chips */}
+                                                                            {clientUploadFiles.length > 0 && (
+                                                                                <div className="flex flex-wrap gap-1.5">
+                                                                                    {clientUploadFiles.map((f, i) => (
+                                                                                        <div key={i} className="flex items-center gap-1 bg-violet-500/10 border border-violet-500/20 rounded-lg px-2 py-1 text-[10px] text-violet-300 max-w-[140px]">
+                                                                                            <File className="w-2.5 h-2.5 flex-shrink-0" />
+                                                                                            <span className="truncate">{f.name}</span>
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                onClick={() => setClientUploadFiles(prev => prev.filter((_, j) => j !== i))}
+                                                                                                className="ml-0.5 text-violet-400 hover:text-rose-400 transition-colors flex-shrink-0"
+                                                                                            >
+                                                                                                <X className="w-2.5 h-2.5" />
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                            )}
+
+                                                                            {/* Note field */}
+                                                                            <textarea
+                                                                                value={clientUploadNote}
+                                                                                onChange={e => setClientUploadNote(e.target.value)}
+                                                                                placeholder="Add a note for MRS & Co. (optional)…"
+                                                                                rows={2}
+                                                                                className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 resize-none focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.06] transition-all"
+                                                                            />
+
+                                                                            {/* Status messages */}
+                                                                            {clientUploadSuccess && (
+                                                                                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-xs">
+                                                                                    <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                                                                                    {clientUploadSuccess}
+                                                                                </div>
+                                                                            )}
+                                                                            {clientUploadError && (
+                                                                                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/25 text-rose-300 text-xs">
+                                                                                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                                                                                    {clientUploadError}
+                                                                                </div>
+                                                                            )}
+
+                                                                            {/* Submit */}
+                                                                            <Tactile3DButton
+                                                                                type="submit"
+                                                                                variant="cyan"
+                                                                                size="sm"
+                                                                                disabled={clientUploading || clientUploadFiles.length === 0}
+                                                                                icon={clientUploading
+                                                                                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                                                    : <Send className="w-3.5 h-3.5" />
+                                                                                }
+                                                                                className="w-full justify-center text-xs h-9 bg-gradient-to-r from-violet-600/80 to-purple-600/80 hover:from-violet-500/90 hover:to-purple-500/90 border-violet-500/40"
+                                                                            >
+                                                                                {clientUploading
+                                                                                    ? `Sending ${clientUploadFiles.length} file${clientUploadFiles.length > 1 ? 's' : ''}…`
+                                                                                    : `Send ${clientUploadFiles.length > 0 ? clientUploadFiles.length + ' ' : ''}Document${clientUploadFiles.length !== 1 ? 's' : ''} to MRS & Co.`
+                                                                                }
+                                                                            </Tactile3DButton>
+                                                                        </form>
+                                                                    </motion.div>
+                                                                )}
+                                                            </AnimatePresence>
+                                                        </div>
+
                                                         {loadingDocs ? (
+
                                                             <div className="flex flex-col items-center justify-center py-20 gap-2">
                                                                 <Loader2 className="w-7 h-7 text-cyan-400 animate-spin" />
                                                                 <p className="text-xs text-slate-400">Loading documents...</p>
