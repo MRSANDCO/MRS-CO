@@ -245,7 +245,9 @@ export default function EmployeeDashboardPage() {
             errors.currentAddress = 'Current address is required';
         }
 
-        if (formData.resumeGoogleDriveLink.trim()) {
+        if (!formData.resumeGoogleDriveLink.trim()) {
+            errors.resumeGoogleDriveLink = 'Resume / Portfolio Google Drive link is required';
+        } else {
             const link = formData.resumeGoogleDriveLink.trim();
             const driveRegex = /^https?:\/\/(drive\.google\.com|docs\.google\.com)\/.+$/i;
             if (!driveRegex.test(link)) {
@@ -1080,12 +1082,13 @@ export default function EmployeeDashboardPage() {
                                             {/* Resume Google Drive Link */}
                                             <div className="sm:col-span-2">
                                                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                                                    Resume / Portfolio (Google Drive Link) <span className="text-slate-500 font-normal">(Optional)</span>
+                                                    Resume / Portfolio (Google Drive Link) <span className="text-rose-400">*</span>
                                                 </label>
                                                 <div className="relative">
                                                     <ExternalLink className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                                                     <Input
                                                         type="url"
+                                                        required
                                                         placeholder="https://drive.google.com/file/d/..."
                                                         value={formData.resumeGoogleDriveLink}
                                                         onChange={(e) => handleInputChange('resumeGoogleDriveLink', e.target.value)}
@@ -1190,6 +1193,7 @@ export default function EmployeeDashboardPage() {
                                                 className="border-2 border-dashed border-white/[0.12] hover:border-blue-500/50 rounded-2xl p-6 text-center cursor-pointer transition-all bg-white/[0.01] hover:bg-blue-500/[0.02]"
                                             >
                                                 <input
+                                                required
                                                     ref={fileInputRef}
                                                     type="file"
                                                     accept="application/pdf"
