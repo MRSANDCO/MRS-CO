@@ -61,8 +61,18 @@ import {
     ChevronRight,
     LayoutDashboard,
     Paperclip,
+    Sparkles,
+    ShieldCheck,
+    Activity,
+    Layers,
+    ArrowUpRight,
 } from 'lucide-react';
 import Link from 'next/link';
+import { CardTilt3D } from '@/components/dashboard/CardTilt3D';
+import { AmbientParticleCanvas } from '@/components/dashboard/AmbientParticleCanvas';
+import { Interactive3DEmptyState } from '@/components/dashboard/Interactive3DEmptyState';
+import { Tactile3DButton } from '@/components/dashboard/Tactile3DButton';
+
 
 // ─── Logo ────────────────────────────────────────────────────────────────────
 
@@ -293,23 +303,40 @@ export default function DashboardPage() {
             fetchAdminQueries();
             return;
         }
-        // client
-        (async () => {
-            try { const p = await getUserProfile(user.userId); setProfile(p); }
-            catch (err: unknown) { setProfileError(err instanceof Error ? err.message : 'Failed to load profile'); }
-            finally { setLoadingProfile(false); }
-        })();
-        (async () => {
-            try {
-                const docs = await getUserDocuments(user.userId);
-                setDocuments(docs.filter(d => !d.deleted));
-            } catch (err: unknown) { setDocsError(err instanceof Error ? err.message : 'Failed to load documents'); }
-            finally { setLoadingDocs(false); }
-        })();
+        fetchClientProfile();
+        fetchClientDocs();
         fetchClientDriveLinks();
         fetchClientQueries();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
+
+    const fetchClientProfile = async () => {
+        if (!user?.userId) return;
+        setLoadingProfile(true);
+        setProfileError('');
+        try {
+            const p = await getUserProfile(user.userId);
+            setProfile(p);
+        } catch (err: unknown) {
+            setProfileError(err instanceof Error ? err.message : 'Failed to load profile');
+        } finally {
+            setLoadingProfile(false);
+        }
+    };
+
+    const fetchClientDocs = async () => {
+        if (!user?.userId) return;
+        setLoadingDocs(true);
+        setDocsError('');
+        try {
+            const docs = await getUserDocuments(user.userId);
+            setDocuments(docs.filter(d => !d.deleted));
+        } catch (err: unknown) {
+            setDocsError(err instanceof Error ? err.message : 'Failed to load documents');
+        } finally {
+            setLoadingDocs(false);
+        }
+    };
 
     useEffect(() => {
         if (user?.role === 'admin') fetchDocs();
@@ -731,15 +758,15 @@ export default function DashboardPage() {
 
     const statusBadge = (status: string) => {
         const map: Record<string, string> = {
-            RESOLVED: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
-            CLOSED: 'bg-slate-500/10 border-slate-500/20 text-slate-400',
-            IN_PROGRESS: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
-            CLIENT_RESPONDED: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
-            ADMIN_RESPONDED: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
-            SEEN: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
-            OPEN: 'bg-rose-500/10 border-rose-500/20 text-rose-400',
+            RESOLVED: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.2)]',
+            CLOSED: 'bg-slate-500/15 border-slate-500/30 text-slate-400',
+            IN_PROGRESS: 'bg-amber-500/15 border-amber-500/30 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.25)] animate-pulse',
+            CLIENT_RESPONDED: 'bg-amber-500/20 border-amber-400/40 text-amber-300 shadow-[0_0_16px_rgba(245,158,11,0.35)] animate-pulse',
+            ADMIN_RESPONDED: 'bg-cyan-500/20 border-cyan-400/40 text-cyan-300 shadow-[0_0_16px_rgba(6,182,212,0.35)] animate-pulse',
+            SEEN: 'bg-blue-500/15 border-blue-500/30 text-blue-300 shadow-[0_0_12px_rgba(59,130,246,0.2)]',
+            OPEN: 'bg-rose-500/20 border-rose-400/40 text-rose-300 shadow-[0_0_16px_rgba(244,63,94,0.4)] animate-pulse',
         };
-        return map[status] || 'bg-rose-500/10 border-rose-500/20 text-rose-400';
+        return map[status] || 'bg-rose-500/20 border-rose-400/40 text-rose-300 shadow-[0_0_16px_rgba(244,63,94,0.4)] animate-pulse';
     };
 
     // ─── Sidebar nav helper ───────────────────────────────────────────────────
@@ -1508,11 +1535,15 @@ export default function DashboardPage() {
     // ═══════════════════════════════════════════════════════════════════════════
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 flex">
-            {/* Background effects */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 right-[20%] w-[500px] h-[500px] bg-blue-500/[0.05] rounded-full blur-[120px]" />
-                <div className="absolute bottom-0 left-[10%] w-[400px] h-[400px] bg-indigo-500/[0.04] rounded-full blur-[100px]" />
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 flex relative overflow-x-hidden selection:bg-cyan-500/30">
+            {/* Animated Canvas Mesh & Particle Background */}
+            <AmbientParticleCanvas />
+
+            {/* Background lighting ambient glows */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-[-10%] right-[15%] w-[600px] h-[600px] bg-blue-600/[0.07] rounded-full blur-[140px] transform-gpu" />
+                <div className="absolute bottom-[-10%] left-[5%] w-[500px] h-[500px] bg-indigo-600/[0.06] rounded-full blur-[130px] transform-gpu" />
+                <div className="absolute top-[40%] right-[5%] w-[450px] h-[450px] bg-cyan-600/[0.04] rounded-full blur-[120px] transform-gpu" />
             </div>
 
             {/* ── ADMIN LAYOUT ── */}
@@ -1577,261 +1608,599 @@ export default function DashboardPage() {
 
             {/* ── CLIENT / USER LAYOUT ── */}
             {user.role === 'user' && (
-                <div className="flex-1 flex flex-col relative z-10">
-                    {/* Header */}
-                    <header className="border-b border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
+                <div className="flex-1 flex flex-col relative z-10 min-h-screen">
+                    {/* Header with Fade-Down Entrance */}
+                    <motion.header
+                        initial={{ opacity: 0, y: -15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: 'easeOut' }}
+                        className="border-b border-white/[0.08] bg-slate-950/40 backdrop-blur-2xl sticky top-0 z-30 shadow-lg shadow-black/20"
+                    >
                         <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                                <Link href="/" className="flex items-center gap-3">
-                                    <div className="relative w-9 h-9 rounded-full flex items-center justify-center"
+                                <Link href="/" className="flex items-center gap-3 group">
+                                    <div className="relative w-9 h-9 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
                                         style={{ background: 'linear-gradient(145deg, #ffffff 0%, #dceeff 100%)', border: '1.5px solid rgba(255,255,255,0.85)', boxShadow: '0 0 0 1px rgba(59,130,246,0.3), 0 4px 16px rgba(59,130,246,0.35)' }}>
                                         <img src="https://education21.in/wp-content/uploads/2023/12/CA-India-Logo-1024x762.png" alt="CA India Logo" className="w-6 h-6 object-contain" />
                                     </div>
-                                    <span className="text-white font-bold text-sm" style={{ fontFamily: 'Georgia, serif' }}>MRS & Co.</span>
+                                    <div className="flex flex-col">
+                                        <span className="text-white font-bold text-sm tracking-wide" style={{ fontFamily: 'Georgia, serif' }}>MRS & Co.</span>
+                                        <span className="text-[10px] text-cyan-400 font-medium tracking-wider uppercase">Chartered Accountants</span>
+                                    </div>
                                 </Link>
                                 <div className="hidden sm:block h-6 w-px bg-white/10" />
-                                <span className="hidden sm:block text-sm text-slate-400">Client Portal</span>
+                                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium text-slate-300 bg-white/[0.04] border border-white/[0.06]">
+                                    <Sparkles className="w-3 h-3 text-cyan-400" /> Client Portal
+                                </span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <Link href="/" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/[0.06] transition-all">
+                                <Link href="/" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-white/[0.06] transition-all">
                                     <Home className="w-3.5 h-3.5" />Home
                                 </Link>
-                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
-                                    <User className="w-3.5 h-3.5 text-blue-400" />
+                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] shadow-inner">
+                                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                                    <User className="w-3.5 h-3.5 text-cyan-400" />
                                     <span className="text-sm text-white font-medium">{user.fullName || user.userId}</span>
                                 </div>
-                                <Button onClick={handleLogout} variant="ghost" className="text-slate-400 hover:text-red-400 hover:bg-red-500/10 px-3">
-                                    <LogOut className="w-4 h-4" /><span className="hidden sm:inline ml-1.5 text-sm">Logout</span>
-                                </Button>
+                                <Tactile3DButton onClick={handleLogout} variant="ghost" size="sm" className="text-slate-400 hover:text-red-400 hover:bg-red-500/10">
+                                    <LogOut className="w-4 h-4" /><span className="hidden sm:inline ml-1 text-xs font-medium">Logout</span>
+                                </Tactile3DButton>
                             </div>
                         </div>
-                    </header>
+                    </motion.header>
 
-                    <main className="flex-1 max-w-6xl mx-auto w-full px-4 md:px-6 py-8 space-y-6">
-                        {/* Welcome */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                            <h1 className="text-2xl font-bold text-white">Welcome, <span className="bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">{user.fullName || user.userId}</span></h1>
-                            <p className="text-slate-400 text-sm mt-1">Your client portal — documents, drive folders, and queries from MRS & Co.</p>
+                    {/* Main Staggered Dashboard Content */}
+                    <motion.main
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            hidden: { opacity: 0 },
+                            visible: {
+                                opacity: 1,
+                                transition: {
+                                    staggerChildren: 0.09,
+                                    delayChildren: 0.05,
+                                },
+                            },
+                        }}
+                        className="flex-1 max-w-6xl mx-auto w-full px-4 md:px-6 py-8 space-y-7"
+                    >
+                        {/* Welcome Banner */}
+                        <motion.div
+                            variants={{
+                                hidden: { opacity: 0, y: 15 },
+                                visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+                            }}
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                        >
+                            <div>
+                                <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight flex items-center gap-2">
+                                    Welcome, <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300 bg-clip-text text-transparent font-extrabold">{user.fullName || user.userId}</span>
+                                </h1>
+                                <p className="text-slate-400 text-sm mt-1">Your unified client portal for documents, cloud drive folders, and active queries from MRS & Co.</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Tactile3DButton
+                                    variant="glass"
+                                    size="sm"
+                                    onClick={() => {
+                                        fetchClientProfile();
+                                        fetchClientDocs();
+                                        fetchClientDriveLinks();
+                                        fetchClientQueries();
+                                    }}
+                                    icon={<RefreshCw className={`w-3.5 h-3.5 ${loadingProfile || loadingDocs || loadingClientDriveLinks || loadingClientQueries ? 'animate-spin text-cyan-400' : 'text-slate-400'}`} />}
+                                >
+                                    Refresh All
+                                </Tactile3DButton>
+                            </div>
                         </motion.div>
 
+                        {/* Metric / Quick-Stat Header Bar */}
+                        <motion.div
+                            variants={{
+                                hidden: { opacity: 0, y: 20 },
+                                visible: { opacity: 1, y: 0, transition: { duration: 0.45 } },
+                            }}
+                            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+                        >
+                            {/* Stat 1: Pending Queries */}
+                            <CardTilt3D intensity={8} spotlightColor="rgba(244, 63, 94, 0.2)">
+                                <Card className="border-0 bg-white/[0.04] backdrop-blur-xl h-full relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/[0.08] rounded-full blur-2xl pointer-events-none" />
+                                    <CardContent className="p-4 sm:p-5 flex items-center justify-between">
+                                        <div>
+                                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pending Queries</p>
+                                            <div className="text-2xl sm:text-3xl font-bold text-white mt-1 flex items-center gap-2">
+                                                {loadingClientQueries ? <Loader2 className="w-5 h-5 animate-spin text-rose-400" /> : clientQueries.filter((q: any) => q.status === 'OPEN').length}
+                                                {clientQueries.filter((q: any) => q.status === 'OPEN').length > 0 && (
+                                                    <span className="relative flex h-2.5 w-2.5">
+                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-[11px] text-slate-400 mt-0.5 font-medium">{clientQueries.length} total inquiries</p>
+                                        </div>
+                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-600/20 border border-rose-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(244,63,94,0.2)]">
+                                            <MessageCircle className="w-6 h-6 text-rose-400" />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </CardTilt3D>
+
+                            {/* Stat 2: Verified Documents */}
+                            <CardTilt3D intensity={8} spotlightColor="rgba(6, 182, 212, 0.2)">
+                                <Card className="border-0 bg-white/[0.04] backdrop-blur-xl h-full relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/[0.08] rounded-full blur-2xl pointer-events-none" />
+                                    <CardContent className="p-4 sm:p-5 flex items-center justify-between">
+                                        <div>
+                                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Documents</p>
+                                            <div className="text-2xl sm:text-3xl font-bold text-white mt-1">
+                                                {loadingDocs ? <Loader2 className="w-5 h-5 animate-spin text-cyan-400" /> : documents.length}
+                                            </div>
+                                            <p className="text-[11px] text-slate-400 mt-0.5 font-medium">Verified CA files</p>
+                                        </div>
+                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+                                            <FileText className="w-6 h-6 text-cyan-400" />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </CardTilt3D>
+
+                            {/* Stat 3: Drive Folders */}
+                            <CardTilt3D intensity={8} spotlightColor="rgba(59, 130, 246, 0.2)">
+                                <Card className="border-0 bg-white/[0.04] backdrop-blur-xl h-full relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/[0.08] rounded-full blur-2xl pointer-events-none" />
+                                    <CardContent className="p-4 sm:p-5 flex items-center justify-between">
+                                        <div>
+                                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Drive Folders</p>
+                                            <div className="text-2xl sm:text-3xl font-bold text-white mt-1">
+                                                {loadingClientDriveLinks ? <Loader2 className="w-5 h-5 animate-spin text-blue-400" /> : clientDriveLinks.length}
+                                            </div>
+                                            <p className="text-[11px] text-slate-400 mt-0.5 font-medium">Cloud sync folders</p>
+                                        </div>
+                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-600/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+                                            <FolderOpen className="w-6 h-6 text-blue-400" />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </CardTilt3D>
+
+                            {/* Stat 4: Account Status */}
+                            <CardTilt3D intensity={8} spotlightColor="rgba(16, 185, 129, 0.2)">
+                                <Card className="border-0 bg-white/[0.04] backdrop-blur-xl h-full relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/[0.08] rounded-full blur-2xl pointer-events-none" />
+                                    <CardContent className="p-4 sm:p-5 flex items-center justify-between">
+                                        <div>
+                                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Account Status</p>
+                                            <div className="text-lg sm:text-xl font-bold text-white mt-1 flex items-center gap-1.5">
+                                                {profile?.active !== false ? (
+                                                    <><span className="w-2 h-2 rounded-full bg-emerald-400 inline-block shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span><span className="text-emerald-400">Active</span></>
+                                                ) : (
+                                                    <><span className="w-2 h-2 rounded-full bg-red-400 inline-block"></span><span className="text-red-400">Inactive</span></>
+                                                )}
+                                            </div>
+                                            <p className="text-[11px] text-slate-400 mt-0.5 font-mono truncate max-w-[120px]">@{user.userId}</p>
+                                        </div>
+                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-600/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                                            <ShieldCheck className="w-6 h-6 text-emerald-400" />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </CardTilt3D>
+                        </motion.div>
+
+                        {/* Main Grid: Profile, Documents, Drive Folders, Queries */}
                         <div className="grid lg:grid-cols-3 gap-6">
-                            {/* Profile */}
-                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="lg:col-span-1">
-                                <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl h-full">
-                                    <CardContent className="p-6">
-                                        <h2 className="text-lg font-semibold text-white mb-5 flex items-center gap-2"><User className="w-5 h-5 text-blue-400" />Profile</h2>
-                                        {loadingProfile ? <div className="flex items-center justify-center py-10"><Loader2 className="w-6 h-6 text-blue-400 animate-spin" /></div>
-                                            : profileError ? <Alert type="error" msg={profileError} />
-                                                : profile ? (
-                                                    <div className="space-y-4">
-                                                        <div className="flex items-center gap-4 pb-4 border-b border-white/[0.06]">
-                                                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-500/25">
-                                                                {(profile.fullName || profile.userId).charAt(0).toUpperCase()}
-                                                            </div>
-                                                            <div>
-                                                                <div className="text-white font-semibold">{profile.fullName}</div>
-                                                                <div className="text-slate-400 text-xs">@{profile.userId}</div>
-                                                            </div>
+                            {/* Profile Card */}
+                            <motion.div
+                                variants={{
+                                    hidden: { opacity: 0, y: 20 },
+                                    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+                                }}
+                                className="lg:col-span-1"
+                            >
+                                <CardTilt3D intensity={10} spotlightColor="rgba(59, 130, 246, 0.15)">
+                                    <Card className="border-0 bg-white/[0.04] backdrop-blur-xl h-full">
+                                        <CardContent className="p-6">
+                                            <div className="flex items-center justify-between mb-5">
+                                                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                                                    <User className="w-5 h-5 text-blue-400" />Profile
+                                                </h2>
+                                                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                                    {profile?.active !== false ? 'Verified Client' : 'Inactive'}
+                                                </span>
+                                            </div>
+                                            {loadingProfile ? (
+                                                <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 text-blue-400 animate-spin" /></div>
+                                            ) : profileError ? (
+                                                <Alert type="error" msg={profileError} />
+                                            ) : profile ? (
+                                                <div className="space-y-4">
+                                                    <div className="flex items-center gap-4 pb-4 border-b border-white/[0.08]">
+                                                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-violet-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-500/30 border border-white/20">
+                                                            {(profile.fullName || profile.userId).charAt(0).toUpperCase()}
                                                         </div>
-                                                        <div className="space-y-3">
-                                                            {profile.email && <div className="flex items-center gap-3 text-sm"><Mail className="w-4 h-4 text-slate-500" /><span className="text-slate-300 truncate">{profile.email}</span></div>}
-                                                            {profile.phone && <div className="flex items-center gap-3 text-sm"><Phone className="w-4 h-4 text-slate-500" /><span className="text-slate-300">{profile.phone}</span></div>}
-                                                            <div className="flex items-center gap-3 text-sm"><Calendar className="w-4 h-4 text-slate-500" /><span className="text-slate-300">Joined {profile.createdAt ? formatDate(profile.createdAt) : 'N/A'}</span></div>
-                                                            <div className="flex items-center gap-3 text-sm">
-                                                                {profile.active ? <><CheckCircle className="w-4 h-4 text-emerald-400" /><span className="text-emerald-400 font-medium">Active</span></> : <><XCircle className="w-4 h-4 text-red-400" /><span className="text-red-400 font-medium">Inactive</span></>}
-                                                            </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="text-white font-semibold text-base truncate">{profile.fullName || 'Client'}</div>
+                                                            <div className="text-cyan-400 font-mono text-xs">@{profile.userId}</div>
                                                         </div>
                                                     </div>
-                                                ) : null}
-                                    </CardContent>
-                                </Card>
-                            </motion.div>
-
-                            {/* Documents */}
-                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="lg:col-span-2">
-                                <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl">
-                                    <CardContent className="p-6">
-                                        <div className="flex items-center justify-between mb-5">
-                                            <h2 className="text-lg font-semibold text-white flex items-center gap-2"><FolderOpen className="w-5 h-5 text-cyan-400" />Your Documents</h2>
-                                            {!loadingDocs && <span className="text-xs text-slate-500 bg-white/[0.04] px-2.5 py-1 rounded-full">{documents.length} {documents.length === 1 ? 'file' : 'files'}</span>}
-                                        </div>
-                                        {loadingDocs ? <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 text-cyan-400 animate-spin" /></div>
-                                            : docsError ? <Alert type="error" msg={docsError} />
-                                                : documents.length === 0 ? <EmptyState icon={<FolderOpen className="w-10 h-10" />} title="No documents yet" subtitle="Documents uploaded by admin will appear here." />
-                                                    : (
-                                                        <div className="space-y-3">
-                                                            {documents.map((doc, index) => (
-                                                                <motion.div key={doc.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
-                                                                    className="group flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] hover:border-white/[0.1] transition-all">
-                                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
-                                                                        <FileText className="w-5 h-5 text-blue-400" />
-                                                                    </div>
-                                                                    <div className="flex-1 min-w-0">
-                                                                        <div className="text-white font-medium text-sm truncate">{doc.title}</div>
-                                                                        {doc.description && <p className="text-slate-400 text-xs mt-0.5 line-clamp-2">{doc.description}</p>}
-                                                                        <div className="flex flex-wrap items-center gap-2 mt-1">
-                                                                            {doc.category && (
-                                                                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gradient-to-r border text-[10px] font-medium uppercase tracking-wider ${getCategoryColor(doc.category)}`}>
-                                                                                    <Tag className="w-2.5 h-2.5" />{doc.category}
-                                                                                </span>
-                                                                            )}
-                                                                            <span className="text-slate-500 text-xs flex items-center gap-1"><Clock className="w-3 h-3" />{formatDate(doc.createdAt)}</span>
-                                                                            <span className="text-slate-600 text-xs">{formatFileSize(doc.fileSize)}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <Button variant="ghost"
-                                                                        onClick={async () => {
-                                                                            try {
-                                                                                const parsed = JSON.parse(localStorage.getItem('mrs_auth_user') || 'null');
-                                                                                const res = await fetch(`/backend/user/${user.userId}/documents/${doc.id}/download`, {
-                                                                                    headers: parsed?.token ? { Authorization: `Bearer ${parsed.token}` } : {},
-                                                                                });
-                                                                                if (!res.ok) throw new Error('Download failed');
-                                                                                const blob = await res.blob();
-                                                                                const url = window.URL.createObjectURL(blob);
-                                                                                const a = document.createElement('a');
-                                                                                a.href = url; a.download = doc.originalFileName || doc.title;
-                                                                                document.body.appendChild(a); a.click(); a.remove();
-                                                                                window.URL.revokeObjectURL(url);
-                                                                            } catch { }
-                                                                        }}
-                                                                        className="text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 opacity-0 group-hover:opacity-100 px-2">
-                                                                        <Download className="w-4 h-4" />
-                                                                    </Button>
-                                                                </motion.div>
-                                                            ))}
+                                                    <div className="space-y-3 pt-1">
+                                                        {profile.email && (
+                                                            <div className="flex items-center gap-3 text-sm p-2 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                                                                <Mail className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                                                                <span className="text-slate-200 truncate">{profile.email}</span>
+                                                            </div>
+                                                        )}
+                                                        {profile.phone && (
+                                                            <div className="flex items-center gap-3 text-sm p-2 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                                                                <Phone className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                                                                <span className="text-slate-200">{profile.phone}</span>
+                                                            </div>
+                                                        )}
+                                                        <div className="flex items-center gap-3 text-sm p-2 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                                                            <Calendar className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                                                            <span className="text-slate-300">Joined {profile.createdAt ? formatDate(profile.createdAt) : 'Recently'}</span>
                                                         </div>
-                                                    )}
-                                    </CardContent>
-                                </Card>
+                                                    </div>
+                                                </div>
+                                            ) : null}
+                                        </CardContent>
+                                    </Card>
+                                </CardTilt3D>
                             </motion.div>
 
-                            {/* Drive Folders */}
-                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="lg:col-span-2">
-                                <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl">
-                                    <CardContent className="p-6">
-                                        <div className="flex items-center justify-between mb-5">
-                                            <h2 className="text-lg font-semibold text-white flex items-center gap-2"><FolderOpen className="w-5 h-5 text-blue-400" />Drive Folders</h2>
-                                            {!loadingClientDriveLinks && <span className="text-xs text-slate-500 bg-white/[0.04] px-2.5 py-1 rounded-full">{clientDriveLinks.length} {clientDriveLinks.length === 1 ? 'folder' : 'folders'}</span>}
-                                        </div>
-                                        {loadingClientDriveLinks ? <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 text-blue-400 animate-spin" /></div>
-                                            : clientDriveLinks.length === 0 ? <EmptyState icon={<FolderOpen className="w-10 h-10" />} title="No shared folders yet" subtitle="Folders shared by admin will appear here." />
-                                                : (
-                                                    <div className="space-y-3">
+                            {/* Documents Card */}
+                            <motion.div
+                                variants={{
+                                    hidden: { opacity: 0, y: 20 },
+                                    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+                                }}
+                                className="lg:col-span-2"
+                            >
+                                <CardTilt3D intensity={7} spotlightColor="rgba(6, 182, 212, 0.15)">
+                                    <Card className="border-0 bg-white/[0.04] backdrop-blur-xl h-full">
+                                        <CardContent className="p-6">
+                                            <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                                                        <FolderOpen className="w-5 h-5 text-cyan-400" />Your Documents
+                                                    </h2>
+                                                    {!loadingDocs && (
+                                                        <span className="text-xs font-medium text-cyan-300 bg-cyan-500/10 border border-cyan-500/25 px-2.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(6,182,212,0.15)]">
+                                                            {documents.length} {documents.length === 1 ? 'file' : 'files'}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Tactile3DButton
+                                                        variant="glass"
+                                                        size="sm"
+                                                        onClick={fetchClientDocs}
+                                                        disabled={loadingDocs}
+                                                        icon={<RefreshCw className={`w-3.5 h-3.5 ${loadingDocs ? 'animate-spin text-cyan-400' : 'text-slate-300'}`} />}
+                                                    >
+                                                        Refresh Sync
+                                                    </Tactile3DButton>
+                                                </div>
+                                            </div>
+
+                                            {loadingDocs ? (
+                                                <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 text-cyan-400 animate-spin" /></div>
+                                            ) : docsError ? (
+                                                <Alert type="error" msg={docsError} />
+                                            ) : documents.length === 0 ? (
+                                                <Interactive3DEmptyState
+                                                    type="documents"
+                                                    title="No documents uploaded yet"
+                                                    subtitle="Signed tax filings, balance sheets, and audit reports shared by MRS & Co. will securely appear here."
+                                                    actionLabel="Refresh Sync"
+                                                    onAction={fetchClientDocs}
+                                                />
+                                            ) : (
+                                                <div className="space-y-3">
+                                                    <AnimatePresence>
+                                                        {documents.map((doc, index) => (
+                                                            <motion.div
+                                                                layout
+                                                                key={doc.id}
+                                                                initial={{ opacity: 0, y: 10 }}
+                                                                animate={{ opacity: 1, y: 0 }}
+                                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                                transition={{ delay: index * 0.04 }}
+                                                                className="group flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-cyan-500/30 transition-all duration-300"
+                                                            >
+                                                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_12px_rgba(6,182,212,0.15)]">
+                                                                    <FileText className="w-5 h-5 text-cyan-400" />
+                                                                </div>
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="text-white font-medium text-sm truncate group-hover:text-cyan-300 transition-colors">{doc.title}</div>
+                                                                    {doc.description && <p className="text-slate-300 text-xs mt-0.5 line-clamp-2">{doc.description}</p>}
+                                                                    <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                                                                        {doc.category && (
+                                                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gradient-to-r border text-[10px] font-medium uppercase tracking-wider ${getCategoryColor(doc.category)}`}>
+                                                                                <Tag className="w-2.5 h-2.5" />{doc.category}
+                                                                            </span>
+                                                                        )}
+                                                                        <span className="text-slate-400 text-xs flex items-center gap-1"><Clock className="w-3 h-3" />{formatDate(doc.createdAt)}</span>
+                                                                        <span className="text-slate-500 text-xs">{formatFileSize(doc.fileSize)}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <Tactile3DButton
+                                                                    variant="glass"
+                                                                    size="sm"
+                                                                    onClick={async () => {
+                                                                        try {
+                                                                            const parsed = JSON.parse(localStorage.getItem('mrs_auth_user') || 'null');
+                                                                            const res = await fetch(`/backend/user/${user.userId}/documents/${doc.id}/download`, {
+                                                                                headers: parsed?.token ? { Authorization: `Bearer ${parsed.token}` } : {},
+                                                                            });
+                                                                            if (!res.ok) throw new Error('Download failed');
+                                                                            const blob = await res.blob();
+                                                                            const url = window.URL.createObjectURL(blob);
+                                                                            const a = document.createElement('a');
+                                                                            a.href = url; a.download = doc.originalFileName || doc.title;
+                                                                            document.body.appendChild(a); a.click(); a.remove();
+                                                                            window.URL.revokeObjectURL(url);
+                                                                        } catch { }
+                                                                    }}
+                                                                    className="opacity-90 group-hover:opacity-100 text-cyan-400 hover:text-cyan-300"
+                                                                    icon={<Download className="w-4 h-4" />}
+                                                                >
+                                                                    <span className="hidden sm:inline text-xs">Download</span>
+                                                                </Tactile3DButton>
+                                                            </motion.div>
+                                                        ))}
+                                                    </AnimatePresence>
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                </CardTilt3D>
+                            </motion.div>
+
+                            {/* Drive Folders Card */}
+                            <motion.div
+                                variants={{
+                                    hidden: { opacity: 0, y: 20 },
+                                    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+                                }}
+                                className="lg:col-span-2"
+                            >
+                                <CardTilt3D intensity={7} spotlightColor="rgba(59, 130, 246, 0.15)">
+                                    <Card className="border-0 bg-white/[0.04] backdrop-blur-xl h-full">
+                                        <CardContent className="p-6">
+                                            <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                                                        <FolderOpen className="w-5 h-5 text-blue-400" />Drive Folders
+                                                    </h2>
+                                                    {!loadingClientDriveLinks && (
+                                                        <span className="text-xs font-medium text-blue-300 bg-blue-500/10 border border-blue-500/25 px-2.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.15)]">
+                                                            {clientDriveLinks.length} {clientDriveLinks.length === 1 ? 'folder' : 'folders'}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Tactile3DButton
+                                                        variant="glass"
+                                                        size="sm"
+                                                        onClick={fetchClientDriveLinks}
+                                                        disabled={loadingClientDriveLinks}
+                                                        icon={<RefreshCw className={`w-3.5 h-3.5 ${loadingClientDriveLinks ? 'animate-spin text-blue-400' : 'text-slate-300'}`} />}
+                                                    >
+                                                        Refresh Sync
+                                                    </Tactile3DButton>
+                                                </div>
+                                            </div>
+
+                                            {loadingClientDriveLinks ? (
+                                                <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 text-blue-400 animate-spin" /></div>
+                                            ) : clientDriveLinks.length === 0 ? (
+                                                <Interactive3DEmptyState
+                                                    type="folders"
+                                                    title="No shared folders yet"
+                                                    subtitle="Google Drive archive links assigned to your account will automatically appear here."
+                                                    actionLabel="Refresh Sync"
+                                                    onAction={fetchClientDriveLinks}
+                                                />
+                                            ) : (
+                                                <div className="space-y-3">
+                                                    <AnimatePresence>
                                                         {clientDriveLinks.map((link, index) => (
-                                                            <motion.div key={link.id || index} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
-                                                                className="group flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] hover:border-white/[0.1] transition-all">
-                                                                <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
+                                                            <motion.div
+                                                                layout
+                                                                key={link.id || index}
+                                                                initial={{ opacity: 0, y: 10 }}
+                                                                animate={{ opacity: 1, y: 0 }}
+                                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                                transition={{ delay: index * 0.04 }}
+                                                                className="group flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-blue-500/30 transition-all duration-300"
+                                                            >
+                                                                <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_12px_rgba(59,130,246,0.15)]">
                                                                     <FolderOpen className="w-5 h-5 text-blue-400" />
                                                                 </div>
                                                                 <div className="flex-1 min-w-0">
-                                                                    <div className="text-white font-medium text-sm">{link.title || 'Drive Folder'}</div>
-                                                                    {link.description && <p className="text-slate-400 text-xs mt-0.5 line-clamp-2">{link.description}</p>}
-                                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-medium uppercase tracking-wider mt-1">
+                                                                    <div className="text-white font-medium text-sm group-hover:text-blue-300 transition-colors">{link.title || 'Drive Folder'}</div>
+                                                                    {link.description && <p className="text-slate-300 text-xs mt-0.5 line-clamp-2">{link.description}</p>}
+                                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/15 border border-blue-500/30 text-blue-300 text-[10px] font-medium uppercase tracking-wider mt-1">
                                                                         <Calendar className="w-2.5 h-2.5" />{link.year}
                                                                     </span>
                                                                 </div>
-                                                                <Button variant="ghost" onClick={() => window.open(link.driveUrl, '_blank')} className="text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 opacity-0 group-hover:opacity-100 px-3">
-                                                                    <Download className="w-4 h-4 mr-1" /><span className="text-xs">Open</span>
-                                                                </Button>
+                                                                <Tactile3DButton
+                                                                    variant="cyan"
+                                                                    size="sm"
+                                                                    onClick={() => window.open(link.driveUrl, '_blank')}
+                                                                    icon={<ArrowUpRight className="w-4 h-4" />}
+                                                                >
+                                                                    Open Drive
+                                                                </Tactile3DButton>
                                                             </motion.div>
                                                         ))}
-                                                    </div>
-                                                )}
-                                    </CardContent>
-                                </Card>
+                                                    </AnimatePresence>
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                </CardTilt3D>
                             </motion.div>
 
-                            {/* Queries */}
-                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="lg:col-span-3">
-                                <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl">
-                                    <CardContent className="p-6">
-                                        <div className="flex items-center justify-between mb-5">
-                                            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                                                <MessageCircle className="w-5 h-5 text-rose-400" />
-                                                Queries from MRS &amp; Co.
-                                                {/* OPEN badge — shown when there are unread/open queries */}
-                                                {!loadingClientQueries && clientQueries.filter((q: any) => q.status === 'OPEN').length > 0 && (
-                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/20 border border-rose-500/30 text-rose-400 animate-pulse">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400 inline-block"></span>
-                                                        {clientQueries.filter((q: any) => q.status === 'OPEN').length} new
-                                                    </span>
-                                                )}
-                                            </h2>
-                                            <div className="flex items-center gap-2">
-                                                {!loadingClientQueries && <span className="text-xs text-slate-500 bg-white/[0.04] px-2.5 py-1 rounded-full">{clientQueries.length} {clientQueries.length === 1 ? 'query' : 'queries'}</span>}
-                                                <Button variant="ghost" onClick={fetchClientQueries} disabled={loadingClientQueries} className="text-slate-400 hover:text-white hover:bg-white/[0.06] px-2">
-                                                    <RefreshCw className={`w-4 h-4 ${loadingClientQueries ? 'animate-spin' : ''}`} />
-                                                </Button>
+                            {/* Queries Section */}
+                            <motion.div
+                                variants={{
+                                    hidden: { opacity: 0, y: 20 },
+                                    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+                                }}
+                                className="lg:col-span-3"
+                            >
+                                <CardTilt3D intensity={6} spotlightColor="rgba(244, 63, 94, 0.15)">
+                                    <Card className="border-0 bg-white/[0.04] backdrop-blur-xl">
+                                        <CardContent className="p-6">
+                                            <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                                                        <MessageCircle className="w-5 h-5 text-rose-400" />
+                                                        Queries from MRS &amp; Co.
+                                                    </h2>
+                                                    {/* OPEN badge — shown when there are unread/open queries */}
+                                                    {!loadingClientQueries && clientQueries.filter((q: any) => q.status === 'OPEN').length > 0 && (
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/20 border border-rose-500/40 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.4)] animate-pulse">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 inline-block"></span>
+                                                            {clientQueries.filter((q: any) => q.status === 'OPEN').length} new
+                                                        </span>
+                                                    )}
+                                                    {!loadingClientQueries && (
+                                                        <span className="text-xs font-medium text-slate-400 bg-white/[0.04] border border-white/[0.06] px-2.5 py-0.5 rounded-full">
+                                                            {clientQueries.length} {clientQueries.length === 1 ? 'query' : 'queries'}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Tactile3DButton
+                                                        variant="glass"
+                                                        size="sm"
+                                                        onClick={fetchClientQueries}
+                                                        disabled={loadingClientQueries}
+                                                        icon={<RefreshCw className={`w-3.5 h-3.5 ${loadingClientQueries ? 'animate-spin text-rose-400' : 'text-slate-300'}`} />}
+                                                    >
+                                                        Refresh Queries
+                                                    </Tactile3DButton>
+                                                </div>
                                             </div>
-                                        </div>
-                                        {loadingClientQueries ? <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 text-rose-400 animate-spin" /></div>
-                                            : clientQueries.length === 0 ? <EmptyState icon={<MessageCircle className="w-10 h-10" />} title="No queries yet" subtitle="Queries raised by MRS & Co. will appear here." />
-                                                : (
-                                                    <div className="space-y-3">
+
+                                            {loadingClientQueries ? (
+                                                <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 text-rose-400 animate-spin" /></div>
+                                            ) : clientQueries.length === 0 ? (
+                                                <Interactive3DEmptyState
+                                                    type="queries"
+                                                    title="No active queries"
+                                                    subtitle="Inquiries or clarifications requested by your audit and tax partners at MRS & Co. will appear here."
+                                                    actionLabel="Check for Queries"
+                                                    onAction={fetchClientQueries}
+                                                />
+                                            ) : (
+                                                <div className="space-y-4">
+                                                    <AnimatePresence>
                                                         {clientQueries.map((q: any, index: number) => (
-                                                            <motion.div key={q.id || index} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
-                                                                className={`p-4 rounded-xl border transition-all relative ${
+                                                            <motion.div
+                                                                layout
+                                                                key={q.id || index}
+                                                                initial={{ opacity: 0, y: 10 }}
+                                                                animate={{ opacity: 1, y: 0 }}
+                                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                                transition={{ delay: index * 0.04 }}
+                                                                className={`p-5 rounded-2xl border transition-all duration-300 relative ${
                                                                     q.status === 'OPEN'
-                                                                        ? 'bg-rose-500/[0.04] border-rose-500/20 hover:bg-rose-500/[0.07] hover:border-rose-500/30'
-                                                                        : 'bg-white/[0.03] border-white/[0.05] hover:bg-white/[0.06] hover:border-rose-500/20'
-                                                                }`}>
+                                                                        ? 'bg-gradient-to-r from-rose-500/[0.08] to-pink-500/[0.04] border-rose-500/30 hover:border-rose-400/50 shadow-[0_4px_20px_rgba(244,63,94,0.1)]'
+                                                                        : 'bg-white/[0.03] border-white/[0.07] hover:bg-white/[0.05] hover:border-white/20'
+                                                                }`}
+                                                            >
                                                                 {/* Pulse dot for OPEN queries */}
                                                                 {q.status === 'OPEN' && (
-                                                                    <span className="absolute top-3 right-3 flex h-2.5 w-2.5">
+                                                                    <span className="absolute top-4 right-4 flex h-3 w-3">
                                                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                                                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                                                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)]"></span>
                                                                     </span>
                                                                 )}
+
                                                                 <div className="flex items-start gap-4">
-                                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-pink-600/20 border border-rose-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-500/25 to-pink-600/25 border border-rose-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_16px_rgba(244,63,94,0.25)] mt-0.5">
                                                                         <MessageCircle className="w-5 h-5 text-rose-400" />
                                                                     </div>
-                                                                    <div className="flex-1 min-w-0">
+                                                                    <div className="flex-1 min-w-0 pr-6">
                                                                         <div className="flex items-center gap-2 flex-wrap">
-                                                                            <span className="text-white font-semibold text-sm">{q.subject || 'Query'}</span>
-                                                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider border ${statusBadge(q.status)}`}>{q.status || 'OPEN'}</span>
+                                                                            <span className="text-white font-semibold text-base tracking-tight">{q.subject || 'Query'}</span>
+                                                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border ${statusBadge(q.status)}`}>
+                                                                                {q.status || 'OPEN'}
+                                                                            </span>
                                                                             {q.fileName && (
-                                                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 border border-amber-500/20 text-amber-400">
-                                                                                    <Paperclip className="w-2.5 h-2.5" /> Attachment
+                                                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/15 border border-amber-500/30 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+                                                                                    <Paperclip className="w-3 h-3" /> Attachment
                                                                                 </span>
                                                                             )}
                                                                         </div>
-                                                                        <p className="text-slate-300 text-sm mt-1.5 leading-relaxed line-clamp-2">{q.messageText || <span className="italic text-slate-500">{q.fileName ? 'See attachment' : 'No message content'}</span>}</p>
-                                                                        {q.createdAt && <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-500"><Clock className="w-3 h-3" /><span>Raised on {formatDate(q.createdAt)}</span></div>}
+                                                                        <p className="text-slate-200 text-sm mt-2 leading-relaxed line-clamp-2">
+                                                                            {q.messageText || <span className="italic text-slate-400">{q.fileName ? 'See attachment below' : 'No message content'}</span>}
+                                                                        </p>
+                                                                        {q.createdAt && (
+                                                                            <div className="flex items-center gap-1.5 mt-2.5 text-xs text-slate-400">
+                                                                                <Clock className="w-3.5 h-3.5 text-slate-500" />
+                                                                                <span>Raised on {formatDate(q.createdAt)}</span>
+                                                                            </div>
+                                                                        )}
                                                                     </div>
                                                                 </div>
-                                                                <div className="mt-3 pt-3 border-t border-white/[0.05] flex items-center gap-2 flex-wrap">
-                                                                    <Button size="sm" onClick={() => handleViewQuery(q)}
-                                                                        className="text-xs bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-400 hover:to-pink-500 text-white shadow-md shadow-rose-500/20 px-3.5 py-1.5 h-auto flex items-center gap-1.5 font-medium rounded-lg">
-                                                                        <Send className="w-3.5 h-3.5" /> Respond to Query
-                                                                    </Button>
-                                                                    <Button size="sm" variant="ghost" onClick={() => handleViewQuery(q)}
-                                                                        className="text-xs text-slate-300 hover:text-white hover:bg-white/[0.06] px-3 py-1.5 h-auto flex items-center gap-1.5">
-                                                                        <Eye className="w-3.5 h-3.5" /> View History
-                                                                    </Button>
+
+                                                                {/* Action Buttons with 3D Hover Spring Dynamics */}
+                                                                <div className="mt-4 pt-3.5 border-t border-white/[0.06] flex items-center gap-3 flex-wrap">
+                                                                    <Tactile3DButton
+                                                                        variant="rose"
+                                                                        size="sm"
+                                                                        onClick={() => handleViewQuery(q)}
+                                                                        icon={<Send className="w-3.5 h-3.5" />}
+                                                                    >
+                                                                        Respond to Query
+                                                                    </Tactile3DButton>
+                                                                    <Tactile3DButton
+                                                                        variant="glass"
+                                                                        size="sm"
+                                                                        onClick={() => handleViewQuery(q)}
+                                                                        icon={<Eye className="w-3.5 h-3.5" />}
+                                                                    >
+                                                                        View History
+                                                                    </Tactile3DButton>
                                                                     {q.fileName && (
-                                                                        <Button size="sm" variant="ghost"
+                                                                        <Tactile3DButton
+                                                                            variant="glass"
+                                                                            size="sm"
                                                                             onClick={() => handleDownloadQueryAttachment(q.id, q.fileName)}
                                                                             disabled={downloadingQueryId === q.id}
-                                                                            className="text-xs text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 px-3 py-1.5 h-auto flex items-center gap-1.5">
-                                                                            {downloadingQueryId === q.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} Download Attachment
-                                                                        </Button>
+                                                                            icon={downloadingQueryId === q.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+                                                                            className="text-amber-300 hover:text-amber-200"
+                                                                        >
+                                                                            Download Attachment
+                                                                        </Tactile3DButton>
                                                                     )}
                                                                 </div>
                                                             </motion.div>
                                                         ))}
-                                                    </div>
-                                                )}
-                                    </CardContent>
-                                </Card>
+                                                    </AnimatePresence>
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                </CardTilt3D>
                             </motion.div>
                         </div>
-                    </main>
+                    </motion.main>
                 </div>
             )}
 
             {/* ── MODALS ── */}
+
 
             {/* Edit User */}
             {editingUser && (
