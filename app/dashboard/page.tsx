@@ -13,6 +13,7 @@ import {
     getUserDocuments,
     createUser,
     getAllUsers,
+    getAdminEmployees,
     changeUserPassword,
     uploadDocument,
     getAdminDocuments,
@@ -366,10 +367,47 @@ export default function DashboardPage() {
     // ─── Fetch functions ─────────────────────────────────────────────────────
 
     const fetchUsers = async () => {
-        setLoadingUsers(true); setUsersError('');
-        try { setAdminUsers(await getAllUsers()); }
-        catch (err: unknown) { setUsersError(err instanceof Error ? err.message : 'Failed to load users'); }
-        finally { setLoadingUsers(false); }
+        setLoadingUsers(true);
+        setUsersError('');
+        try {
+            const [allUsersRes, employeesRes] = await Promise.allSettled([
+                getAllUsers(),
+                getAdminEmployees('', 0, 1000),
+            ]);
+
+            const allUsers = allUsersRes.status === 'fulfilled' ? allUsersRes.value : [];
+            const employeeIds = new Set<string>();
+            const employeeMobiles = new Set<string>();
+
+            if (employeesRes.status === 'fulfilled' && employeesRes.value?.content) {
+                for (const emp of employeesRes.value.content) {
+                    if (emp.employeeId) employeeIds.add(emp.employeeId.toLowerCase().trim());
+                    if (emp.mobileNumber) employeeMobiles.add(emp.mobileNumber.trim());
+                }
+            }
+
+            // Exclude employees and admins from the client list
+            const filteredClients = allUsers.filter((u) => {
+                const uid = (u.userId || '').toLowerCase().trim();
+                const uRole = (u.role || (u as any).userType || '').toLowerCase().trim();
+                const uEmpId = ((u as any).employeeId || '').toLowerCase().trim();
+                const uPhone = (u.phone || '').trim();
+
+                if (uRole.includes('employee') || uRole.includes('admin')) return false;
+                if (uEmpId) return false;
+                if (employeeIds.has(uid) || (uEmpId && employeeIds.has(uEmpId))) return false;
+                if (uPhone && employeeMobiles.has(uPhone)) return false;
+                if (uid.startsWith('emp') || uid.startsWith('admin')) return false;
+
+                return true;
+            });
+
+            setAdminUsers(filteredClients);
+        } catch (err: unknown) {
+            setUsersError(err instanceof Error ? err.message : 'Failed to load users');
+        } finally {
+            setLoadingUsers(false);
+        }
     };
 
     const fetchDocs = async () => {
@@ -1523,7 +1561,7 @@ export default function DashboardPage() {
 
             // ── Employee Management ──────────────────────────────────────────
             case 'employees':
-                return <AdminEmployeeManagement />;
+                return <AdminEmployeeManagement onEmployeeChange={fetchUsers} />;
 
             default:
                 return null;

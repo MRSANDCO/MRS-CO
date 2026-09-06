@@ -22,6 +22,9 @@ export interface UserProfile {
     fullName: string;
     email: string;
     phone: string;
+    role?: string;
+    userType?: string;
+    employeeId?: string;
     active: boolean;
     createdAt: string;
     createdBy: string;
@@ -141,7 +144,21 @@ export async function getAllUsers(): Promise<UserProfile[]> {
     const res = await fetch(`${BACKEND_DIRECT}/admin/users`, {
         headers: authHeaders(),
     });
-    return handleResponse<UserProfile[]>(res);
+    const users = await handleResponse<UserProfile[]>(res);
+    if (!Array.isArray(users)) return [];
+
+    return users.filter((u) => {
+        const uid = (u.userId || '').toLowerCase().trim();
+        const uRole = (u.role || (u as any).userType || '').toLowerCase().trim();
+        const uEmpId = ((u as any).employeeId || '').toLowerCase().trim();
+
+        // Filter out employees and admins
+        if (uRole.includes('employee') || uRole.includes('admin')) return false;
+        if (uEmpId) return false;
+        if (uid.startsWith('emp') || uid.startsWith('admin')) return false;
+
+        return true;
+    });
 }
 
 export async function changeUserPassword(userId: string, newPassword: string): Promise<{ message: string; userId: string }> {

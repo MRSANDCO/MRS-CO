@@ -66,7 +66,11 @@ function maskPAN(pan?: string): string {
     return `${cleaned.slice(0, 2)}XXXXXX${cleaned.slice(-2)}`;
 }
 
-export function AdminEmployeeManagement() {
+export interface AdminEmployeeManagementProps {
+    onEmployeeChange?: () => void;
+}
+
+export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManagementProps = {}) {
     // State
     const [employees, setEmployees] = useState<EmployeeProfile[]>([]);
     const [loading, setLoading] = useState(true);
@@ -186,6 +190,7 @@ export function AdminEmployeeManagement() {
 
             setNewEmpData({ name: '', mobileNumber: '', initialPassword: '' });
             fetchEmployees();
+            onEmployeeChange?.();
             setFeedback({ type: 'success', text: `Employee ${res.employeeId} created successfully!` });
         } catch (err: unknown) {
             setFeedback({ type: 'error', text: err instanceof Error ? err.message : 'Failed to create employee.' });
@@ -233,6 +238,7 @@ export function AdminEmployeeManagement() {
             setFeedback({ type: 'success', text: `Employee ${editingEmployee.employeeId} updated successfully!` });
             setEditingEmployee(null);
             fetchEmployees();
+            onEmployeeChange?.();
             if (viewingEmployee?.employeeId === editingEmployee.employeeId) {
                 setViewingEmployee(res.employee);
             }
@@ -258,6 +264,7 @@ export function AdminEmployeeManagement() {
                 setViewingEmployee(null);
             }
             fetchEmployees();
+            onEmployeeChange?.();
         } catch (err: unknown) {
             setFeedback({
                 type: 'error',
@@ -278,6 +285,7 @@ export function AdminEmployeeManagement() {
                 text: `Employee ${emp.employeeId} account ${nextActive ? 'activated' : 'deactivated'}.`,
             });
             fetchEmployees();
+            onEmployeeChange?.();
             if (viewingEmployee?.employeeId === emp.employeeId) {
                 setViewingEmployee((prev) => (prev ? { ...prev, active: nextActive } : null));
             }
