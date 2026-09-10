@@ -513,6 +513,16 @@ export default function EmployeeDashboardPage() {
 
                     {/* Right action bar: User info & Logout */}
                     <div className="flex items-center gap-3 sm:gap-4">
+                        <Link href="/employee/attendance">
+                            <Button
+                                variant="outline"
+                                className="border-blue-500/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 hover:text-white h-9 px-3 text-xs gap-1.5 rounded-lg transition-all"
+                            >
+                                <Calendar className="w-3.5 h-3.5 text-blue-400" />
+                                <span>Attendance</span>
+                            </Button>
+                        </Link>
+
                         <div className="hidden sm:flex flex-col text-right">
                             <span className="text-xs font-semibold text-white">
                                 {profile?.name || user?.fullName || 'Employee'}

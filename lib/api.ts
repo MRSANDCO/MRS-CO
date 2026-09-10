@@ -523,3 +523,75 @@ export async function deleteAdminEmployee(employeeId: string): Promise<{ message
     return handleResponse<{ message: string; employeeId: string }>(res);
 }
 
+// ===================== Attendance Types & APIs =====================
+
+export interface AttendanceRecord {
+    attendanceId?: string;
+    employeeId: string;
+    employeeName?: string;
+    date: string;
+    formattedDate?: string;
+    checkInTime?: string;
+    formattedCheckInTime?: string;
+    status: 'PRESENT' | 'ABSENT' | 'LATE';
+}
+
+export interface TodayAttendanceResponse {
+    marked: boolean;
+    todayDate: string;
+    status: string;
+    attendance?: AttendanceRecord;
+}
+
+export interface AttendanceFilterParams {
+    employeeId?: string;
+    date?: string;
+    status?: string;
+    month?: string | number;
+    year?: string | number;
+    page?: number;
+    size?: number;
+}
+
+export async function markEmployeeAttendance(): Promise<{ message: string; attendance: AttendanceRecord }> {
+    const res = await fetch(`${BACKEND_DIRECT}/employee/attendance/check-in`, {
+        method: 'POST',
+        headers: authHeaders(),
+    });
+    return handleResponse<{ message: string; attendance: AttendanceRecord }>(res);
+}
+
+export async function getTodayAttendance(): Promise<TodayAttendanceResponse> {
+    const res = await fetch(`${BACKEND_DIRECT}/employee/attendance/today`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<TodayAttendanceResponse>(res);
+}
+
+export async function getEmployeeAttendanceHistory(): Promise<AttendanceRecord[]> {
+    const res = await fetch(`${BACKEND_DIRECT}/employee/attendance/history`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<AttendanceRecord[]>(res);
+}
+
+export async function getAdminAttendanceRecords(params: AttendanceFilterParams = {}): Promise<PageResponse<AttendanceRecord>> {
+    const searchParams = new URLSearchParams();
+    if (params.employeeId) searchParams.append('employeeId', params.employeeId);
+    if (params.date) searchParams.append('date', params.date);
+    if (params.status) searchParams.append('status', params.status);
+    if (params.month) searchParams.append('month', String(params.month));
+    if (params.year) searchParams.append('year', String(params.year));
+    if (params.page !== undefined) searchParams.append('page', String(params.page));
+    if (params.size !== undefined) searchParams.append('size', String(params.size));
+
+    const queryString = searchParams.toString();
+    const url = `${BACKEND_DIRECT}/admin/attendance${queryString ? `?${queryString}` : ''}`;
+
+    const res = await fetch(url, {
+        headers: authHeaders(),
+    });
+    return handleResponse<PageResponse<AttendanceRecord>>(res);
+}
+
+

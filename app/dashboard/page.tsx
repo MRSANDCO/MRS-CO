@@ -74,6 +74,7 @@ import { AmbientParticleCanvas } from '@/components/dashboard/AmbientParticleCan
 import { Interactive3DEmptyState } from '@/components/dashboard/Interactive3DEmptyState';
 import { Tactile3DButton } from '@/components/dashboard/Tactile3DButton';
 import { AdminEmployeeManagement } from '@/components/dashboard/AdminEmployeeManagement';
+import AdminAttendanceDashboard from '@/components/attendance/AdminAttendanceDashboard';
 
 
 // ─── Logo ────────────────────────────────────────────────────────────────────
@@ -134,7 +135,8 @@ type AdminSection =
     | 'drive-list'
     | 'raise-query'
     | 'queries-list'
-    | 'employees';
+    | 'employees'
+    | 'attendance-management';
 
 interface NavItem {
     id: AdminSection;
@@ -150,6 +152,7 @@ const adminNavItems: NavItem[] = [
     { id: 'share-drive', label: 'Share Drive Folder', icon: <FolderOpen className="w-4 h-4" />, group: 'actions' },
     { id: 'raise-query', label: 'Raise a Query', icon: <MessageSquarePlus className="w-4 h-4" />, group: 'actions' },
     { id: 'employees', label: 'Employee Management', icon: <Users className="w-4 h-4" />, group: 'lists' },
+    { id: 'attendance-management', label: 'Attendance Management', icon: <Calendar className="w-4 h-4" />, group: 'lists' },
     { id: 'clients-list', label: 'All Clients', icon: <Users className="w-4 h-4" />, group: 'lists' },
     { id: 'documents-list', label: 'Documents', icon: <FileText className="w-4 h-4" />, group: 'lists' },
     { id: 'drive-list', label: 'Drive Links', icon: <FolderOpen className="w-4 h-4" />, group: 'lists' },
@@ -891,6 +894,7 @@ export default function DashboardPage() {
         'raise-query': 'text-rose-400',
         'queries-list': 'text-rose-400',
         'employees': 'text-emerald-400',
+        'attendance-management': 'text-emerald-400',
     };
 
     const navItemAccent: Record<AdminSection, string> = {
@@ -904,6 +908,7 @@ export default function DashboardPage() {
         'raise-query': 'bg-rose-500/10 border-rose-500/20 text-rose-300',
         'queries-list': 'bg-rose-500/10 border-rose-500/20 text-rose-300',
         'employees': 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300',
+        'attendance-management': 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300',
     };
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -1562,6 +1567,10 @@ export default function DashboardPage() {
             // ── Employee Management ──────────────────────────────────────────
             case 'employees':
                 return <AdminEmployeeManagement onEmployeeChange={fetchUsers} />;
+
+            // ── Attendance Management ─────────────────────────────────────────
+            case 'attendance-management':
+                return <AdminAttendanceDashboard />;
 
             default:
                 return null;
