@@ -276,6 +276,7 @@ export async function downloadDocument(documentId: string, fallbackFileName = 'd
 
 export type ProfileStatus = 'INCOMPLETE' | 'SUBMITTED';
 export type DocumentVerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
+export type EmploymentStatus = 'ACTIVE' | 'EX_EMPLOYEE';
 
 export interface EmployeeProfile {
     id?: string;
@@ -297,6 +298,7 @@ export interface EmployeeProfile {
     documentStatus: DocumentVerificationStatus;
     documentRejectionReason?: string;
     active?: boolean;
+    employmentStatus?: EmploymentStatus;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -489,13 +491,17 @@ export async function resetEmployeePassword(employeeId: string, newPassword?: st
     return handleResponse<{ message: string; employeeId: string; newPassword?: string }>(res);
 }
 
-export async function setEmployeeActiveStatus(employeeId: string, active: boolean): Promise<{ message: string; employeeId: string; active: boolean }> {
+export async function setEmployeeActiveStatus(
+    employeeId: string,
+    active: boolean,
+    employmentStatus?: EmploymentStatus
+): Promise<{ message: string; employeeId: string; active: boolean; employmentStatus?: EmploymentStatus }> {
     const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/status`, {
         method: 'PATCH',
         headers: authHeaders({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify({ active }),
+        body: JSON.stringify({ active, ...(employmentStatus ? { employmentStatus } : {}) }),
     });
-    return handleResponse<{ message: string; employeeId: string; active: boolean }>(res);
+    return handleResponse<{ message: string; employeeId: string; active: boolean; employmentStatus?: EmploymentStatus }>(res);
 }
 
 export async function verifyEmployeeDocument(employeeId: string): Promise<{ message: string; employeeId: string; documentStatus: string }> {

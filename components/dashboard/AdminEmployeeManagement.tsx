@@ -76,6 +76,8 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+    // Filter state
+    const [employmentTab, setEmploymentTab] = useState<'ALL' | 'ACTIVE' | 'EX_EMPLOYEE'>('ACTIVE');
     const [profileFilter, setProfileFilter] = useState<'ALL' | 'INCOMPLETE' | 'SUBMITTED'>('ALL');
     const [docFilter, setDocFilter] = useState<'ALL' | 'PENDING' | 'VERIFIED' | 'REJECTED' | 'NONE'>('ALL');
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
@@ -94,6 +96,8 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
     const [viewingEmployee, setViewingEmployee] = useState<EmployeeProfile | null>(null);
     const [editingEmployee, setEditingEmployee] = useState<EmployeeProfile | null>(null);
     const [deletingEmployee, setDeletingEmployee] = useState<EmployeeProfile | null>(null);
+    const [confirmExEmployee, setConfirmExEmployee] = useState<EmployeeProfile | null>(null);
+    const [confirmActiveEmployee, setConfirmActiveEmployee] = useState<EmployeeProfile | null>(null);
     const [rejectingDocId, setRejectingDocId] = useState<string | null>(null);
     const [rejectionReason, setRejectionReason] = useState('');
     const [resettingPasswordId, setResettingPasswordId] = useState<string | null>(null);
@@ -144,6 +148,11 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
     // Client-side filtering on the fetched page
     const filteredEmployees = useMemo(() => {
         return employees.filter((emp) => {
+            // Employment status tab filter
+            const empStatus = emp.employmentStatus || (emp.active === false ? 'EX_EMPLOYEE' : 'ACTIVE');
+            if (employmentTab === 'ACTIVE' && empStatus !== 'ACTIVE') return false;
+            if (employmentTab === 'EX_EMPLOYEE' && empStatus !== 'EX_EMPLOYEE') return false;
+
             if (profileFilter !== 'ALL' && emp.profileStatus !== profileFilter) return false;
 
             if (docFilter === 'NONE') {
@@ -157,7 +166,7 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
 
             return true;
         });
-    }, [employees, profileFilter, docFilter, statusFilter]);
+    }, [employees, employmentTab, profileFilter, docFilter, statusFilter]);
 
     // Copy to clipboard helper
     const handleCopy = (text: string) => {
@@ -275,6 +284,41 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
         }
     };
 
+    // Toggle employment status (Mark as Ex-Employee / Mark as Active)
+    const handleConfirmSetEmploymentStatus = async (emp: EmployeeProfile, targetStatus: 'ACTIVE' | 'EX_EMPLOYEE') => {
+        setActionLoading(true);
+        try {
+            const nextActive = targetStatus === 'ACTIVE';
+            await setEmployeeActiveStatus(emp.employeeId, nextActive, targetStatus);
+            setFeedback({
+                type: 'success',
+                text: `Employee ${emp.employeeId} marked as ${targetStatus === 'EX_EMPLOYEE' ? 'Ex-Employee' : 'Active'}.`,
+            });
+            setConfirmExEmployee(null);
+            setConfirmActiveEmployee(null);
+            
+            // Update local state directly & refetch
+            setEmployees((prev) =>
+                prev.map((e) =>
+                    e.employeeId === emp.employeeId
+                        ? { ...e, active: nextActive, employmentStatus: targetStatus }
+                        : e
+                )
+            );
+            if (viewingEmployee?.employeeId === emp.employeeId) {
+                setViewingEmployee((prev) =>
+                    prev ? { ...prev, active: nextActive, employmentStatus: targetStatus } : null
+                );
+            }
+            onEmployeeChange?.();
+            fetchEmployees();
+        } catch (err: unknown) {
+            setFeedback({ type: 'error', text: err instanceof Error ? err.message : 'Failed to update employment status.' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     // Toggle active status
     const handleToggleStatus = async (emp: EmployeeProfile) => {
         const nextActive = emp.active === false ? true : false;
@@ -369,7 +413,9 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
         const submitted = employees.filter((e) => e.profileStatus === 'SUBMITTED').length;
         const incomplete = employees.filter((e) => e.profileStatus === 'INCOMPLETE').length;
         const pendingDoc = employees.filter((e) => e.documentStatus === 'PENDING' && e.aadhaarFileName).length;
-        return { submitted, incomplete, pendingDoc };
+        const activeCount = employees.filter((e) => (e.employmentStatus || (e.active !== false ? 'ACTIVE' : 'EX_EMPLOYEE')) === 'ACTIVE').length;
+        const exCount = employees.filter((e) => (e.employmentStatus || (e.active !== false ? 'ACTIVE' : 'EX_EMPLOYEE')) === 'EX_EMPLOYEE').length;
+        return { submitted, incomplete, pendingDoc, activeCount, exCount };
     }, [employees]);
 
     return (
@@ -479,6 +525,44 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                 ))}
             </div>
 
+            {/* Employment Status Tabs */}
+            <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-900/80 border border-white/[0.08] w-fit">
+                <button
+                    onClick={() => setEmploymentTab('ACTIVE')}
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+                        employmentTab === 'ACTIVE'
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                            : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                    }`}
+                >
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    Active Employees
+                </button>
+
+                <button
+                    onClick={() => setEmploymentTab('EX_EMPLOYEE')}
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+                        employmentTab === 'EX_EMPLOYEE'
+                            ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30'
+                            : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                    }`}
+                >
+                    <span className="w-2 h-2 rounded-full bg-amber-400" />
+                    Ex-Employees
+                </button>
+
+                <button
+                    onClick={() => setEmploymentTab('ALL')}
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+                        employmentTab === 'ALL'
+                            ? 'bg-slate-800 text-white border border-white/[0.1]'
+                            : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                    }`}
+                >
+                    All Employees
+                </button>
+            </div>
+
             {/* Filter & Search Bar */}
             <Card className="border-white/[0.08] bg-white/[0.02] backdrop-blur-xl">
                 <CardContent className="p-4">
@@ -545,6 +629,7 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                                 <th className="p-3.5 sm:p-4">Employee ID</th>
                                 <th className="p-3.5 sm:p-4">Name</th>
                                 <th className="p-3.5 sm:p-4">Mobile</th>
+                                <th className="p-3.5 sm:p-4">Status</th>
                                 <th className="p-3.5 sm:p-4">Profile Status</th>
                                 <th className="p-3.5 sm:p-4">Document Status</th>
                                 <th className="p-3.5 sm:p-4">Account</th>
@@ -554,7 +639,7 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                         <tbody className="divide-y divide-white/[0.05]">
                             {loading && (
                                 <tr>
-                                    <td colSpan={7} className="p-8 text-center text-slate-400">
+                                    <td colSpan={8} className="p-8 text-center text-slate-400">
                                         <div className="flex items-center justify-center gap-2">
                                             <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
                                             <span>Loading employees...</span>
@@ -565,12 +650,12 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
 
                             {!loading && filteredEmployees.length === 0 && (
                                 <tr>
-                                    <td colSpan={7} className="p-8 text-center text-slate-400">
+                                    <td colSpan={8} className="p-8 text-center text-slate-400">
                                         <div className="flex flex-col items-center justify-center gap-2">
                                             <Users className="w-8 h-8 text-slate-600" />
                                             <p className="text-sm font-medium text-slate-300">No employees found</p>
                                             <p className="text-xs text-slate-500">
-                                                Try adjusting your search criteria or add a new employee.
+                                                Try adjusting your search criteria or filter.
                                             </p>
                                         </div>
                                     </td>
@@ -583,6 +668,8 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                                     const hasDoc = Boolean(emp.aadhaarFileName);
                                     const docStatus = emp.documentStatus || 'PENDING';
                                     const isActive = emp.active !== false;
+                                    const empStatus = emp.employmentStatus || (emp.active === false ? 'EX_EMPLOYEE' : 'ACTIVE');
+                                    const isEx = empStatus === 'EX_EMPLOYEE';
 
                                     return (
                                         <tr
@@ -604,6 +691,21 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                                             {/* Mobile */}
                                             <td className="p-3.5 sm:p-4 font-mono text-slate-300 whitespace-nowrap">
                                                 {emp.mobileNumber}
+                                            </td>
+
+                                            {/* Employment Status */}
+                                            <td className="p-3.5 sm:p-4 whitespace-nowrap">
+                                                {isEx ? (
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                                                        Ex-Employee
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                                                        Active
+                                                    </span>
+                                                )}
                                             </td>
 
                                             {/* Profile Status */}
@@ -668,6 +770,29 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                                             {/* Action Buttons */}
                                             <td className="p-3.5 sm:p-4 text-right whitespace-nowrap">
                                                 <div className="flex items-center justify-end gap-1.5">
+                                                    {/* Mark as Ex-Employee / Mark as Active Button */}
+                                                    {isEx ? (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            onClick={() => setConfirmActiveEmployee(emp)}
+                                                            className="h-7 text-[11px] border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 hover:text-white px-2.5 rounded-lg"
+                                                            title="Mark Employee as Active"
+                                                        >
+                                                            Mark as Active
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            onClick={() => setConfirmExEmployee(emp)}
+                                                            className="h-7 text-[11px] border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-white px-2.5 rounded-lg"
+                                                            title="Mark Employee as Ex-Employee"
+                                                        >
+                                                            Mark as Ex-Employee
+                                                        </Button>
+                                                    )}
+
                                                     {/* View */}
                                                     <button
                                                         onClick={() => handleOpenView(emp)}
@@ -1532,6 +1657,139 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                             >
                                 Done
                             </Button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ── Modal: Confirm Mark as Ex-Employee ── */}
+            <AnimatePresence>
+                {confirmExEmployee && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-slate-900 border border-amber-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl relative"
+                        >
+                            <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mx-auto mb-4">
+                                <Power className="w-6 h-6" />
+                            </div>
+
+                            <h3 className="text-lg font-bold text-white text-center mb-2">Mark as Ex-Employee</h3>
+                            <p className="text-xs sm:text-sm text-slate-300 text-center mb-5 leading-relaxed">
+                                You are about to mark{' '}
+                                <strong className="text-white font-mono">{confirmExEmployee.employeeId}</strong> (
+                                <span className="text-slate-100 font-semibold">{confirmExEmployee.name}</span>) as an{' '}
+                                <span className="text-amber-300 font-semibold">Ex-Employee</span>.
+                            </p>
+
+                            <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-xs mb-6 space-y-1.5">
+                                <div className="font-semibold flex items-center gap-1.5 text-amber-300">
+                                    <Shield className="w-4 h-4 text-amber-400" />
+                                    Employee data will NOT be deleted
+                                </div>
+                                <ul className="text-[11px] text-amber-200/80 leading-relaxed pl-5 list-disc space-y-1">
+                                    <li>Their profile and document records are fully preserved.</li>
+                                    <li>They will be moved to the Ex-Employees list.</li>
+                                    <li>They can be reinstated as Active at any time.</li>
+                                    <li>Their account access will be deactivated.</li>
+                                </ul>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-3">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    disabled={actionLoading}
+                                    onClick={() => setConfirmExEmployee(null)}
+                                    className="text-slate-400 hover:text-white text-xs h-10 px-4"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="button"
+                                    onClick={() => handleConfirmSetEmploymentStatus(confirmExEmployee, 'EX_EMPLOYEE')}
+                                    disabled={actionLoading}
+                                    className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-xl h-10 px-5 gap-2 shadow-lg shadow-amber-600/30"
+                                >
+                                    {actionLoading ? (
+                                        <>
+                                            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Processing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Power className="w-3.5 h-3.5" /> Confirm — Mark as Ex-Employee
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ── Modal: Confirm Mark as Active ── */}
+            <AnimatePresence>
+                {confirmActiveEmployee && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-slate-900 border border-emerald-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl relative"
+                        >
+                            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mx-auto mb-4">
+                                <CheckCircle2 className="w-6 h-6" />
+                            </div>
+
+                            <h3 className="text-lg font-bold text-white text-center mb-2">Reinstate as Active Employee</h3>
+                            <p className="text-xs sm:text-sm text-slate-300 text-center mb-5 leading-relaxed">
+                                You are about to reinstate{' '}
+                                <strong className="text-white font-mono">{confirmActiveEmployee.employeeId}</strong> (
+                                <span className="text-slate-100 font-semibold">{confirmActiveEmployee.name}</span>) as an{' '}
+                                <span className="text-emerald-300 font-semibold">Active Employee</span>.
+                            </p>
+
+                            <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-xs mb-6 space-y-1.5">
+                                <div className="font-semibold flex items-center gap-1.5 text-emerald-300">
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                                    Reinstatement Details
+                                </div>
+                                <ul className="text-[11px] text-emerald-200/80 leading-relaxed pl-5 list-disc space-y-1">
+                                    <li>The employee will be moved back to the Active Employees list.</li>
+                                    <li>Their existing profile and documents are unchanged.</li>
+                                    <li>Their account login access will be restored.</li>
+                                </ul>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-3">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    disabled={actionLoading}
+                                    onClick={() => setConfirmActiveEmployee(null)}
+                                    className="text-slate-400 hover:text-white text-xs h-10 px-4"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="button"
+                                    onClick={() => handleConfirmSetEmploymentStatus(confirmActiveEmployee, 'ACTIVE')}
+                                    disabled={actionLoading}
+                                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl h-10 px-5 gap-2 shadow-lg shadow-emerald-600/30"
+                                >
+                                    {actionLoading ? (
+                                        <>
+                                            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Processing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <CheckCircle2 className="w-3.5 h-3.5" /> Confirm — Mark as Active
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
                         </motion.div>
                     </div>
                 )}
