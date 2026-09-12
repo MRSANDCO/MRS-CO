@@ -299,8 +299,17 @@ export default function EmployeeDashboardPage() {
             setToastMessage({ type: 'success', text: 'Document uploaded successfully!' });
             setSelectedFile(null);
             if (fileInputRef.current) fileInputRef.current.value = '';
-            // Refresh profile
-            await fetchProfile();
+            
+            // Update profile document state directly without re-fetching profile and overwriting entered form inputs
+            setProfile((prev) => {
+                if (!prev) return prev;
+                return {
+                    ...prev,
+                    aadhaarFileName: res.fileName || selectedFile.name,
+                    aadhaarFileSize: selectedFile.size,
+                    documentStatus: (res.documentStatus as 'PENDING' | 'VERIFIED' | 'REJECTED') || 'PENDING',
+                };
+            });
         } catch (err: unknown) {
             setDocError(err instanceof Error ? err.message : 'Failed to upload document');
             setToastMessage({ type: 'error', text: 'Document upload failed. Please try again.' });
