@@ -29,6 +29,7 @@ import {
     Search,
     Filter,
     Eye,
+    EyeOff,
     Edit,
     Trash2,
     FileText,
@@ -92,9 +93,13 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
     const [rejectingDocId, setRejectingDocId] = useState<string | null>(null);
     const [rejectingProfileId, setRejectingProfileId] = useState<string | null>(null);
     const [rejectionReason, setRejectionReason] = useState('');
-    const [resettingPasswordId, setResettingPasswordId] = useState<string | null>(null);
-    const [customNewPassword, setCustomNewPassword] = useState('');
-    const [resetResult, setResetResult] = useState<{ employeeId: string; newPassword?: string } | null>(null);
+    // Change password modal state
+    const [changingPasswordEmployee, setChangingPasswordEmployee] = useState<EmployeeProfile | null>(null);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordError, setPasswordError] = useState<string | null>(null);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     // Action loaders
     const [actionLoading, setActionLoading] = useState(false);
@@ -440,24 +445,50 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
         }
     };
 
-    // Reset password
-    const handleConfirmResetPassword = async () => {
-        if (!resettingPasswordId) return;
+    // Change password — open modal helper
+    const openChangePasswordModal = (emp: EmployeeProfile) => {
+        setChangingPasswordEmployee(emp);
+        setNewPassword('');
+        setConfirmPassword('');
+        setPasswordError(null);
+        setShowNewPassword(false);
+        setShowConfirmPassword(false);
+    };
+
+    // Change password — submit handler
+    const handleChangePassword = async () => {
+        if (!changingPasswordEmployee) return;
+
+        // Validate
+        if (!newPassword.trim()) {
+            setPasswordError('Password is required.');
+            return;
+        }
+        if (!confirmPassword.trim()) {
+            setPasswordError('Please confirm the password.');
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            setPasswordError('Passwords do not match.');
+            return;
+        }
+        if (newPassword.trim().length < 6) {
+            setPasswordError('Password must be at least 6 characters.');
+            return;
+        }
+
+        setPasswordError(null);
         setActionLoading(true);
         try {
-            const res = await resetEmployeePassword(
-                resettingPasswordId,
-                customNewPassword.trim() || undefined
-            );
-            setResetResult({
-                employeeId: res.employeeId,
-                newPassword: res.newPassword,
-            });
-            setResettingPasswordId(null);
-            setCustomNewPassword('');
-            setFeedback({ type: 'success', text: `Password for ${res.employeeId} has been reset.` });
+            await resetEmployeePassword(changingPasswordEmployee.employeeId, newPassword.trim());
+            const empName = changingPasswordEmployee.name;
+            const empId = changingPasswordEmployee.employeeId;
+            setChangingPasswordEmployee(null);
+            setNewPassword('');
+            setConfirmPassword('');
+            setFeedback({ type: 'success', text: `Password for ${empName} (${empId}) changed successfully.` });
         } catch (err: unknown) {
-            setFeedback({ type: 'error', text: err instanceof Error ? err.message : 'Failed to reset password.' });
+            setPasswordError(err instanceof Error ? err.message : 'Failed to change password. Please try again.');
         } finally {
             setActionLoading(false);
         }
@@ -925,14 +956,11 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                                                         </button>
                                                     )}
 
-                                                    {/* Reset Password */}
+                                                    {/* Change Password */}
                                                     <button
-                                                        onClick={() => {
-                                                            setResettingPasswordId(emp.employeeId);
-                                                            setCustomNewPassword('');
-                                                        }}
+                                                        onClick={() => openChangePasswordModal(emp)}
                                                         className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-amber-400 hover:text-amber-300 transition-colors"
-                                                        title="Reset Password"
+                                                        title="Change Password"
                                                     >
                                                         <KeyRound className="w-3.5 h-3.5" />
                                                     </button>
@@ -1425,13 +1453,26 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                             </div>
 
                             <div className="flex items-center justify-between pt-6 mt-6 border-t border-white/[0.08]">
-                                <Button
-                                    variant="outline"
-                                    onClick={() => handleOpenEdit(viewingEmployee)}
-                                    className="border-white/[0.1] text-blue-400 hover:text-white gap-1.5 text-xs h-9"
-                                >
-                                    <Edit className="w-3.5 h-3.5" /> Edit Profile
-                                </Button>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => handleOpenEdit(viewingEmployee)}
+                                        className="border-white/[0.1] text-blue-400 hover:text-white gap-1.5 text-xs h-9"
+                                    >
+                                        <Edit className="w-3.5 h-3.5" /> Edit Profile
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            const emp = viewingEmployee;
+                                            setViewingEmployee(null);
+                                            openChangePasswordModal(emp);
+                                        }}
+                                        className="border-amber-500/30 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 gap-1.5 text-xs h-9"
+                                    >
+                                        <KeyRound className="w-3.5 h-3.5" /> Change Password
+                                    </Button>
+                                </div>
 
                                 <Button
                                     variant="ghost"
@@ -1755,111 +1796,132 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                 )}
             </AnimatePresence>
 
-            {/* ── Modal: Reset Password ── */}
+            {/* ── Modal: Change Employee Password ── */}
             <AnimatePresence>
-                {resettingPasswordId && (
+                {changingPasswordEmployee && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-slate-900 border border-white/[0.1] rounded-2xl p-6 max-w-md w-full shadow-2xl"
+                            className="bg-slate-900 border border-white/[0.1] rounded-2xl p-6 max-w-md w-full shadow-2xl relative"
                         >
-                            <div className="flex items-center gap-2.5 mb-3 text-amber-400">
-                                <KeyRound className="w-5 h-5" />
-                                <h3 className="text-base font-bold text-white">Reset Employee Password</h3>
-                            </div>
-
-                            <p className="text-xs text-slate-300 mb-4">
-                                Reset login password for employee <strong>{resettingPasswordId}</strong>.
-                                You may provide a specific password below, or leave it blank to auto-generate a secure temporary password.
-                            </p>
-
-                            <Input
-                                type="text"
-                                placeholder="New password (optional)"
-                                value={customNewPassword}
-                                onChange={(e) => setCustomNewPassword(e.target.value)}
-                                className="h-10 bg-white/[0.04] border-white/[0.1] text-white rounded-xl text-xs mb-5"
-                            />
-
-                            <div className="flex items-center justify-end gap-3">
-                                <Button
+                            {/* Header */}
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2.5 text-amber-400">
+                                    <KeyRound className="w-5 h-5" />
+                                    <h3 className="text-base font-bold text-white">Change Employee Password</h3>
+                                </div>
+                                <button
                                     type="button"
-                                    variant="ghost"
-                                    onClick={() => setResettingPasswordId(null)}
-                                    className="text-slate-400 hover:text-white text-xs"
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    type="button"
-                                    onClick={handleConfirmResetPassword}
+                                    onClick={() => !actionLoading && setChangingPasswordEmployee(null)}
+                                    className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors disabled:opacity-50"
                                     disabled={actionLoading}
-                                    className="bg-amber-600 hover:bg-amber-500 text-white text-xs rounded-xl px-4 font-semibold"
+                                    title="Close"
                                 >
-                                    {actionLoading ? 'Resetting...' : 'Reset Password'}
-                                </Button>
+                                    <X className="w-4 h-4" />
+                                </button>
                             </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
 
-            {/* ── Modal: Reset Password Result ── */}
-            <AnimatePresence>
-                {resetResult && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-slate-900 border border-white/[0.1] rounded-2xl p-6 max-w-md w-full shadow-2xl text-center"
-                        >
-                            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mx-auto mb-3">
-                                <CheckCircle2 className="w-6 h-6" />
+                            {/* Employee info */}
+                            <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/[0.06] mb-5 text-xs space-y-1">
+                                <p className="text-slate-300">
+                                    <span className="text-slate-400">Employee Name: </span>
+                                    <span className="font-semibold text-white">{changingPasswordEmployee.name}</span>
+                                </p>
+                                <p className="text-slate-300">
+                                    <span className="text-slate-400">Employee ID: </span>
+                                    <span className="font-mono font-semibold text-amber-300">{changingPasswordEmployee.employeeId}</span>
+                                </p>
                             </div>
-                            <h3 className="text-base font-bold text-white mb-1">Password Reset Complete</h3>
-                            <p className="text-xs text-slate-400 mb-4">
-                                The new password for <strong>{resetResult.employeeId}</strong> is:
-                            </p>
 
-                            <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-between mb-5">
-                                <span className="font-mono font-bold text-amber-300 text-sm">
-                                    {resetResult.newPassword || 'Updated to custom password'}
-                                </span>
-                                {resetResult.newPassword && (
-                                    <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={() => handleCopy(resetResult.newPassword || '')}
-                                        className="h-7 text-xs text-blue-400 hover:text-blue-300 gap-1"
-                                    >
-                                        {copiedPassword ? (
-                                            <>
-                                                <Check className="w-3 h-3 text-emerald-400" /> Copied
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Copy className="w-3 h-3" /> Copy
-                                            </>
-                                        )}
-                                    </Button>
+                            <form onSubmit={(e) => { e.preventDefault(); handleChangePassword(); }}>
+                                {/* New Password */}
+                                <div className="mb-3">
+                                    <label className="block text-xs font-medium text-slate-300 mb-1.5">New Password</label>
+                                    <div className="relative">
+                                        <Input
+                                            type={showNewPassword ? 'text' : 'password'}
+                                            placeholder="Enter new password"
+                                            value={newPassword}
+                                            onChange={(e) => { setNewPassword(e.target.value); setPasswordError(null); }}
+                                            className="h-10 pr-10 bg-white/[0.04] border-white/[0.1] text-white rounded-xl text-xs"
+                                            disabled={actionLoading}
+                                            autoFocus
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowNewPassword((v) => !v)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+                                            tabIndex={-1}
+                                        >
+                                            {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Confirm Password */}
+                                <div className="mb-4">
+                                    <label className="block text-xs font-medium text-slate-300 mb-1.5">Confirm New Password</label>
+                                    <div className="relative">
+                                        <Input
+                                            type={showConfirmPassword ? 'text' : 'password'}
+                                            placeholder="Re-enter new password"
+                                            value={confirmPassword}
+                                            onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError(null); }}
+                                            className="h-10 pr-10 bg-white/[0.04] border-white/[0.1] text-white rounded-xl text-xs"
+                                            disabled={actionLoading}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword((v) => !v)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+                                            tabIndex={-1}
+                                        >
+                                            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Inline error */}
+                                {passwordError && (
+                                    <div className="flex items-center gap-2 text-rose-400 text-xs mb-4 p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20">
+                                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                        <span>{passwordError}</span>
+                                    </div>
                                 )}
-                            </div>
 
-                            <Button
-                                onClick={() => setResetResult(null)}
-                                className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs h-10"
-                            >
-                                Done
-                            </Button>
+                                {/* Actions */}
+                                <div className="flex items-center justify-end gap-3">
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        onClick={() => setChangingPasswordEmployee(null)}
+                                        disabled={actionLoading}
+                                        className="text-slate-400 hover:text-white text-xs"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        disabled={actionLoading}
+                                        className="bg-amber-600 hover:bg-amber-500 text-white text-xs rounded-xl px-4 font-semibold min-w-[130px]"
+                                    >
+                                        {actionLoading ? (
+                                            <span className="flex items-center gap-1.5">
+                                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                Changing Password...
+                                            </span>
+                                        ) : 'Change Password'}
+                                    </Button>
+                                </div>
+                            </form>
                         </motion.div>
                     </div>
                 )}
             </AnimatePresence>
 
-            {/* ── Modal: Confirm Mark as Ex-Employee ── */}
+                        {/* ── Modal: Confirm Mark as Ex-Employee ── */}
             <AnimatePresence>
                 {confirmExEmployee && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
