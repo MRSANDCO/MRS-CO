@@ -95,7 +95,6 @@ export default function EmployeeDashboardPage() {
     // Feedback messages
     const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-    const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -255,8 +254,12 @@ export default function EmployeeDashboardPage() {
             }
         }
 
-        if (isFullSubmission && !profile?.aadhaarFileName && !selectedFile) {
-            errors.document = 'Aadhaar / ID proof PDF document upload is required before submission';
+        if (isFullSubmission) {
+            if (!profile?.aadhaarFileName) {
+                errors.document = selectedFile
+                    ? 'Please click "Upload Now" to upload your selected Aadhaar document before submitting profile'
+                    : 'Aadhaar / ID proof PDF document must be uploaded before submitting profile';
+            }
         }
 
         setFieldErrors(errors);
@@ -288,7 +291,7 @@ export default function EmployeeDashboardPage() {
         setSelectedFile(file);
     };
 
-    // Upload Document
+    // Upload Document (Works independently — does NOT trigger profile submission)
     const handleUploadDoc = async () => {
         if (!selectedFile) return;
         setUploadingDoc(true);
@@ -296,10 +299,17 @@ export default function EmployeeDashboardPage() {
 
         try {
             const res = await uploadEmployeeDocument(selectedFile);
-            setToastMessage({ type: 'success', text: 'Document uploaded successfully!' });
+            setToastMessage({ type: 'success', text: 'Aadhaar document uploaded successfully!' });
             setSelectedFile(null);
             if (fileInputRef.current) fileInputRef.current.value = '';
-            
+
+            // Clear document validation error
+            setFieldErrors((prev) => {
+                const next = { ...prev };
+                delete next.document;
+                return next;
+            });
+
             // Update profile document state directly without re-fetching profile and overwriting entered form inputs
             setProfile((prev) => {
                 if (!prev) return prev;
@@ -350,19 +360,13 @@ export default function EmployeeDashboardPage() {
         }
     };
 
-    // Execute Submit Profile
+    // Execute Submit Profile (Does NOT trigger file upload; sends complete profile to backend)
     const executeSubmitProfile = async () => {
-        setShowSubmitConfirm(false);
+        if (submitting) return;
         setSubmitting(true);
 
         try {
-            // First upload document if one is selected
-            if (selectedFile) {
-                await uploadEmployeeDocument(selectedFile);
-                setSelectedFile(null);
-            }
-
-            // Save details
+            // Build complete profile payload with all personal & identification information
             const payload: UpdateProfileRequest = {
                 name: formData.name.trim(),
                 fatherName: formData.fatherName.trim(),
@@ -374,19 +378,35 @@ export default function EmployeeDashboardPage() {
                 permanentAddress: formData.permanentAddress.trim(),
                 currentAddress: formData.currentAddress.trim(),
                 resumeGoogleDriveLink: formData.resumeGoogleDriveLink.trim(),
+                aadhaarFileName: profile?.aadhaarFileName,
             };
+
+            // First persist profile details to backend
             await updateEmployeeProfile(payload);
 
-            // Call submit API
-            const res = await submitEmployeeProfile();
-            setProfile(res.profile);
-            updateUser({ profileStatus: 'SUBMITTED' });
+            // Call submit API passing complete profile payload
+            const res = await submitEmployeeProfile(payload);
+
+            // Successfully submitted! Update profile state to SUBMITTED
+            const updatedProfile: EmployeeProfile = res.profile || {
+                ...profile,
+                ...payload,
+                employeeId: profile?.employeeId || user?.employeeId || '',
+                profileStatus: 'SUBMITTED',
+                documentStatus: profile?.documentStatus || 'PENDING',
+            };
+            setProfile(updatedProfile);
+            updateUser({
+                profileStatus: 'SUBMITTED',
+                fullName: updatedProfile.name || user?.fullName,
+            });
 
             setToastMessage({
                 type: 'success',
-                text: 'Profile submitted successfully! Your profile is now locked in read-only mode for administrative verification.',
+                text: res.message || 'Profile submitted successfully! Profile status is now SUBMITTED.',
             });
         } catch (err: unknown) {
+            // Form data remains preserved in formData state on failure!
             setToastMessage({
                 type: 'error',
                 text: err instanceof Error ? err.message : 'Submission failed. Please check your details and try again.',
@@ -396,16 +416,19 @@ export default function EmployeeDashboardPage() {
         }
     };
 
-    const handleSubmitClick = (e: React.FormEvent) => {
+    const handleSubmitClick = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (submitting) return;
+
         if (!validateForm(true)) {
             setToastMessage({
                 type: 'error',
-                text: 'Please complete all required fields and upload your Aadhaar document before submitting.',
+                text: 'Please complete all required fields and ensure your Aadhaar document is uploaded before submitting.',
             });
             return;
         }
-        setShowSubmitConfirm(true);
+
+        await executeSubmitProfile();
     };
 
     // Download / View document
@@ -421,21 +444,38 @@ export default function EmployeeDashboardPage() {
     };
 
     // Profile Status & Document Status badge styling
-    const isSubmitted = profile?.profileStatus === 'SUBMITTED';
+    const isSubmitted = profile?.profileStatus === 'SUBMITTED' || profile?.profileStatus === 'VERIFIED';
 
     const renderProfileStatusBadge = () => {
-        if (isSubmitted) {
+        const status = profile?.profileStatus;
+        if (status === 'SUBMITTED') {
             return (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     <CheckCircle className="w-3.5 h-3.5" />
-                    SUBMITTED (Locked)
+                    Profile Submitted
+                </span>
+            );
+        }
+        if (status === 'VERIFIED') {
+            return (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    Profile Verified
+                </span>
+            );
+        }
+        if (status === 'REJECTED') {
+            return (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    Profile Rejected
                 </span>
             );
         }
         return (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
                 <AlertTriangle className="w-3.5 h-3.5" />
-                INCOMPLETE (Action Required)
+                Draft / Incomplete
             </span>
         );
     };
@@ -905,6 +945,7 @@ export default function EmployeeDashboardPage() {
                         ) : (
                             /* ── CONDITIONAL VIEW: EDITABLE FORM IF INCOMPLETE ── */
                             <motion.form
+                                noValidate
                                 onSubmit={handleSubmitClick}
                                 initial={{ opacity: 0, y: 16 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -1212,7 +1253,6 @@ export default function EmployeeDashboardPage() {
                                                 className="border-2 border-dashed border-white/[0.12] hover:border-blue-500/50 rounded-2xl p-6 text-center cursor-pointer transition-all bg-white/[0.01] hover:bg-blue-500/[0.02]"
                                             >
                                                 <input
-                                                required
                                                     ref={fileInputRef}
                                                     type="file"
                                                     accept="application/pdf"
@@ -1333,50 +1373,6 @@ export default function EmployeeDashboardPage() {
                     </div>
                 )}
             </main>
-
-            {/* ── Confirmation Modal Before Permanent Submission ── */}
-            <AnimatePresence>
-                {showSubmitConfirm && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-slate-900 border border-white/[0.1] rounded-2xl p-6 max-w-md w-full shadow-2xl"
-                        >
-                            <div className="flex items-center gap-3 mb-4 text-amber-400">
-                                <AlertTriangle className="w-6 h-6" />
-                                <h3 className="text-lg font-bold text-white">Confirm Profile Submission</h3>
-                            </div>
-
-                            <p className="text-sm text-slate-300 leading-relaxed mb-6">
-                                Once submitted, your profile will become <strong>permanently locked in read-only mode</strong>.
-                                You will no longer be able to edit your personal details or documents without administrator approval.
-                                <br /><br />
-                                Are you sure all details are accurate and you wish to submit?
-                            </p>
-
-                            <div className="flex items-center justify-end gap-3">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    onClick={() => setShowSubmitConfirm(false)}
-                                    className="text-slate-400 hover:text-white"
-                                >
-                                    Cancel & Review
-                                </Button>
-                                <Button
-                                    type="button"
-                                    onClick={executeSubmitProfile}
-                                    className="bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl px-5"
-                                >
-                                    Yes, Submit Profile
-                                </Button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
         </div>
     );
 }

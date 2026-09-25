@@ -8,8 +8,11 @@ import {
     updateAdminEmployee,
     resetEmployeePassword,
     setEmployeeActiveStatus,
+    markEmployeeAsExEmployee,
     verifyEmployeeDocument,
     rejectEmployeeDocument,
+    verifyEmployeeProfile,
+    rejectEmployeeProfile,
     downloadEmployeeDocument,
     type EmployeeProfile,
     type UpdateProfileRequest,
@@ -44,19 +47,7 @@ import {
     ExternalLink,
 } from 'lucide-react';
 
-function maskAadhaar(aadhaar?: string): string {
-    if (!aadhaar) return 'Not provided';
-    const cleaned = aadhaar.replace(/\D/g, '');
-    if (cleaned.length < 4) return 'XXXX-XXXX-XXXX';
-    return `XXXX-XXXX-${cleaned.slice(-4)}`;
-}
 
-function maskPAN(pan?: string): string {
-    if (!pan) return 'Not provided';
-    const cleaned = pan.trim().toUpperCase();
-    if (cleaned.length < 5) return 'XXXXXXXXXX';
-    return `${cleaned.slice(0, 2)}XXXXXX${cleaned.slice(-2)}`;
-}
 
 interface PageProps {
     params: Promise<{ employeeId: string }>;
@@ -78,6 +69,13 @@ export default function AdminSingleEmployeePage({ params }: PageProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [editFormData, setEditFormData] = useState<UpdateProfileRequest>({});
     const [saving, setSaving] = useState(false);
+
+    // Modals & Action loading
+    const [showExConfirmModal, setShowExConfirmModal] = useState(false);
+    const [showActiveConfirmModal, setShowActiveConfirmModal] = useState(false);
+    const [showRejectProfileModal, setShowRejectProfileModal] = useState(false);
+    const [profileRejectionReason, setProfileRejectionReason] = useState('');
+    const [actionLoading, setActionLoading] = useState(false);
 
     // Document rejection modal
     const [showRejectModal, setShowRejectModal] = useState(false);
@@ -184,9 +182,74 @@ export default function AdminSingleEmployeePage({ params }: PageProps) {
         }
     };
 
+    const handleMarkAsExEmployee = async () => {
+        if (actionLoading) return;
+        setActionLoading(true);
+        try {
+            await markEmployeeAsExEmployee(employeeId);
+            setEmployee((prev) => (prev ? { ...prev, active: false, employmentStatus: 'EX_EMPLOYEE' } : null));
+            setShowExConfirmModal(false);
+            setFeedback({ type: 'success', text: `Employee ${employeeId} marked as Ex-Employee.` });
+            await loadEmployee();
+        } catch (err: unknown) {
+            setFeedback({ type: 'error', text: err instanceof Error ? err.message : 'Failed to mark as ex-employee' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleReinstateActive = async () => {
+        if (actionLoading) return;
+        setActionLoading(true);
+        try {
+            await setEmployeeActiveStatus(employeeId, true, 'ACTIVE');
+            setEmployee((prev) => (prev ? { ...prev, active: true, employmentStatus: 'ACTIVE' } : null));
+            setShowActiveConfirmModal(false);
+            setFeedback({ type: 'success', text: `Employee ${employeeId} reinstated as Active Employee.` });
+            await loadEmployee();
+        } catch (err: unknown) {
+            setFeedback({ type: 'error', text: err instanceof Error ? err.message : 'Failed to reinstate employee' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleVerifyProfile = async () => {
+        if (actionLoading) return;
+        setActionLoading(true);
+        try {
+            await verifyEmployeeProfile(employeeId);
+            setEmployee((prev) => (prev ? { ...prev, profileStatus: 'VERIFIED' } : null));
+            setFeedback({ type: 'success', text: `Profile for employee ${employeeId} verified successfully!` });
+            await loadEmployee();
+        } catch (err: unknown) {
+            setFeedback({ type: 'error', text: err instanceof Error ? err.message : 'Failed to verify profile' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleRejectProfile = async () => {
+        if (actionLoading) return;
+        setActionLoading(true);
+        try {
+            await rejectEmployeeProfile(employeeId, profileRejectionReason.trim());
+            setEmployee((prev) => (prev ? { ...prev, profileStatus: 'REJECTED' } : null));
+            setShowRejectProfileModal(false);
+            setProfileRejectionReason('');
+            setFeedback({ type: 'success', text: `Profile for employee ${employeeId} rejected.` });
+            await loadEmployee();
+        } catch (err: unknown) {
+            setFeedback({ type: 'error', text: err instanceof Error ? err.message : 'Failed to reject profile' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     const handleToggleActive = async () => {
-        if (!employee) return;
+        if (!employee || actionLoading) return;
         const nextActive = employee.active === false ? true : false;
+        setActionLoading(true);
         try {
             await setEmployeeActiveStatus(employeeId, nextActive);
             setEmployee((prev) => (prev ? { ...prev, active: nextActive } : null));
@@ -196,6 +259,8 @@ export default function AdminSingleEmployeePage({ params }: PageProps) {
             });
         } catch (err: unknown) {
             setFeedback({ type: 'error', text: err instanceof Error ? err.message : 'Status change failed' });
+        } finally {
+            setActionLoading(false);
         }
     };
 
@@ -316,6 +381,52 @@ export default function AdminSingleEmployeePage({ params }: PageProps) {
 
                                     {/* Action Bar */}
                                     <div className="flex flex-wrap items-center gap-2">
+                                        {/* Employment Status Action */}
+                                        {employee.employmentStatus === 'EX_EMPLOYEE' ? (
+                                            <Button
+                                                onClick={() => setShowActiveConfirmModal(true)}
+                                                variant="outline"
+                                                className="h-9 px-3 text-xs border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 hover:text-white rounded-xl gap-1.5"
+                                            >
+                                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                                Mark as Active
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                onClick={() => setShowExConfirmModal(true)}
+                                                variant="outline"
+                                                className="h-9 px-3 text-xs border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-white rounded-xl gap-1.5"
+                                            >
+                                                Mark as Ex-Employee
+                                            </Button>
+                                        )}
+
+                                        {/* Profile Verification Actions */}
+                                        {employee.profileStatus === 'SUBMITTED' && (
+                                            <>
+                                                <Button
+                                                    onClick={handleVerifyProfile}
+                                                    disabled={actionLoading}
+                                                    className="h-9 px-3 text-xs bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl gap-1.5"
+                                                >
+                                                    <Check className="w-3.5 h-3.5" />
+                                                    Verify Profile
+                                                </Button>
+                                                <Button
+                                                    onClick={() => {
+                                                        setShowRejectProfileModal(true);
+                                                        setProfileRejectionReason('');
+                                                    }}
+                                                    disabled={actionLoading}
+                                                    variant="destructive"
+                                                    className="h-9 px-3 text-xs rounded-xl gap-1.5"
+                                                >
+                                                    <X className="w-3.5 h-3.5" />
+                                                    Reject Profile
+                                                </Button>
+                                            </>
+                                        )}
+
                                         <Button
                                             onClick={() => setIsEditing(!isEditing)}
                                             variant="outline"
@@ -508,12 +619,12 @@ export default function AdminSingleEmployeePage({ params }: PageProps) {
                                                 <span className="font-mono text-white">{employee.mobileNumber}</span>
                                             </div>
                                             <div className="flex justify-between py-1.5 border-b border-white/[0.04]">
-                                                <span className="text-slate-500">Aadhaar (Masked)</span>
-                                                <span className="font-mono text-cyan-300">{maskAadhaar(employee.aadhaarNumber)}</span>
+                                                <span className="text-slate-500">Aadhaar Number (Complete)</span>
+                                                <span className="font-mono text-cyan-300 font-semibold tracking-wider">{employee.aadhaarNumber || 'Not provided'}</span>
                                             </div>
                                             <div className="flex justify-between py-1.5 border-b border-white/[0.04]">
-                                                <span className="text-slate-500">PAN (Masked)</span>
-                                                <span className="font-mono text-cyan-300">{maskPAN(employee.panNumber)}</span>
+                                                <span className="text-slate-500">PAN Number (Complete)</span>
+                                                <span className="font-mono text-cyan-300 font-semibold tracking-wider">{employee.panNumber || 'Not provided'}</span>
                                             </div>
                                             {employee.resumeGoogleDriveLink && (
                                                 <div className="flex justify-between py-1.5 border-b border-white/[0.04]">
@@ -726,6 +837,112 @@ export default function AdminSingleEmployeePage({ params }: PageProps) {
                         <Button onClick={() => setResetResult(null)} className="w-full bg-blue-600 text-white text-xs h-9">
                             Done
                         </Button>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Modal: Confirm Mark as Ex-Employee ── */}
+            {showExConfirmModal && employee && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+                    <div className="bg-slate-900 border border-amber-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl relative">
+                        <h3 className="text-lg font-bold text-white text-center mb-2">Mark as Ex-Employee</h3>
+                        <p className="text-xs sm:text-sm text-slate-300 text-center mb-5 leading-relaxed">
+                            Are you sure you want to mark this employee as an ex-employee?
+                            <br />
+                            <strong className="text-white font-mono">{employee.employeeId}</strong> (
+                            <span className="text-slate-100 font-semibold">{employee.name}</span>)
+                        </p>
+
+                        <div className="flex items-center justify-end gap-3">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                disabled={actionLoading}
+                                onClick={() => setShowExConfirmModal(false)}
+                                className="text-slate-400 hover:text-white text-xs h-10 px-4"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={handleMarkAsExEmployee}
+                                disabled={actionLoading}
+                                className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-xl h-10 px-5 gap-2 shadow-lg shadow-amber-600/30"
+                            >
+                                {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                                Confirm — Mark as Ex-Employee
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Modal: Confirm Reinstate Active ── */}
+            {showActiveConfirmModal && employee && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+                    <div className="bg-slate-900 border border-emerald-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl relative">
+                        <h3 className="text-lg font-bold text-white text-center mb-2">Reinstate as Active Employee</h3>
+                        <p className="text-xs sm:text-sm text-slate-300 text-center mb-5 leading-relaxed">
+                            Are you sure you want to reinstate employee <strong className="text-white font-mono">{employee.employeeId}</strong> as an Active Employee?
+                        </p>
+
+                        <div className="flex items-center justify-end gap-3">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                disabled={actionLoading}
+                                onClick={() => setShowActiveConfirmModal(false)}
+                                className="text-slate-400 hover:text-white text-xs h-10 px-4"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={handleReinstateActive}
+                                disabled={actionLoading}
+                                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl h-10 px-5 gap-2 shadow-lg shadow-emerald-600/30"
+                            >
+                                {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                                Confirm — Mark as Active
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Modal: Reject Profile Reason ── */}
+            {showRejectProfileModal && employee && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+                    <div className="bg-slate-900 border border-rose-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+                        <h3 className="text-base font-bold text-white mb-2 text-rose-400">Reject Employee Profile</h3>
+                        <p className="text-xs text-slate-300 mb-4">
+                            Provide an optional reason for rejecting the submitted profile for employee <strong className="text-white font-mono">{employee.employeeId}</strong>:
+                        </p>
+                        <textarea
+                            rows={3}
+                            placeholder="Reason for profile rejection..."
+                            value={profileRejectionReason}
+                            onChange={(e) => setProfileRejectionReason(e.target.value)}
+                            className="w-full p-3 bg-white/[0.04] border border-white/[0.1] text-white rounded-xl text-xs mb-4 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                        />
+                        <div className="flex justify-end gap-3">
+                            <Button
+                                variant="ghost"
+                                disabled={actionLoading}
+                                onClick={() => setShowRejectProfileModal(false)}
+                                className="text-xs text-slate-400 hover:text-white"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={handleRejectProfile}
+                                disabled={actionLoading}
+                                className="bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-xl"
+                            >
+                                {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                                Reject Profile
+                            </Button>
+                        </div>
                     </div>
                 </div>
             )}

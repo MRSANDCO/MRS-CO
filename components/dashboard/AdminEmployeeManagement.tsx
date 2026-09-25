@@ -12,8 +12,11 @@ import {
     updateAdminEmployee,
     resetEmployeePassword,
     setEmployeeActiveStatus,
+    markEmployeeAsExEmployee,
     verifyEmployeeDocument,
     rejectEmployeeDocument,
+    verifyEmployeeProfile,
+    rejectEmployeeProfile,
     downloadEmployeeDocument,
     deleteAdminEmployee,
     type EmployeeProfile,
@@ -52,19 +55,7 @@ import {
     ExternalLink,
 } from 'lucide-react';
 
-function maskAadhaar(aadhaar?: string): string {
-    if (!aadhaar) return 'Not provided';
-    const cleaned = aadhaar.replace(/\D/g, '');
-    if (cleaned.length < 4) return 'XXXX-XXXX-XXXX';
-    return `XXXX-XXXX-${cleaned.slice(-4)}`;
-}
 
-function maskPAN(pan?: string): string {
-    if (!pan) return 'Not provided';
-    const cleaned = pan.trim().toUpperCase();
-    if (cleaned.length < 5) return 'XXXXXXXXXX';
-    return `${cleaned.slice(0, 2)}XXXXXX${cleaned.slice(-2)}`;
-}
 
 export interface AdminEmployeeManagementProps {
     onEmployeeChange?: () => void;
@@ -78,7 +69,7 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
     const [searchQuery, setSearchQuery] = useState('');
     // Filter state
     const [employmentTab, setEmploymentTab] = useState<'ALL' | 'ACTIVE' | 'EX_EMPLOYEE'>('ACTIVE');
-    const [profileFilter, setProfileFilter] = useState<'ALL' | 'INCOMPLETE' | 'SUBMITTED'>('ALL');
+    const [profileFilter, setProfileFilter] = useState<'ALL' | 'INCOMPLETE' | 'SUBMITTED' | 'VERIFIED' | 'REJECTED'>('ALL');
     const [docFilter, setDocFilter] = useState<'ALL' | 'PENDING' | 'VERIFIED' | 'REJECTED' | 'NONE'>('ALL');
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
     const [page, setPage] = useState(0);
@@ -99,6 +90,7 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
     const [confirmExEmployee, setConfirmExEmployee] = useState<EmployeeProfile | null>(null);
     const [confirmActiveEmployee, setConfirmActiveEmployee] = useState<EmployeeProfile | null>(null);
     const [rejectingDocId, setRejectingDocId] = useState<string | null>(null);
+    const [rejectingProfileId, setRejectingProfileId] = useState<string | null>(null);
     const [rejectionReason, setRejectionReason] = useState('');
     const [resettingPasswordId, setResettingPasswordId] = useState<string | null>(null);
     const [customNewPassword, setCustomNewPassword] = useState('');
@@ -119,11 +111,15 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
     // Edit employee form state
     const [editFormData, setEditFormData] = useState<UpdateProfileRequest>({});
 
-    const fetchEmployees = async (searchTerm = searchQuery, pageNum = page) => {
+    const fetchEmployees = async (
+        searchTerm = searchQuery,
+        pageNum = page,
+        empStatusTab = employmentTab
+    ) => {
         setLoading(true);
         setError(null);
         try {
-            const data = await getAdminEmployees(searchTerm, pageNum, 20);
+            const data = await getAdminEmployees(searchTerm, pageNum, 20, empStatusTab);
             setEmployees(data.content || []);
             setTotalPages(data.totalPages || 1);
             setTotalElements(data.totalElements || 0);
@@ -135,25 +131,38 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
     };
 
     useEffect(() => {
-        fetchEmployees(searchQuery, page);
+        fetchEmployees(searchQuery, page, employmentTab);
     }, [page]);
+
+    useEffect(() => {
+        setPage(0);
+        fetchEmployees(searchQuery, 0, employmentTab);
+    }, [employmentTab]);
 
     // Handle search submit or debounce
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setPage(0);
-        fetchEmployees(searchQuery, 0);
+        fetchEmployees(searchQuery, 0, employmentTab);
     };
 
     // Client-side filtering on the fetched page
     const filteredEmployees = useMemo(() => {
         return employees.filter((emp) => {
             // Employment status tab filter
-            const empStatus = emp.employmentStatus || (emp.active === false ? 'EX_EMPLOYEE' : 'ACTIVE');
-            if (employmentTab === 'ACTIVE' && empStatus !== 'ACTIVE') return false;
-            if (employmentTab === 'EX_EMPLOYEE' && empStatus !== 'EX_EMPLOYEE') return false;
+            const rawStatus = (emp.employmentStatus || (emp as any).status || '').toUpperCase().trim();
+            const isEx = rawStatus === 'EX_EMPLOYEE' || (rawStatus !== 'ACTIVE' && emp.active === false);
 
-            if (profileFilter !== 'ALL' && emp.profileStatus !== profileFilter) return false;
+            if (employmentTab === 'ACTIVE' && isEx) return false;
+            if (employmentTab === 'EX_EMPLOYEE' && !isEx) return false;
+
+            if (profileFilter !== 'ALL') {
+                if (profileFilter === 'INCOMPLETE') {
+                    if (emp.profileStatus !== 'INCOMPLETE' && emp.profileStatus !== 'DRAFT') return false;
+                } else {
+                    if (emp.profileStatus !== profileFilter) return false;
+                }
+            }
 
             if (docFilter === 'NONE') {
                 if (emp.aadhaarFileName) return false;
@@ -286,34 +295,89 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
 
     // Toggle employment status (Mark as Ex-Employee / Mark as Active)
     const handleConfirmSetEmploymentStatus = async (emp: EmployeeProfile, targetStatus: 'ACTIVE' | 'EX_EMPLOYEE') => {
+        if (actionLoading) return;
         setActionLoading(true);
         try {
             const nextActive = targetStatus === 'ACTIVE';
-            await setEmployeeActiveStatus(emp.employeeId, nextActive, targetStatus);
+            if (targetStatus === 'EX_EMPLOYEE') {
+                await markEmployeeAsExEmployee(emp.employeeId);
+            } else {
+                await setEmployeeActiveStatus(emp.employeeId, true, 'ACTIVE');
+            }
+
             setFeedback({
                 type: 'success',
                 text: `Employee ${emp.employeeId} marked as ${targetStatus === 'EX_EMPLOYEE' ? 'Ex-Employee' : 'Active'}.`,
             });
             setConfirmExEmployee(null);
             setConfirmActiveEmployee(null);
-            
-            // Update local state directly & refetch
-            setEmployees((prev) =>
-                prev.map((e) =>
-                    e.employeeId === emp.employeeId
-                        ? { ...e, active: nextActive, employmentStatus: targetStatus }
-                        : e
-                )
-            );
+
+            // Update local state directly: remove from list if on opposing filter tab
+            setEmployees((prev) => {
+                if (employmentTab === 'ACTIVE' && targetStatus === 'EX_EMPLOYEE') {
+                    return prev.filter((e) => e.employeeId !== emp.employeeId);
+                } else if (employmentTab === 'EX_EMPLOYEE' && targetStatus === 'ACTIVE') {
+                    return prev.filter((e) => e.employeeId !== emp.employeeId);
+                } else {
+                    return prev.map((e) =>
+                        e.employeeId === emp.employeeId
+                            ? { ...e, active: nextActive, employmentStatus: targetStatus }
+                            : e
+                    );
+                }
+            });
+
             if (viewingEmployee?.employeeId === emp.employeeId) {
                 setViewingEmployee((prev) =>
                     prev ? { ...prev, active: nextActive, employmentStatus: targetStatus } : null
                 );
             }
+
             onEmployeeChange?.();
-            fetchEmployees();
+            await fetchEmployees(searchQuery, page, employmentTab);
         } catch (err: unknown) {
             setFeedback({ type: 'error', text: err instanceof Error ? err.message : 'Failed to update employment status.' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    // Verify profile
+    const handleVerifyProfile = async (employeeId: string) => {
+        setActionLoading(true);
+        try {
+            await verifyEmployeeProfile(employeeId);
+            setFeedback({ type: 'success', text: `Profile for employee ${employeeId} verified successfully!` });
+            await fetchEmployees(searchQuery, page, employmentTab);
+            if (viewingEmployee?.employeeId === employeeId) {
+                setViewingEmployee((prev) => (prev ? { ...prev, profileStatus: 'VERIFIED' } : null));
+            }
+        } catch (err: unknown) {
+            setFeedback({ type: 'error', text: err instanceof Error ? err.message : 'Failed to verify profile.' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    // Reject profile
+    const handleConfirmRejectProfile = async () => {
+        if (!rejectingProfileId) return;
+        setActionLoading(true);
+        try {
+            await rejectEmployeeProfile(rejectingProfileId, rejectionReason.trim());
+            setFeedback({ type: 'success', text: `Profile for employee ${rejectingProfileId} rejected.` });
+            setRejectingProfileId(null);
+            setRejectionReason('');
+            await fetchEmployees(searchQuery, page, employmentTab);
+            if (viewingEmployee?.employeeId === rejectingProfileId) {
+                setViewingEmployee((prev) =>
+                    prev
+                        ? { ...prev, profileStatus: 'REJECTED', documentRejectionReason: rejectionReason.trim() }
+                        : null
+                );
+            }
+        } catch (err: unknown) {
+            setFeedback({ type: 'error', text: err instanceof Error ? err.message : 'Failed to reject profile.' });
         } finally {
             setActionLoading(false);
         }
@@ -588,8 +652,10 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                                 className="h-10 px-3 bg-slate-900 border border-white/[0.1] text-slate-300 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
                             >
                                 <option value="ALL">Profile: All</option>
-                                <option value="SUBMITTED">Profile: Submitted</option>
-                                <option value="INCOMPLETE">Profile: Incomplete</option>
+                                <option value="SUBMITTED">Profile: Submitted (Review)</option>
+                                <option value="VERIFIED">Profile: Verified</option>
+                                <option value="REJECTED">Profile: Rejected</option>
+                                <option value="INCOMPLETE">Profile: Incomplete / Draft</option>
                             </select>
 
                             {/* Document status filter */}
@@ -710,15 +776,25 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
 
                                             {/* Profile Status */}
                                             <td className="p-3.5 sm:p-4 whitespace-nowrap">
-                                                {isSub ? (
+                                                {emp.profileStatus === 'VERIFIED' ? (
                                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                                         <CheckCircle2 className="w-3 h-3" />
-                                                        Submitted
+                                                        Verified
+                                                    </span>
+                                                ) : emp.profileStatus === 'SUBMITTED' ? (
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                        <Clock className="w-3 h-3" />
+                                                        Submitted (Review)
+                                                    </span>
+                                                ) : emp.profileStatus === 'REJECTED' ? (
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                                        <XCircle className="w-3 h-3" />
+                                                        Rejected
                                                     </span>
                                                 ) : (
                                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
                                                         <Clock className="w-3 h-3" />
-                                                        Incomplete
+                                                        Incomplete / Draft
                                                     </span>
                                                 )}
                                             </td>
@@ -1150,21 +1226,27 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="text-slate-500 block mb-1">Aadhaar Number</span>
-                                            <span className="font-mono text-cyan-300">
-                                                {maskAadhaar(viewingEmployee.aadhaarNumber)}
+                                            <span className="text-slate-500 block mb-1">Aadhaar Number (Complete)</span>
+                                            <span className="font-mono text-cyan-300 font-semibold tracking-wider">
+                                                {viewingEmployee.aadhaarNumber || 'Not provided'}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="text-slate-500 block mb-1">PAN Number</span>
-                                            <span className="font-mono text-cyan-300">
-                                                {maskPAN(viewingEmployee.panNumber)}
+                                            <span className="text-slate-500 block mb-1">PAN Number (Complete)</span>
+                                            <span className="font-mono text-cyan-300 font-semibold tracking-wider">
+                                                {viewingEmployee.panNumber || 'Not provided'}
                                             </span>
                                         </div>
                                         <div>
                                             <span className="text-slate-500 block mb-1">Father&apos;s Mobile</span>
                                             <span className="font-mono text-white">
                                                 {viewingEmployee.fatherMobileNumber || '—'}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span className="text-slate-500 block mb-1">Employment Status</span>
+                                            <span className={viewingEmployee.employmentStatus === 'EX_EMPLOYEE' ? 'text-amber-400 font-semibold' : 'text-emerald-400 font-semibold'}>
+                                                {viewingEmployee.employmentStatus === 'EX_EMPLOYEE' ? 'Ex-Employee' : 'Active Employee'}
                                             </span>
                                         </div>
                                         <div>
@@ -1276,6 +1358,68 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                                         ) : (
                                             <p className="text-slate-500">No document uploaded by this employee yet.</p>
                                         )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                                        Profile Verification
+                                    </h4>
+                                    <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                        <div>
+                                            <span className="text-slate-400 block mb-1">Profile Verification Status</span>
+                                            <div>
+                                                {viewingEmployee.profileStatus === 'VERIFIED' ? (
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                        <CheckCircle2 className="w-3 h-3" />
+                                                        Verified
+                                                    </span>
+                                                ) : viewingEmployee.profileStatus === 'SUBMITTED' ? (
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                        <Clock className="w-3 h-3" />
+                                                        Submitted (Needs Verification)
+                                                    </span>
+                                                ) : viewingEmployee.profileStatus === 'REJECTED' ? (
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                                        <XCircle className="w-3 h-3" />
+                                                        Rejected
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                        <Clock className="w-3 h-3" />
+                                                        Draft / Incomplete
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            {viewingEmployee.profileStatus !== 'VERIFIED' && (
+                                                <Button
+                                                    size="sm"
+                                                    disabled={actionLoading}
+                                                    onClick={() => handleVerifyProfile(viewingEmployee.employeeId)}
+                                                    className="h-8 text-xs bg-emerald-600 hover:bg-emerald-500 text-white gap-1.5"
+                                                >
+                                                    <Check className="w-3.5 h-3.5" /> Verify Profile
+                                                </Button>
+                                            )}
+
+                                            {viewingEmployee.profileStatus !== 'REJECTED' && (
+                                                <Button
+                                                    size="sm"
+                                                    disabled={actionLoading}
+                                                    variant="destructive"
+                                                    onClick={() => {
+                                                        setRejectingProfileId(viewingEmployee.employeeId);
+                                                        setRejectionReason('');
+                                                    }}
+                                                    className="h-8 text-xs gap-1.5"
+                                                >
+                                                    <X className="w-3.5 h-3.5" /> Reject Profile
+                                                </Button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1551,6 +1695,59 @@ export function AdminEmployeeManagement({ onEmployeeChange }: AdminEmployeeManag
                                     className="bg-rose-600 hover:bg-rose-500 text-white text-xs rounded-xl px-4"
                                 >
                                     {actionLoading ? 'Rejecting...' : 'Reject Document'}
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ── Modal: Profile Rejection Reason ── */}
+            <AnimatePresence>
+                {rejectingProfileId && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-slate-900 border border-rose-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl"
+                        >
+                            <div className="flex items-center gap-2.5 mb-3 text-rose-400">
+                                <XCircle className="w-5 h-5" />
+                                <h3 className="text-base font-bold text-white">Reject Employee Profile</h3>
+                            </div>
+
+                            <p className="text-xs text-slate-300 mb-4">
+                                Provide an optional rejection reason for employee <strong>{rejectingProfileId}</strong>.
+                            </p>
+
+                            <textarea
+                                rows={3}
+                                placeholder="E.g. Incomplete address, PAN mismatch, invalid details..."
+                                value={rejectionReason}
+                                onChange={(e) => setRejectionReason(e.target.value)}
+                                className="w-full p-3 bg-white/[0.04] border border-white/[0.1] text-white placeholder:text-slate-600 rounded-xl text-xs mb-5"
+                            />
+
+                            <div className="flex items-center justify-end gap-3">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() => {
+                                        setRejectingProfileId(null);
+                                        setRejectionReason('');
+                                    }}
+                                    className="text-slate-400 hover:text-white text-xs"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="button"
+                                    onClick={handleConfirmRejectProfile}
+                                    disabled={actionLoading}
+                                    className="bg-rose-600 hover:bg-rose-500 text-white text-xs rounded-xl px-4"
+                                >
+                                    {actionLoading ? 'Rejecting...' : 'Reject Profile'}
                                 </Button>
                             </div>
                         </motion.div>

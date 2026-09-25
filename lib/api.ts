@@ -274,7 +274,7 @@ export async function downloadDocument(documentId: string, fallbackFileName = 'd
 
 // ===================== Employee Management Types =====================
 
-export type ProfileStatus = 'INCOMPLETE' | 'SUBMITTED';
+export type ProfileStatus = 'INCOMPLETE' | 'DRAFT' | 'SUBMITTED' | 'VERIFIED' | 'REJECTED';
 export type DocumentVerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
 export type EmploymentStatus = 'ACTIVE' | 'EX_EMPLOYEE';
 
@@ -314,6 +314,8 @@ export interface UpdateProfileRequest {
     permanentAddress?: string;
     currentAddress?: string;
     resumeGoogleDriveLink?: string;
+    aadhaarFileName?: string;
+    email?: string;
 }
 
 export interface CreateEmployeeRequest {
@@ -382,10 +384,11 @@ export async function updateEmployeeProfile(data: UpdateProfileRequest): Promise
     return handleResponse<{ message: string; profile: EmployeeProfile }>(res);
 }
 
-export async function submitEmployeeProfile(): Promise<{ message: string; profileStatus: string; profile: EmployeeProfile }> {
+export async function submitEmployeeProfile(data?: UpdateProfileRequest): Promise<{ message: string; profileStatus: string; profile: EmployeeProfile }> {
     const res = await fetch(`${BACKEND_DIRECT}/employee/profile/submit`, {
         method: 'POST',
-        headers: authHeaders(),
+        headers: authHeaders(data ? { 'Content-Type': 'application/json' } : {}),
+        body: data ? JSON.stringify(data) : undefined,
     });
     return handleResponse<{ message: string; profileStatus: string; profile: EmployeeProfile }>(res);
 }
@@ -454,11 +457,20 @@ export async function createAdminEmployee(data: CreateEmployeeRequest): Promise<
     return handleResponse<CreateEmployeeResponse>(res);
 }
 
-export async function getAdminEmployees(search = '', page = 0, size = 20): Promise<PageResponse<EmployeeProfile>> {
+export async function getAdminEmployees(
+    search = '',
+    page = 0,
+    size = 20,
+    employmentStatus?: 'ACTIVE' | 'EX_EMPLOYEE' | 'ALL'
+): Promise<PageResponse<EmployeeProfile>> {
     const params = new URLSearchParams();
     if (search) params.append('search', search);
     params.append('page', String(page));
     params.append('size', String(size));
+    if (employmentStatus && employmentStatus !== 'ALL') {
+        params.append('employmentStatus', employmentStatus);
+        params.append('status', employmentStatus);
+    }
 
     const res = await fetch(`${BACKEND_DIRECT}/admin/employees?${params.toString()}`, {
         headers: authHeaders(),
@@ -495,13 +507,87 @@ export async function setEmployeeActiveStatus(
     employeeId: string,
     active: boolean,
     employmentStatus?: EmploymentStatus
-): Promise<{ message: string; employeeId: string; active: boolean; employmentStatus?: EmploymentStatus }> {
+): Promise<{ message: string; employeeId: string; active: boolean; employmentStatus?: EmploymentStatus; employee?: EmployeeProfile }> {
+    const statusVal = employmentStatus || (active ? 'ACTIVE' : 'EX_EMPLOYEE');
+
+    // If changing employmentStatus, try PATCH /employment-status first
+    if (employmentStatus) {
+        try {
+            const statusRes = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/employment-status`, {
+                method: 'PATCH',
+                headers: authHeaders({ 'Content-Type': 'application/json' }),
+                body: JSON.stringify({ employmentStatus: statusVal }),
+            });
+            if (statusRes.ok) {
+                return await handleResponse(statusRes);
+            }
+        } catch {
+            // Fallback to /status endpoint below
+        }
+    }
+
     const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/status`, {
         method: 'PATCH',
         headers: authHeaders({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify({ active, ...(employmentStatus ? { employmentStatus } : {}) }),
+        body: JSON.stringify({ active, employmentStatus: statusVal, status: statusVal }),
     });
-    return handleResponse<{ message: string; employeeId: string; active: boolean; employmentStatus?: EmploymentStatus }>(res);
+    return handleResponse<{ message: string; employeeId: string; active: boolean; employmentStatus?: EmploymentStatus; employee?: EmployeeProfile }>(res);
+}
+
+export async function markEmployeeAsExEmployee(
+    employeeId: string
+): Promise<{ message: string; employeeId: string; active?: boolean; employmentStatus?: EmploymentStatus; employee?: EmployeeProfile }> {
+    // 1. Try dedicated shorthand endpoint POST /admin/employees/{employeeId}/mark-ex-employee
+    try {
+        const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/mark-ex-employee`, {
+            method: 'POST',
+            headers: authHeaders(),
+        });
+        if (res.ok) {
+            return await handleResponse(res);
+        }
+    } catch {
+        // Fallback to next options
+    }
+
+    // 2. Fallback to PATCH /admin/employees/{employeeId}/employment-status
+    try {
+        const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/employment-status`, {
+            method: 'PATCH',
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ employmentStatus: 'EX_EMPLOYEE' }),
+        });
+        if (res.ok) {
+            return await handleResponse(res);
+        }
+    } catch {
+        // Fallback to /status
+    }
+
+    // 3. Fallback to PATCH /admin/employees/{employeeId}/status
+    const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/status`, {
+        method: 'PATCH',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ active: false, employmentStatus: 'EX_EMPLOYEE', status: 'EX_EMPLOYEE' }),
+    });
+    return handleResponse(res);
+}
+
+export async function verifyEmployeeProfile(employeeId: string): Promise<{ message: string; employeeId: string; profileStatus: string; employee?: EmployeeProfile }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/profile/verify`, {
+        method: 'POST',
+        headers: authHeaders(),
+    });
+    return handleResponse<{ message: string; employeeId: string; profileStatus: string; employee?: EmployeeProfile }>(res);
+}
+
+export async function rejectEmployeeProfile(employeeId: string, reason?: string): Promise<{ message: string; employeeId: string; profileStatus: string; rejectionReason?: string; employee?: EmployeeProfile }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/employees/${encodeURIComponent(employeeId)}/profile/reject`, {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(reason ? { reason } : {}),
+    });
+    return handleResponse<{ message: string; employeeId: string; profileStatus: string; rejectionReason?: string; employee?: EmployeeProfile }>(res);
 }
 
 export async function verifyEmployeeDocument(employeeId: string): Promise<{ message: string; employeeId: string; documentStatus: string }> {
