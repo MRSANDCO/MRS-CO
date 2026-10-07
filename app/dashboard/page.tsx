@@ -380,12 +380,10 @@ export default function DashboardPage() {
 
             const allUsers = allUsersRes.status === 'fulfilled' ? allUsersRes.value : [];
             const employeeIds = new Set<string>();
-            const employeeMobiles = new Set<string>();
 
             if (employeesRes.status === 'fulfilled' && employeesRes.value?.content) {
                 for (const emp of employeesRes.value.content) {
                     if (emp.employeeId) employeeIds.add(emp.employeeId.toLowerCase().trim());
-                    if (emp.mobileNumber) employeeMobiles.add(emp.mobileNumber.trim());
                 }
             }
 
@@ -394,12 +392,10 @@ export default function DashboardPage() {
                 const uid = (u.userId || '').toLowerCase().trim();
                 const uRole = (u.role || (u as any).userType || '').toLowerCase().trim();
                 const uEmpId = ((u as any).employeeId || '').toLowerCase().trim();
-                const uPhone = (u.phone || '').trim();
 
                 if (uRole.includes('employee') || uRole.includes('admin')) return false;
                 if (uEmpId) return false;
                 if (employeeIds.has(uid) || (uEmpId && employeeIds.has(uEmpId))) return false;
-                if (uPhone && employeeMobiles.has(uPhone)) return false;
                 if (uid.startsWith('emp') || uid.startsWith('admin')) return false;
 
                 return true;
