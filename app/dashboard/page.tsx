@@ -74,6 +74,7 @@ import {
     Search,
     Filter,
     Crown,
+    Cake,
 } from 'lucide-react';
 import Link from 'next/link';
 import { CardTilt3D } from '@/components/dashboard/CardTilt3D';
@@ -215,10 +216,11 @@ export default function DashboardPage() {
         companyName: '',
         contactPersonName: '',
         formationDate: '',
+        dateOfBirth: '',
         anniversaryAutomationEnabled: false,
         whatsappConsentGiven: false,
     });
-    const [clientTypeFilter, setClientTypeFilter] = useState<'ALL' | 'COMPANY' | 'INDIVIDUAL' | 'UNVERIFIED'>('ALL');
+    const [clientTypeFilter, setClientTypeFilter] = useState<'ALL' | 'COMPANY' | 'INDIVIDUAL'>('ALL');
     const [clientSearchQuery, setClientSearchQuery] = useState('');
 
     // ── Admin: drive links ──
@@ -298,6 +300,7 @@ export default function DashboardPage() {
     const [editCompanyName, setEditCompanyName] = useState('');
     const [editContactPersonName, setEditContactPersonName] = useState('');
     const [editFormationDate, setEditFormationDate] = useState('');
+    const [editDateOfBirth, setEditDateOfBirth] = useState('');
     const [editAnniversaryAutomationEnabled, setEditAnniversaryAutomationEnabled] = useState(false);
     const [editWhatsappConsentGiven, setEditWhatsappConsentGiven] = useState(false);
     const [editError, setEditError] = useState('');
@@ -514,19 +517,20 @@ export default function DashboardPage() {
                 email: newUser.email?.trim() || undefined,
                 phone: newUser.phone?.trim() || undefined,
                 clientType: currentType,
-                whatsappConsentGiven: !!newUser.whatsappConsentGiven,
             };
 
             if (currentType === 'COMPANY') {
                 payload.companyName = newUser.companyName?.trim() || undefined;
                 payload.contactPersonName = newUser.contactPersonName?.trim() || undefined;
                 payload.formationDate = newUser.formationDate || undefined;
+                payload.dateOfBirth = undefined;
                 payload.anniversaryAutomationEnabled = !!newUser.anniversaryAutomationEnabled;
             } else {
-                // Individual clients do not have company fields or anniversary automation
+                // Individual clients have date of birth, no company formation
                 payload.companyName = undefined;
                 payload.contactPersonName = undefined;
                 payload.formationDate = undefined;
+                payload.dateOfBirth = newUser.dateOfBirth || undefined;
                 payload.anniversaryAutomationEnabled = false;
             }
 
@@ -543,6 +547,7 @@ export default function DashboardPage() {
                 companyName: '',
                 contactPersonName: '',
                 formationDate: '',
+                dateOfBirth: '',
                 anniversaryAutomationEnabled: false,
                 whatsappConsentGiven: false,
             });
@@ -757,26 +762,27 @@ export default function DashboardPage() {
                 companyName?: string;
                 contactPersonName?: string;
                 formationDate?: string;
+                dateOfBirth?: string;
                 anniversaryAutomationEnabled?: boolean;
-                whatsappConsentGiven?: boolean;
             } = {
                 fullName: editFullName.trim() || undefined,
                 email: editEmail.trim() || undefined,
                 phone: editPhone.trim() || undefined,
                 clientType: editClientType,
-                whatsappConsentGiven: editWhatsappConsentGiven,
             };
 
             if (editClientType === 'COMPANY') {
                 updatePayload.companyName = editCompanyName.trim() || undefined;
                 updatePayload.contactPersonName = editContactPersonName.trim() || undefined;
                 updatePayload.formationDate = editFormationDate || undefined;
+                updatePayload.dateOfBirth = undefined;
                 updatePayload.anniversaryAutomationEnabled = editAnniversaryAutomationEnabled;
             } else {
-                // For individual clients, clear company fields and ensure anniversary greetings are disabled
+                // For individual clients, set date of birth and clear company fields
                 updatePayload.companyName = undefined;
                 updatePayload.contactPersonName = undefined;
                 updatePayload.formationDate = undefined;
+                updatePayload.dateOfBirth = editDateOfBirth || undefined;
                 updatePayload.anniversaryAutomationEnabled = false;
             }
 
@@ -1209,21 +1215,16 @@ export default function DashboardPage() {
                                                             className="pl-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-purple-500/50" />
                                                     </div>
                                                 </Field>
-                                            </div>
-
-                                            <div className="pt-1">
-                                                <label className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] cursor-pointer hover:bg-white/[0.04] transition-colors">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={!!newUser.whatsappConsentGiven}
-                                                        onChange={e => setNewUser({ ...newUser, whatsappConsentGiven: e.target.checked })}
-                                                        className="mt-0.5 rounded border-white/20 bg-white/10 text-emerald-500 focus:ring-0"
-                                                    />
-                                                    <div>
-                                                        <div className="text-xs font-semibold text-white">WhatsApp communication consent confirmed</div>
-                                                        <p className="text-[11px] text-slate-400 mt-0.5">Client has given consent to receive service updates, query replies, and tax notifications via WhatsApp.</p>
+                                                <Field label="Date of Birth">
+                                                    <div className="relative">
+                                                        <Input type="date" value={newUser.dateOfBirth || ''}
+                                                            onChange={e => setNewUser({ ...newUser, dateOfBirth: e.target.value })}
+                                                            className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-purple-500/50" />
                                                     </div>
-                                                </label>
+                                                    <p className="text-[11px] text-slate-500 mt-1">
+                                                        Used for automated WhatsApp birthday greetings on the matching date.
+                                                    </p>
+                                                </Field>
                                             </div>
                                         </div>
                                     ) : (
@@ -1266,45 +1267,9 @@ export default function DashboardPage() {
                                                             className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50" />
                                                     </div>
                                                     <p className="text-[11px] text-slate-500 mt-1">
-                                                        The company will receive an annual WhatsApp greeting on the anniversary of this date, subject to eligibility and consent.
+                                                        The company will receive an annual WhatsApp greeting on the anniversary of this date.
                                                     </p>
                                                 </Field>
-                                            </div>
-
-                                            {/* Anniversary Automation Toggles */}
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                                                <label className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] cursor-pointer hover:bg-white/[0.04] transition-colors">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={!!newUser.anniversaryAutomationEnabled}
-                                                        onChange={e => {
-                                                            if (e.target.checked && !newUser.formationDate) {
-                                                                setCreateError('Please enter a Company Formation Date before enabling automated greetings.');
-                                                                return;
-                                                            }
-                                                            setCreateError('');
-                                                            setNewUser({ ...newUser, anniversaryAutomationEnabled: e.target.checked });
-                                                        }}
-                                                        className="mt-0.5 rounded border-white/20 bg-white/10 text-pink-500 focus:ring-0"
-                                                    />
-                                                    <div>
-                                                        <div className="text-xs font-semibold text-white">Enable automatic anniversary greetings</div>
-                                                        <p className="text-[11px] text-slate-400 mt-0.5">Send automated WhatsApp greetings annually on company formation date.</p>
-                                                    </div>
-                                                </label>
-
-                                                <label className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] cursor-pointer hover:bg-white/[0.04] transition-colors">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={!!newUser.whatsappConsentGiven}
-                                                        onChange={e => setNewUser({ ...newUser, whatsappConsentGiven: e.target.checked })}
-                                                        className="mt-0.5 rounded border-white/20 bg-white/10 text-emerald-500 focus:ring-0"
-                                                    />
-                                                    <div>
-                                                        <div className="text-xs font-semibold text-white">WhatsApp greeting consent confirmed</div>
-                                                        <p className="text-[11px] text-slate-400 mt-0.5">Client has given consent to receive greetings via WhatsApp.</p>
-                                                    </div>
-                                                </label>
                                             </div>
                                         </div>
                                     )}
@@ -1325,12 +1290,10 @@ export default function DashboardPage() {
             case 'clients-list': {
                 const companiesCount = adminUsers.filter(u => u.clientType === 'COMPANY').length;
                 const individualsCount = adminUsers.filter(u => u.clientType === 'INDIVIDUAL').length;
-                const unverifiedCount = adminUsers.filter(u => !u.clientType).length;
 
                 const filteredClients = adminUsers.filter(u => {
                     if (clientTypeFilter === 'COMPANY' && u.clientType !== 'COMPANY') return false;
                     if (clientTypeFilter === 'INDIVIDUAL' && u.clientType !== 'INDIVIDUAL') return false;
-                    if (clientTypeFilter === 'UNVERIFIED' && (u.clientType === 'COMPANY' || u.clientType === 'INDIVIDUAL')) return false;
 
                     if (clientSearchQuery.trim()) {
                         const q = clientSearchQuery.toLowerCase().trim();
@@ -1398,19 +1361,6 @@ export default function DashboardPage() {
                                     <User className="w-3.5 h-3.5" />
                                     Individuals ({individualsCount})
                                 </button>
-                                {unverifiedCount > 0 && (
-                                    <button
-                                        onClick={() => setClientTypeFilter('UNVERIFIED')}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
-                                            clientTypeFilter === 'UNVERIFIED'
-                                                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
-                                                : 'text-amber-400 hover:text-amber-300 hover:bg-amber-500/10'
-                                        }`}
-                                    >
-                                        <AlertTriangle className="w-3.5 h-3.5" />
-                                        Unverified ({unverifiedCount})
-                                    </button>
-                                )}
                             </div>
 
                             <div className="relative w-full sm:w-64">
@@ -1451,7 +1401,7 @@ export default function DashboardPage() {
                                                 <tr className="border-b border-white/[0.06]">
                                                     <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left">Client</th>
                                                     <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left">Type</th>
-                                                    <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left hidden md:table-cell">Company / Formation</th>
+                                                    <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left hidden md:table-cell">Client Details &amp; Dates</th>
                                                     <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left hidden sm:table-cell">Email</th>
                                                     <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left hidden md:table-cell">Phone</th>
                                                     <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left">Status</th>
@@ -1486,36 +1436,51 @@ export default function DashboardPage() {
                                                         <td className="py-3 px-4">
                                                             {u.clientType === 'COMPANY' ? (
                                                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
-                                                                    <Building2 className="w-3 h-3" /> Company
+                                                                    <Building2 className="w-3 h-3" /> Company / Firm
                                                                 </span>
                                                             ) : u.clientType === 'INDIVIDUAL' ? (
                                                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 border border-purple-500/20 text-purple-400">
                                                                     <User className="w-3 h-3" /> Individual
                                                                 </span>
                                                             ) : (
-                                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 border border-amber-500/25 text-amber-300" title="Legacy record without client type — click Edit to verify">
-                                                                    <AlertTriangle className="w-3 h-3" /> Unverified
+                                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 border border-amber-500/25 text-amber-300" title="Click Edit to classify this client record">
+                                                                    <AlertTriangle className="w-3 h-3" /> Classification Required
                                                                 </span>
                                                             )}
                                                         </td>
 
-                                                        {/* Company / Formation */}
+                                                        {/* Company / Formation / DOB */}
                                                         <td className="py-3 px-4 hidden md:table-cell">
                                                             {u.clientType === 'INDIVIDUAL' ? (
-                                                                <span className="text-slate-500 text-xs italic">Direct Client (No firm)</span>
-                                                            ) : (
+                                                                <div>
+                                                                    <div className="text-slate-200 text-xs font-medium">{u.fullName || '—'}</div>
+                                                                    {u.dateOfBirth ? (
+                                                                        <div className="text-purple-300 text-[11px] flex items-center gap-1 mt-0.5">
+                                                                            <Cake className="w-3 h-3 text-purple-400 flex-shrink-0" />
+                                                                            <span>DOB: {formatDate(u.dateOfBirth)}</span>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <span className="text-slate-500 text-[11px] italic">Date of birth not added</span>
+                                                                    )}
+                                                                </div>
+                                                            ) : u.clientType === 'COMPANY' ? (
                                                                 <div>
                                                                     <div className="text-slate-200 text-xs font-medium truncate max-w-[180px]">
-                                                                        {u.companyName || (u.clientType === 'COMPANY' ? u.fullName : '—')}
+                                                                        {u.companyName || u.fullName || '—'}
                                                                     </div>
                                                                     {u.formationDate ? (
                                                                         <div className="text-slate-400 text-[11px] flex items-center gap-1 mt-0.5">
                                                                             <Calendar className="w-3 h-3 text-pink-400 flex-shrink-0" />
-                                                                            <span>{formatDate(u.formationDate)}</span>
+                                                                            <span>Formed: {formatDate(u.formationDate)}</span>
                                                                         </div>
-                                                                    ) : u.clientType === 'COMPANY' ? (
-                                                                        <span className="text-slate-500 text-[11px] italic">No formation date</span>
-                                                                    ) : null}
+                                                                    ) : (
+                                                                        <span className="text-slate-500 text-[11px] italic">Formation date not added</span>
+                                                                    )}
+                                                                </div>
+                                                            ) : (
+                                                                <div>
+                                                                    <div className="text-slate-200 text-xs font-medium">{u.companyName || u.fullName || '—'}</div>
+                                                                    <span className="text-amber-400/80 text-[11px] italic">Classification needed</span>
                                                                 </div>
                                                             )}
                                                         </td>
@@ -1563,13 +1528,14 @@ export default function DashboardPage() {
                                                                         setEditEmail(u.email || '');
                                                                         setEditPhone(u.phone || '');
                                                                         setEditFormationDate(u.formationDate || '');
+                                                                        setEditDateOfBirth(u.dateOfBirth || '');
                                                                         setEditAnniversaryAutomationEnabled(!!u.anniversaryAutomationEnabled);
                                                                         setEditWhatsappConsentGiven(!!u.whatsappConsentGiven);
                                                                         setEditCompanyName(u.companyName || '');
                                                                         setEditContactPersonName(u.contactPersonName || '');
                                                                         setEditError('');
                                                                     }}
-                                                                        className="h-8 px-2 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10" title={!u.clientType ? "Verify & Edit Client" : "Edit"}><Edit className="w-4 h-4" /></Button>
+                                                                        className="h-8 px-2 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10" title="Edit Client"><Edit className="w-4 h-4" /></Button>
                                                                     <Button variant="ghost" onClick={() => setUserToDelete(u.userId)}
                                                                         className="h-8 px-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10" title="Delete"><Trash2 className="w-4 h-4" /></Button>
                                                                 </div>
@@ -3006,14 +2972,14 @@ export default function DashboardPage() {
             {editingUser && (
                 <Modal onClose={() => setEditingUser(null)} title={<><Edit className="w-5 h-5 text-blue-400" /> Edit: {editingUser.userId}</>}>
                     <div className="space-y-4">
-                        {/* Unverified Legacy Alert */}
+                        {/* Unclassified Alert */}
                         {!editingUser.clientType && (
                             <div className="p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-2.5">
                                 <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
                                 <div>
-                                    <div className="font-semibold text-amber-300">Legacy Record — Client Type Unverified</div>
+                                    <div className="font-semibold text-amber-300">Client Classification Required</div>
                                     <p className="mt-0.5 text-amber-200/90 leading-relaxed">
-                                        This client was created before client types were introduced. Please select whether this client is a <strong>Company / Firm</strong> or an <strong>Individual</strong> to verify the record.
+                                        Please select whether this client is an <strong>Individual</strong> or a <strong>Company / Firm</strong> to configure their greeting preferences.
                                     </p>
                                 </div>
                             </div>
@@ -3066,7 +3032,7 @@ export default function DashboardPage() {
                                             Individual
                                             {editClientType === 'INDIVIDUAL' && <CheckCircle className="w-3 h-3 text-purple-400" />}
                                         </div>
-                                        <p className="text-[10px] text-slate-400 mt-0.5">Direct personal client (no firm)</p>
+                                        <p className="text-[10px] text-slate-400 mt-0.5">Direct client with birthday greetings</p>
                                     </div>
                                 </button>
                             </div>
@@ -3083,24 +3049,21 @@ export default function DashboardPage() {
                                     <Input value={editEmail} onChange={e => setEditEmail(e.target.value)} type="email"
                                         className="bg-white/[0.04] text-white border-white/10 focus:border-purple-500/50" placeholder="rajesh@example.com" />
                                 </Field>
-                                <Field label="Phone / WhatsApp Contact">
+                                <Field label="Phone / WhatsApp Number">
                                     <Input value={editPhone} onChange={e => setEditPhone(e.target.value)}
                                         className="bg-white/[0.04] text-white border-white/10 focus:border-purple-500/50" placeholder="+91 98765 43210" />
                                 </Field>
-
-                                <div className="pt-1">
-                                    <label className="flex items-start gap-2.5 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06] cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={editWhatsappConsentGiven}
-                                            onChange={e => setEditWhatsappConsentGiven(e.target.checked)}
-                                            className="mt-0.5 rounded border-white/20 bg-white/10 text-emerald-500"
-                                        />
-                                        <div className="text-xs text-white">
-                                            WhatsApp communication consent confirmed
-                                        </div>
-                                    </label>
-                                </div>
+                                <Field label="Date of Birth">
+                                    <Input
+                                        type="date"
+                                        value={editDateOfBirth}
+                                        onChange={e => setEditDateOfBirth(e.target.value)}
+                                        className="bg-white/[0.04] text-white border-white/10 focus:border-purple-500/50"
+                                    />
+                                    <p className="text-[11px] text-slate-500 mt-1">
+                                        Used for automated WhatsApp birthday greetings on this date.
+                                    </p>
+                                </Field>
                             </div>
                         ) : (
                             /* ── Company / Firm Edit Fields ── */
@@ -3129,7 +3092,7 @@ export default function DashboardPage() {
                                         className="bg-white/[0.04] text-white border-white/10 focus:border-cyan-500/50"
                                     />
                                     <p className="text-[11px] text-slate-500 mt-1">
-                                        The company will receive an annual WhatsApp greeting on the anniversary of this date, subject to eligibility and consent.
+                                        The company will receive an annual WhatsApp greeting on the anniversary of this date.
                                     </p>
                                 </Field>
 
@@ -3143,17 +3106,6 @@ export default function DashboardPage() {
                                         />
                                         <div className="text-xs text-white">
                                             Enable automatic anniversary greetings
-                                        </div>
-                                    </label>
-                                    <label className="flex items-start gap-2.5 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06] cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={editWhatsappConsentGiven}
-                                            onChange={e => setEditWhatsappConsentGiven(e.target.checked)}
-                                            className="mt-0.5 rounded border-white/20 bg-white/10 text-emerald-500"
-                                        />
-                                        <div className="text-xs text-white">
-                                            WhatsApp greeting consent confirmed
                                         </div>
                                     </label>
                                 </div>

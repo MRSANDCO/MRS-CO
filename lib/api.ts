@@ -34,6 +34,7 @@ export interface UserProfile {
     companyName?: string;
     contactPersonName?: string;
     formationDate?: string;
+    dateOfBirth?: string;
     anniversaryAutomationEnabled?: boolean;
     whatsappConsentGiven?: boolean;
     whatsappConsentDate?: string;
@@ -135,6 +136,7 @@ export interface CreateUserRequest {
     companyName?: string;
     contactPersonName?: string;
     formationDate?: string;
+    dateOfBirth?: string;
     anniversaryAutomationEnabled?: boolean;
     whatsappConsentGiven?: boolean;
 }
@@ -196,6 +198,7 @@ export async function updateUser(
         companyName?: string;
         contactPersonName?: string;
         formationDate?: string;
+        dateOfBirth?: string;
         anniversaryAutomationEnabled?: boolean;
         whatsappConsentGiven?: boolean;
     }
