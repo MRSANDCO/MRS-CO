@@ -153,41 +153,52 @@ function NotificationStatusBadge({ status }: { status?: string }) {
 
     const s = status.toUpperCase();
     switch (s) {
+        case 'SENT':
+            return (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/15 border border-indigo-500/30 text-indigo-300">
+                    <Check className="w-3 h-3 text-indigo-400" /> Sent
+                </span>
+            );
         case 'DELIVERED':
-        case 'READ':
             return (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
-                    <CheckCircle className="w-3 h-3 text-emerald-400" /> {s}
+                    <CheckCircle className="w-3 h-3 text-emerald-400" /> Delivered
+                </span>
+            );
+        case 'READ':
+            return (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 border border-blue-500/30 text-blue-300">
+                    <CheckCircle className="w-3 h-3 text-blue-400" /> Read
                 </span>
             );
         case 'ACCEPTED':
             return (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 border border-blue-500/30 text-blue-300">
-                    <Check className="w-3 h-3 text-blue-400" /> ACCEPTED
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-500/15 border border-cyan-500/30 text-cyan-300">
+                    <Check className="w-3 h-3 text-cyan-400" /> Accepted by WhatsApp API
                 </span>
             );
         case 'PROCESSING':
             return (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-500/15 border border-cyan-500/30 text-cyan-300">
-                    <Loader2 className="w-3 h-3 animate-spin text-cyan-400" /> PROCESSING
+                    <Loader2 className="w-3 h-3 animate-spin text-cyan-400" /> Processing
                 </span>
             );
         case 'RETRY_PENDING':
             return (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-300">
-                    <Clock className="w-3 h-3 text-amber-400" /> RETRY PENDING
-                </span>
-            );
-        case 'FAILED':
-            return (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/15 border border-red-500/30 text-red-300">
-                    <XCircle className="w-3 h-3 text-red-400" /> FAILED
+                    <Clock className="w-3 h-3 text-amber-400" /> Retry Pending
                 </span>
             );
         case 'AMBIGUOUS':
             return (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-500/15 border border-yellow-500/30 text-yellow-300">
-                    <AlertTriangle className="w-3 h-3 text-yellow-400" /> AMBIGUOUS
+                    <AlertTriangle className="w-3 h-3 text-yellow-400" /> Requires Verification
+                </span>
+            );
+        case 'FAILED':
+            return (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/15 border border-red-500/30 text-red-300">
+                    <XCircle className="w-3 h-3 text-red-400" /> Failed
                 </span>
             );
         default:
@@ -1034,7 +1045,7 @@ export default function FounderManagement() {
                                             <th className="px-4 py-3 font-semibold">Date of Birth</th>
                                             <th className="px-4 py-3 font-semibold">WhatsApp Number</th>
                                             <th className="px-4 py-3 font-semibold">Consent</th>
-                                            <th className="px-4 py-3 font-semibold">Greeting Pref</th>
+                                            <th className="px-4 py-3 font-semibold">Automation</th>
                                             <th className="px-4 py-3 font-semibold">Status</th>
                                             <th className="px-4 py-3 font-semibold text-right">Actions</th>
                                         </tr>

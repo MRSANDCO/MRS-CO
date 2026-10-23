@@ -147,6 +147,12 @@ function StatusBadge({ status }: { status?: string }) {
     const s = status.toUpperCase();
 
     switch (s) {
+        case 'SENT':
+            return (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/15 border border-indigo-500/30 text-indigo-300">
+                    <Check className="w-3 h-3 text-indigo-400" /> Sent
+                </span>
+            );
         case 'DELIVERED':
             return (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
@@ -162,7 +168,7 @@ function StatusBadge({ status }: { status?: string }) {
         case 'ACCEPTED':
             return (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-500/15 border border-cyan-500/30 text-cyan-300">
-                    <Check className="w-3 h-3 text-cyan-400" /> API Accepted
+                    <Check className="w-3 h-3 text-cyan-400" /> Accepted by WhatsApp API
                 </span>
             );
         case 'PROCESSING':
@@ -176,6 +182,12 @@ function StatusBadge({ status }: { status?: string }) {
             return (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 border border-amber-500/30 text-amber-300">
                     <Clock className="w-3 h-3 text-amber-400" /> {s === 'RETRY_PENDING' ? 'Retry Pending' : 'Pending'}
+                </span>
+            );
+        case 'AMBIGUOUS':
+            return (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/15 border border-yellow-500/30 text-yellow-300">
+                    <AlertTriangle className="w-3 h-3 text-yellow-400" /> Requires Verification
                 </span>
             );
         case 'FAILED':
