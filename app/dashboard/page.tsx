@@ -24,6 +24,7 @@ import {
     type UserProfile,
     type UserDocument,
     type CreateUserRequest,
+    type ClientType,
 } from '@/lib/api';
 import {
     User,
@@ -67,6 +68,12 @@ import {
     Activity,
     Layers,
     ArrowUpRight,
+    PartyPopper,
+    Building2,
+    AlertTriangle,
+    Search,
+    Filter,
+    Crown,
 } from 'lucide-react';
 import Link from 'next/link';
 import { CardTilt3D } from '@/components/dashboard/CardTilt3D';
@@ -75,6 +82,8 @@ import { Interactive3DEmptyState } from '@/components/dashboard/Interactive3DEmp
 import { Tactile3DButton } from '@/components/dashboard/Tactile3DButton';
 import { AdminEmployeeManagement } from '@/components/dashboard/AdminEmployeeManagement';
 import AdminAttendanceDashboard from '@/components/attendance/AdminAttendanceDashboard';
+import CompanyAnniversariesManagement from '@/components/dashboard/CompanyAnniversariesManagement';
+import FounderManagement from '@/components/dashboard/FounderManagement';
 
 
 // ─── Logo ────────────────────────────────────────────────────────────────────
@@ -136,7 +145,9 @@ type AdminSection =
     | 'raise-query'
     | 'queries-list'
     | 'employees'
-    | 'attendance-management';
+    | 'attendance-management'
+    | 'company-anniversaries'
+    | 'founder-management';
 
 interface NavItem {
     id: AdminSection;
@@ -153,6 +164,8 @@ const adminNavItems: NavItem[] = [
     { id: 'raise-query', label: 'Raise a Query', icon: <MessageSquarePlus className="w-4 h-4" />, group: 'actions' },
     { id: 'employees', label: 'Employee Management', icon: <Users className="w-4 h-4" />, group: 'lists' },
     { id: 'attendance-management', label: 'Attendance Management', icon: <Calendar className="w-4 h-4" />, group: 'lists' },
+    { id: 'company-anniversaries', label: 'Company Anniversaries', icon: <PartyPopper className="w-4 h-4" />, group: 'lists' },
+    { id: 'founder-management', label: 'Founder Birthdays', icon: <Crown className="w-4 h-4" />, group: 'lists' },
     { id: 'clients-list', label: 'All Clients', icon: <Users className="w-4 h-4" />, group: 'lists' },
     { id: 'documents-list', label: 'Documents', icon: <FileText className="w-4 h-4" />, group: 'lists' },
     { id: 'drive-list', label: 'Drive Links', icon: <FolderOpen className="w-4 h-4" />, group: 'lists' },
@@ -193,8 +206,20 @@ export default function DashboardPage() {
     const [createSuccess, setCreateSuccess] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [newUser, setNewUser] = useState<CreateUserRequest>({
-        userId: '', password: '', fullName: '', email: '', phone: '',
+        userId: '',
+        password: '',
+        fullName: '',
+        email: '',
+        phone: '',
+        clientType: 'COMPANY',
+        companyName: '',
+        contactPersonName: '',
+        formationDate: '',
+        anniversaryAutomationEnabled: false,
+        whatsappConsentGiven: false,
     });
+    const [clientTypeFilter, setClientTypeFilter] = useState<'ALL' | 'COMPANY' | 'INDIVIDUAL' | 'UNVERIFIED'>('ALL');
+    const [clientSearchQuery, setClientSearchQuery] = useState('');
 
     // ── Admin: drive links ──
     const [driveLinks, setDriveLinks] = useState<any[]>([]);
@@ -266,9 +291,16 @@ export default function DashboardPage() {
 
     // ── Edit user ──
     const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
+    const [editClientType, setEditClientType] = useState<ClientType | ''>('COMPANY');
     const [editFullName, setEditFullName] = useState('');
     const [editEmail, setEditEmail] = useState('');
     const [editPhone, setEditPhone] = useState('');
+    const [editCompanyName, setEditCompanyName] = useState('');
+    const [editContactPersonName, setEditContactPersonName] = useState('');
+    const [editFormationDate, setEditFormationDate] = useState('');
+    const [editAnniversaryAutomationEnabled, setEditAnniversaryAutomationEnabled] = useState(false);
+    const [editWhatsappConsentGiven, setEditWhatsappConsentGiven] = useState(false);
+    const [editError, setEditError] = useState('');
     const [updatingUser, setUpdatingUser] = useState(false);
 
     // ── Delete user ──
@@ -468,14 +500,58 @@ export default function DashboardPage() {
     // ─── Handlers ────────────────────────────────────────────────────────────
 
     const handleCreateUser = async (e: React.FormEvent) => {
-        e.preventDefault(); setCreateError(''); setCreateSuccess(''); setCreating(true);
+        e.preventDefault();
+        setCreateError('');
+        setCreateSuccess('');
+        setCreating(true);
         try {
-            const res = await createUser(newUser);
-            setCreateSuccess(`Client "${res.userId}" created successfully!`);
-            setNewUser({ userId: '', password: '', fullName: '', email: '', phone: '' });
+            const currentType: ClientType = newUser.clientType || 'COMPANY';
+
+            const payload: CreateUserRequest = {
+                userId: newUser.userId.trim(),
+                password: newUser.password,
+                fullName: newUser.fullName?.trim() || undefined,
+                email: newUser.email?.trim() || undefined,
+                phone: newUser.phone?.trim() || undefined,
+                clientType: currentType,
+                whatsappConsentGiven: !!newUser.whatsappConsentGiven,
+            };
+
+            if (currentType === 'COMPANY') {
+                payload.companyName = newUser.companyName?.trim() || undefined;
+                payload.contactPersonName = newUser.contactPersonName?.trim() || undefined;
+                payload.formationDate = newUser.formationDate || undefined;
+                payload.anniversaryAutomationEnabled = !!newUser.anniversaryAutomationEnabled;
+            } else {
+                // Individual clients do not have company fields or anniversary automation
+                payload.companyName = undefined;
+                payload.contactPersonName = undefined;
+                payload.formationDate = undefined;
+                payload.anniversaryAutomationEnabled = false;
+            }
+
+            const res = await createUser(payload);
+            const typeLabel = currentType === 'COMPANY' ? 'Company / Firm' : 'Individual';
+            setCreateSuccess(`Client "${res.userId}" (${typeLabel}) created successfully!`);
+            setNewUser({
+                userId: '',
+                password: '',
+                fullName: '',
+                email: '',
+                phone: '',
+                clientType: 'COMPANY',
+                companyName: '',
+                contactPersonName: '',
+                formationDate: '',
+                anniversaryAutomationEnabled: false,
+                whatsappConsentGiven: false,
+            });
             fetchUsers();
-        } catch (err: unknown) { setCreateError(err instanceof Error ? err.message : 'Failed to create client'); }
-        finally { setCreating(false); }
+        } catch (err: unknown) {
+            setCreateError(err instanceof Error ? err.message : 'Failed to create client');
+        } finally {
+            setCreating(false);
+        }
     };
 
     const handleChangePassword = async (e: React.FormEvent) => {
@@ -664,14 +740,55 @@ export default function DashboardPage() {
 
     const handleUpdateUser = async () => {
         if (!editingUser) return;
+        setEditError('');
+
+        if (!editClientType) {
+            setEditError('Please select a Client Type (Company / Firm or Individual) to verify this client record.');
+            return;
+        }
+
         setUpdatingUser(true);
         try {
-            await updateUser(editingUser.userId, { fullName: editFullName, email: editEmail, phone: editPhone });
-            setCreateSuccess(`Client "${editingUser.userId}" updated!`);
+            const updatePayload: {
+                fullName?: string;
+                email?: string;
+                phone?: string;
+                clientType: ClientType;
+                companyName?: string;
+                contactPersonName?: string;
+                formationDate?: string;
+                anniversaryAutomationEnabled?: boolean;
+                whatsappConsentGiven?: boolean;
+            } = {
+                fullName: editFullName.trim() || undefined,
+                email: editEmail.trim() || undefined,
+                phone: editPhone.trim() || undefined,
+                clientType: editClientType,
+                whatsappConsentGiven: editWhatsappConsentGiven,
+            };
+
+            if (editClientType === 'COMPANY') {
+                updatePayload.companyName = editCompanyName.trim() || undefined;
+                updatePayload.contactPersonName = editContactPersonName.trim() || undefined;
+                updatePayload.formationDate = editFormationDate || undefined;
+                updatePayload.anniversaryAutomationEnabled = editAnniversaryAutomationEnabled;
+            } else {
+                // For individual clients, clear company fields and ensure anniversary greetings are disabled
+                updatePayload.companyName = undefined;
+                updatePayload.contactPersonName = undefined;
+                updatePayload.formationDate = undefined;
+                updatePayload.anniversaryAutomationEnabled = false;
+            }
+
+            await updateUser(editingUser.userId, updatePayload);
+            setCreateSuccess(`Client "${editingUser.userId}" updated successfully!`);
             setEditingUser(null);
             fetchUsers();
-        } catch (err: unknown) { setCreateError(err instanceof Error ? err.message : 'Update failed'); }
-        finally { setUpdatingUser(false); }
+        } catch (err: unknown) {
+            setEditError(err instanceof Error ? err.message : 'Update failed');
+        } finally {
+            setUpdatingUser(false);
+        }
     };
 
     const handleDeleteUser = async () => {
@@ -835,7 +952,15 @@ export default function DashboardPage() {
     // ─── Formatters ──────────────────────────────────────────────────────────
 
     const formatDate = (dateStr: string) => {
-        try { return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); }
+        try {
+            // Date-only strings (YYYY-MM-DD) must be parsed as local time to avoid
+            // a UTC-midnight → previous-day shift in UTC+ timezones such as IST.
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                const [y, m, d] = dateStr.split('-').map(Number);
+                return new Date(y, m - 1, d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            }
+            return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
         catch { return dateStr; }
     };
 
@@ -891,6 +1016,8 @@ export default function DashboardPage() {
         'queries-list': 'text-rose-400',
         'employees': 'text-emerald-400',
         'attendance-management': 'text-emerald-400',
+        'company-anniversaries': 'text-pink-400',
+        'founder-management': 'text-amber-400',
     };
 
     const navItemAccent: Record<AdminSection, string> = {
@@ -905,6 +1032,8 @@ export default function DashboardPage() {
         'queries-list': 'bg-rose-500/10 border-rose-500/20 text-rose-300',
         'employees': 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300',
         'attendance-management': 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300',
+        'company-anniversaries': 'bg-pink-500/10 border-pink-500/20 text-pink-300',
+        'founder-management': 'bg-amber-500/10 border-amber-500/20 text-amber-300',
     };
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -964,12 +1093,79 @@ export default function DashboardPage() {
                         {createError && <Alert type="error" msg={createError} onClose={() => setCreateError('')} />}
                         <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl">
                             <CardContent className="p-6">
-                                <form onSubmit={handleCreateUser} className="space-y-4">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <form onSubmit={handleCreateUser} className="space-y-5">
+                                    {/* Client Type Selector */}
+                                    <div>
+                                        <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                                            Client Type *
+                                        </label>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => setNewUser(prev => ({ ...prev, clientType: 'COMPANY' }))}
+                                                className={`flex items-start gap-3 p-3.5 rounded-xl border text-left transition-all ${
+                                                    (newUser.clientType || 'COMPANY') === 'COMPANY'
+                                                        ? 'border-cyan-500/60 bg-gradient-to-br from-cyan-500/15 via-blue-500/10 to-transparent text-white shadow-lg shadow-cyan-500/10 ring-1 ring-cyan-500/30'
+                                                        : 'border-white/[0.08] bg-white/[0.02] text-slate-400 hover:border-white/20 hover:bg-white/[0.04]'
+                                                }`}
+                                            >
+                                                <div className={`p-2 rounded-lg flex-shrink-0 ${
+                                                    (newUser.clientType || 'COMPANY') === 'COMPANY'
+                                                        ? 'bg-cyan-500/20 text-cyan-400'
+                                                        : 'bg-white/[0.05] text-slate-400'
+                                                }`}>
+                                                    <Building2 className="w-5 h-5" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="text-xs font-semibold text-white flex items-center gap-1.5">
+                                                        Company / Firm
+                                                        {(newUser.clientType || 'COMPANY') === 'COMPANY' && (
+                                                            <CheckCircle className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+                                                        )}
+                                                    </div>
+                                                    <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                                                        Registered entity or firm with formation date &amp; anniversary greetings.
+                                                    </p>
+                                                </div>
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() => setNewUser(prev => ({ ...prev, clientType: 'INDIVIDUAL' }))}
+                                                className={`flex items-start gap-3 p-3.5 rounded-xl border text-left transition-all ${
+                                                    newUser.clientType === 'INDIVIDUAL'
+                                                        ? 'border-purple-500/60 bg-gradient-to-br from-purple-500/15 via-indigo-500/10 to-transparent text-white shadow-lg shadow-purple-500/10 ring-1 ring-purple-500/30'
+                                                        : 'border-white/[0.08] bg-white/[0.02] text-slate-400 hover:border-white/20 hover:bg-white/[0.04]'
+                                                }`}
+                                            >
+                                                <div className={`p-2 rounded-lg flex-shrink-0 ${
+                                                    newUser.clientType === 'INDIVIDUAL'
+                                                        ? 'bg-purple-500/20 text-purple-400'
+                                                        : 'bg-white/[0.05] text-slate-400'
+                                                }`}>
+                                                    <User className="w-5 h-5" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="text-xs font-semibold text-white flex items-center gap-1.5">
+                                                        Individual
+                                                        {newUser.clientType === 'INDIVIDUAL' && (
+                                                            <CheckCircle className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
+                                                        )}
+                                                    </div>
+                                                    <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                                                        Direct individual receiving personal services without an associated firm.
+                                                    </p>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Credentials (Common) */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                                         <Field label="Client ID *">
                                             <div className="relative">
                                                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                                                <Input required placeholder="e.g. acme_corp" value={newUser.userId}
+                                                <Input required placeholder="e.g. acme_corp or john_doe" value={newUser.userId}
                                                     onChange={e => setNewUser({ ...newUser, userId: e.target.value })}
                                                     className="pl-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50" />
                                             </div>
@@ -985,28 +1181,134 @@ export default function DashboardPage() {
                                                 </button>
                                             </div>
                                         </Field>
-                                        <Field label="Full Name">
-                                            <Input placeholder="e.g. Acme Corporation" value={newUser.fullName}
-                                                onChange={e => setNewUser({ ...newUser, fullName: e.target.value })}
-                                                className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50" />
-                                        </Field>
-                                        <Field label="Email">
-                                            <div className="relative">
-                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                                                <Input type="email" placeholder="contact@example.com" value={newUser.email}
-                                                    onChange={e => setNewUser({ ...newUser, email: e.target.value })}
-                                                    className="pl-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50" />
-                                            </div>
-                                        </Field>
-                                        <Field label="Phone" className="sm:col-span-2">
-                                            <div className="relative">
-                                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                                                <Input placeholder="+91 98765 43210" value={newUser.phone}
-                                                    onChange={e => setNewUser({ ...newUser, phone: e.target.value })}
-                                                    className="pl-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50" />
-                                            </div>
-                                        </Field>
                                     </div>
+
+                                    {/* Fields based on Client Type */}
+                                    {newUser.clientType === 'INDIVIDUAL' ? (
+                                        /* ── Individual Client Fields ── */
+                                        <div className="space-y-4 pt-1">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <Field label="Individual's Full Name *">
+                                                    <Input required placeholder="e.g. Rajesh Kumar Sharma" value={newUser.fullName}
+                                                        onChange={e => setNewUser({ ...newUser, fullName: e.target.value })}
+                                                        className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-purple-500/50" />
+                                                </Field>
+                                                <Field label="Email Address">
+                                                    <div className="relative">
+                                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                                        <Input type="email" placeholder="rajesh@example.com" value={newUser.email}
+                                                            onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+                                                            className="pl-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-purple-500/50" />
+                                                    </div>
+                                                </Field>
+                                                <Field label="Phone / WhatsApp Number">
+                                                    <div className="relative">
+                                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                                        <Input placeholder="+91 98765 43210" value={newUser.phone}
+                                                            onChange={e => setNewUser({ ...newUser, phone: e.target.value })}
+                                                            className="pl-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-purple-500/50" />
+                                                    </div>
+                                                </Field>
+                                            </div>
+
+                                            <div className="pt-1">
+                                                <label className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] cursor-pointer hover:bg-white/[0.04] transition-colors">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!newUser.whatsappConsentGiven}
+                                                        onChange={e => setNewUser({ ...newUser, whatsappConsentGiven: e.target.checked })}
+                                                        className="mt-0.5 rounded border-white/20 bg-white/10 text-emerald-500 focus:ring-0"
+                                                    />
+                                                    <div>
+                                                        <div className="text-xs font-semibold text-white">WhatsApp communication consent confirmed</div>
+                                                        <p className="text-[11px] text-slate-400 mt-0.5">Client has given consent to receive service updates, query replies, and tax notifications via WhatsApp.</p>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        /* ── Company / Firm Fields ── */
+                                        <div className="space-y-4 pt-1">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <Field label="Company / Firm Name">
+                                                    <div className="relative">
+                                                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                                        <Input placeholder="e.g. Acme Technologies Pvt Ltd" value={newUser.companyName}
+                                                            onChange={e => setNewUser({ ...newUser, companyName: e.target.value })}
+                                                            className="pl-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50" />
+                                                    </div>
+                                                </Field>
+                                                <Field label="Contact Person / Authorized Signatory">
+                                                    <Input placeholder="e.g. Rajesh Sharma" value={newUser.contactPersonName || newUser.fullName}
+                                                        onChange={e => setNewUser({ ...newUser, contactPersonName: e.target.value, fullName: e.target.value })}
+                                                        className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50" />
+                                                </Field>
+                                                <Field label="Email">
+                                                    <div className="relative">
+                                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                                        <Input type="email" placeholder="contact@example.com" value={newUser.email}
+                                                            onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+                                                            className="pl-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50" />
+                                                    </div>
+                                                </Field>
+                                                <Field label="Phone / WhatsApp Contact">
+                                                    <div className="relative">
+                                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                                        <Input placeholder="+91 98765 43210" value={newUser.phone}
+                                                            onChange={e => setNewUser({ ...newUser, phone: e.target.value })}
+                                                            className="pl-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50" />
+                                                    </div>
+                                                </Field>
+                                                <Field label="Company Formation Date">
+                                                    <div className="relative">
+                                                        <Input type="date" value={newUser.formationDate}
+                                                            onChange={e => setNewUser({ ...newUser, formationDate: e.target.value })}
+                                                            className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-cyan-500/50" />
+                                                    </div>
+                                                    <p className="text-[11px] text-slate-500 mt-1">
+                                                        The company will receive an annual WhatsApp greeting on the anniversary of this date, subject to eligibility and consent.
+                                                    </p>
+                                                </Field>
+                                            </div>
+
+                                            {/* Anniversary Automation Toggles */}
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                                                <label className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] cursor-pointer hover:bg-white/[0.04] transition-colors">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!newUser.anniversaryAutomationEnabled}
+                                                        onChange={e => {
+                                                            if (e.target.checked && !newUser.formationDate) {
+                                                                setCreateError('Please enter a Company Formation Date before enabling automated greetings.');
+                                                                return;
+                                                            }
+                                                            setCreateError('');
+                                                            setNewUser({ ...newUser, anniversaryAutomationEnabled: e.target.checked });
+                                                        }}
+                                                        className="mt-0.5 rounded border-white/20 bg-white/10 text-pink-500 focus:ring-0"
+                                                    />
+                                                    <div>
+                                                        <div className="text-xs font-semibold text-white">Enable automatic anniversary greetings</div>
+                                                        <p className="text-[11px] text-slate-400 mt-0.5">Send automated WhatsApp greetings annually on company formation date.</p>
+                                                    </div>
+                                                </label>
+
+                                                <label className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] cursor-pointer hover:bg-white/[0.04] transition-colors">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!newUser.whatsappConsentGiven}
+                                                        onChange={e => setNewUser({ ...newUser, whatsappConsentGiven: e.target.checked })}
+                                                        className="mt-0.5 rounded border-white/20 bg-white/10 text-emerald-500 focus:ring-0"
+                                                    />
+                                                    <div>
+                                                        <div className="text-xs font-semibold text-white">WhatsApp greeting consent confirmed</div>
+                                                        <p className="text-[11px] text-slate-400 mt-0.5">Client has given consent to receive greetings via WhatsApp.</p>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="flex justify-end pt-2">
                                         <Button type="submit" disabled={creating}
                                             className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-medium px-6 shadow-lg shadow-cyan-500/20">
@@ -1020,7 +1322,28 @@ export default function DashboardPage() {
                 );
 
             // ── Clients List ──────────────────────────────────────────────────
-            case 'clients-list':
+            case 'clients-list': {
+                const companiesCount = adminUsers.filter(u => u.clientType === 'COMPANY').length;
+                const individualsCount = adminUsers.filter(u => u.clientType === 'INDIVIDUAL').length;
+                const unverifiedCount = adminUsers.filter(u => !u.clientType).length;
+
+                const filteredClients = adminUsers.filter(u => {
+                    if (clientTypeFilter === 'COMPANY' && u.clientType !== 'COMPANY') return false;
+                    if (clientTypeFilter === 'INDIVIDUAL' && u.clientType !== 'INDIVIDUAL') return false;
+                    if (clientTypeFilter === 'UNVERIFIED' && (u.clientType === 'COMPANY' || u.clientType === 'INDIVIDUAL')) return false;
+
+                    if (clientSearchQuery.trim()) {
+                        const q = clientSearchQuery.toLowerCase().trim();
+                        const matchesName = (u.fullName || '').toLowerCase().includes(q);
+                        const matchesUserId = (u.userId || '').toLowerCase().includes(q);
+                        const matchesEmail = (u.email || '').toLowerCase().includes(q);
+                        const matchesPhone = (u.phone || '').toLowerCase().includes(q);
+                        const matchesCompany = (u.companyName || '').toLowerCase().includes(q);
+                        return matchesName || matchesUserId || matchesEmail || matchesPhone || matchesCompany;
+                    }
+                    return true;
+                });
+
                 return (
                     <div className="space-y-6">
                         <div className="flex items-center justify-between">
@@ -1028,58 +1351,189 @@ export default function DashboardPage() {
                                 <Users className="w-6 h-6 text-blue-400" /> All Clients
                             </h1>
                             <div className="flex items-center gap-2">
-                                <span className="text-xs text-slate-500 bg-white/[0.04] px-2.5 py-1 rounded-full">{adminUsers.length} clients</span>
+                                <span className="text-xs text-slate-500 bg-white/[0.04] px-2.5 py-1 rounded-full">{adminUsers.length} total</span>
                                 <Button variant="ghost" onClick={fetchUsers} disabled={loadingUsers} className="text-slate-400 hover:text-white hover:bg-white/[0.06] px-2">
                                     <RefreshCw className={`w-4 h-4 ${loadingUsers ? 'animate-spin' : ''}`} />
                                 </Button>
                             </div>
                         </div>
+
                         {passwordChangeSuccess && <Alert type="success" msg={passwordChangeSuccess} onClose={() => setPasswordChangeSuccess('')} />}
                         {passwordChangeError && <Alert type="error" msg={passwordChangeError} onClose={() => setPasswordChangeError('')} />}
                         {createSuccess && <Alert type="success" msg={createSuccess} onClose={() => setCreateSuccess('')} />}
                         {createError && <Alert type="error" msg={createError} onClose={() => setCreateError('')} />}
+
+                        {/* Search & Filter Toolbar */}
+                        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+                            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white/[0.03] border border-white/[0.08] overflow-x-auto">
+                                <button
+                                    onClick={() => setClientTypeFilter('ALL')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                        clientTypeFilter === 'ALL'
+                                            ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                                    }`}
+                                >
+                                    All ({adminUsers.length})
+                                </button>
+                                <button
+                                    onClick={() => setClientTypeFilter('COMPANY')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
+                                        clientTypeFilter === 'COMPANY'
+                                            ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/20'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                                    }`}
+                                >
+                                    <Building2 className="w-3.5 h-3.5" />
+                                    Companies ({companiesCount})
+                                </button>
+                                <button
+                                    onClick={() => setClientTypeFilter('INDIVIDUAL')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
+                                        clientTypeFilter === 'INDIVIDUAL'
+                                            ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                                    }`}
+                                >
+                                    <User className="w-3.5 h-3.5" />
+                                    Individuals ({individualsCount})
+                                </button>
+                                {unverifiedCount > 0 && (
+                                    <button
+                                        onClick={() => setClientTypeFilter('UNVERIFIED')}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
+                                            clientTypeFilter === 'UNVERIFIED'
+                                                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
+                                                : 'text-amber-400 hover:text-amber-300 hover:bg-amber-500/10'
+                                        }`}
+                                    >
+                                        <AlertTriangle className="w-3.5 h-3.5" />
+                                        Unverified ({unverifiedCount})
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="relative w-full sm:w-64">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                <Input
+                                    placeholder="Search name, firm, ID, phone..."
+                                    value={clientSearchQuery}
+                                    onChange={e => setClientSearchQuery(e.target.value)}
+                                    className="pl-9 pr-8 h-9 text-xs bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-500 focus:border-cyan-500/50"
+                                />
+                                {clientSearchQuery && (
+                                    <button
+                                        onClick={() => setClientSearchQuery('')}
+                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                                    >
+                                        <X className="w-3.5 h-3.5" />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
                         <Card className="border-white/[0.08] bg-white/[0.04] backdrop-blur-xl">
                             <CardContent className="p-0">
                                 {loadingUsers ? (
                                     <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 text-blue-400 animate-spin" /></div>
                                 ) : usersError ? (
                                     <div className="p-6"><Alert type="error" msg={usersError} onClose={() => setUsersError('')} /></div>
-                                ) : adminUsers.length === 0 ? (
-                                    <EmptyState icon={<Users className="w-12 h-12" />} title="No clients yet" subtitle='Go to "Create Client" to add the first one.' />
+                                ) : filteredClients.length === 0 ? (
+                                    <EmptyState
+                                        icon={<Users className="w-12 h-12" />}
+                                        title={clientSearchQuery || clientTypeFilter !== 'ALL' ? 'No matching clients found' : 'No clients yet'}
+                                        subtitle={clientSearchQuery || clientTypeFilter !== 'ALL' ? 'Try adjusting your filters or search query.' : 'Go to "Create Client" to add the first one.'}
+                                    />
                                 ) : (
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-sm">
                                             <thead>
                                                 <tr className="border-b border-white/[0.06]">
-                                                    {['Client', 'Email', 'Phone', 'Status', 'Created', 'Actions'].map(h => (
-                                                        <th key={h} className={`py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left ${h === 'Actions' ? 'text-right' : ''} ${h === 'Email' ? 'hidden sm:table-cell' : ''} ${h === 'Phone' ? 'hidden md:table-cell' : ''} ${h === 'Created' ? 'hidden lg:table-cell' : ''}`}>{h}</th>
-                                                    ))}
+                                                    <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left">Client</th>
+                                                    <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left">Type</th>
+                                                    <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left hidden md:table-cell">Company / Formation</th>
+                                                    <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left hidden sm:table-cell">Email</th>
+                                                    <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left hidden md:table-cell">Phone</th>
+                                                    <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-left">Status</th>
+                                                    <th className="py-3 px-4 text-slate-400 font-medium text-xs uppercase tracking-wider text-right">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {adminUsers.map((u, index) => (
+                                                {filteredClients.map((u, index) => (
                                                     <motion.tr key={u.id || u.userId}
-                                                        initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}
+                                                        initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.02 }}
                                                         className="border-b border-white/[0.03] hover:bg-white/[0.03] transition-colors">
+                                                        {/* Client Name & ID */}
                                                         <td className="py-3 px-4">
                                                             <div className="flex items-center gap-3">
-                                                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/30 to-indigo-500/30 border border-blue-500/20 flex items-center justify-center text-blue-300 text-xs font-bold">
-                                                                    {(u.fullName || u.userId).charAt(0).toUpperCase()}
+                                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold border ${
+                                                                    u.clientType === 'INDIVIDUAL'
+                                                                        ? 'bg-purple-500/20 border-purple-500/30 text-purple-300'
+                                                                        : u.clientType === 'COMPANY'
+                                                                        ? 'bg-blue-500/20 border-blue-500/30 text-blue-300'
+                                                                        : 'bg-amber-500/20 border-amber-500/30 text-amber-300'
+                                                                }`}>
+                                                                    {(u.fullName || u.companyName || u.userId).charAt(0).toUpperCase()}
                                                                 </div>
                                                                 <div>
-                                                                    <div className="text-white font-medium">{u.fullName || u.userId}</div>
+                                                                    <div className="text-white font-medium">{u.fullName || u.companyName || u.userId}</div>
                                                                     <div className="text-slate-500 text-xs">@{u.userId}</div>
                                                                 </div>
                                                             </div>
                                                         </td>
+
+                                                        {/* Client Type Badge */}
+                                                        <td className="py-3 px-4">
+                                                            {u.clientType === 'COMPANY' ? (
+                                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+                                                                    <Building2 className="w-3 h-3" /> Company
+                                                                </span>
+                                                            ) : u.clientType === 'INDIVIDUAL' ? (
+                                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                                                                    <User className="w-3 h-3" /> Individual
+                                                                </span>
+                                                            ) : (
+                                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 border border-amber-500/25 text-amber-300" title="Legacy record without client type — click Edit to verify">
+                                                                    <AlertTriangle className="w-3 h-3" /> Unverified
+                                                                </span>
+                                                            )}
+                                                        </td>
+
+                                                        {/* Company / Formation */}
+                                                        <td className="py-3 px-4 hidden md:table-cell">
+                                                            {u.clientType === 'INDIVIDUAL' ? (
+                                                                <span className="text-slate-500 text-xs italic">Direct Client (No firm)</span>
+                                                            ) : (
+                                                                <div>
+                                                                    <div className="text-slate-200 text-xs font-medium truncate max-w-[180px]">
+                                                                        {u.companyName || (u.clientType === 'COMPANY' ? u.fullName : '—')}
+                                                                    </div>
+                                                                    {u.formationDate ? (
+                                                                        <div className="text-slate-400 text-[11px] flex items-center gap-1 mt-0.5">
+                                                                            <Calendar className="w-3 h-3 text-pink-400 flex-shrink-0" />
+                                                                            <span>{formatDate(u.formationDate)}</span>
+                                                                        </div>
+                                                                    ) : u.clientType === 'COMPANY' ? (
+                                                                        <span className="text-slate-500 text-[11px] italic">No formation date</span>
+                                                                    ) : null}
+                                                                </div>
+                                                            )}
+                                                        </td>
+
+                                                        {/* Email */}
                                                         <td className="py-3 px-4 text-slate-300 hidden sm:table-cell">{u.email || <span className="text-slate-600">—</span>}</td>
+
+                                                        {/* Phone */}
                                                         <td className="py-3 px-4 text-slate-300 hidden md:table-cell">{u.phone || <span className="text-slate-600">—</span>}</td>
+
+                                                        {/* Status */}
                                                         <td className="py-3 px-4">
                                                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${u.active ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
                                                                 {u.active ? <><CheckCircle className="w-3 h-3" />Active</> : <><XCircle className="w-3 h-3" />Inactive</>}
                                                             </span>
                                                         </td>
-                                                        <td className="py-3 px-4 text-slate-400 text-xs hidden lg:table-cell">{u.createdAt ? formatDate(u.createdAt) : '—'}</td>
+
+                                                        {/* Actions */}
                                                         <td className="py-3 px-4 text-right">
                                                             {changingPasswordFor === u.userId ? (
                                                                 <form onSubmit={handleChangePassword} className="flex items-center gap-2 justify-end">
@@ -1102,8 +1556,20 @@ export default function DashboardPage() {
                                                                 <div className="flex items-center justify-end gap-1">
                                                                     <Button variant="ghost" onClick={() => { setChangingPasswordFor(u.userId); setNewPasswordValue(''); setPasswordChangeError(''); setPasswordChangeSuccess(''); }}
                                                                         className="h-8 px-2 text-slate-400 hover:text-amber-400 hover:bg-amber-500/10" title="Change password"><KeyRound className="w-4 h-4" /></Button>
-                                                                    <Button variant="ghost" onClick={() => { setEditingUser(u); setEditFullName(u.fullName || ''); setEditEmail(u.email || ''); setEditPhone(u.phone || ''); }}
-                                                                        className="h-8 px-2 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10" title="Edit"><Edit className="w-4 h-4" /></Button>
+                                                                    <Button variant="ghost" onClick={() => {
+                                                                        setEditingUser(u);
+                                                                        setEditClientType(u.clientType || '');
+                                                                        setEditFullName(u.fullName || '');
+                                                                        setEditEmail(u.email || '');
+                                                                        setEditPhone(u.phone || '');
+                                                                        setEditFormationDate(u.formationDate || '');
+                                                                        setEditAnniversaryAutomationEnabled(!!u.anniversaryAutomationEnabled);
+                                                                        setEditWhatsappConsentGiven(!!u.whatsappConsentGiven);
+                                                                        setEditCompanyName(u.companyName || '');
+                                                                        setEditContactPersonName(u.contactPersonName || '');
+                                                                        setEditError('');
+                                                                    }}
+                                                                        className="h-8 px-2 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10" title={!u.clientType ? "Verify & Edit Client" : "Edit"}><Edit className="w-4 h-4" /></Button>
                                                                     <Button variant="ghost" onClick={() => setUserToDelete(u.userId)}
                                                                         className="h-8 px-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10" title="Delete"><Trash2 className="w-4 h-4" /></Button>
                                                                 </div>
@@ -1119,6 +1585,7 @@ export default function DashboardPage() {
                         </Card>
                     </div>
                 );
+            }
 
             // ── Upload Document ───────────────────────────────────────────────
             case 'upload-document':
@@ -1568,6 +2035,14 @@ export default function DashboardPage() {
             case 'attendance-management':
                 return <AdminAttendanceDashboard />;
 
+            // ── Company Formation Anniversaries ───────────────────────────────
+            case 'company-anniversaries':
+                return <CompanyAnniversariesManagement />;
+
+            // ── Founder Birthday Management ───────────────────────────────────
+            case 'founder-management':
+                return <FounderManagement />;
+
             default:
                 return null;
         }
@@ -1892,15 +2367,33 @@ export default function DashboardPage() {
                                                 <div className="min-w-0 flex-1">
                                                     <div className="text-white font-semibold text-sm truncate">{profile?.fullName || user.fullName || 'Client'}</div>
                                                     <div className="text-cyan-400 font-mono text-xs truncate">@{user.userId}</div>
-                                                    <div className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 mt-0.5">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                                                        CA Portal Access
+                                                    <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                                                        {profile?.clientType === 'COMPANY' ? (
+                                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-cyan-500/15 border border-cyan-500/30 text-cyan-300">
+                                                                <Building2 className="w-3 h-3" /> Company Client
+                                                            </span>
+                                                        ) : profile?.clientType === 'INDIVIDUAL' ? (
+                                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/15 border border-purple-500/30 text-purple-300">
+                                                                <User className="w-3 h-3" /> Individual Client
+                                                            </span>
+                                                        ) : (
+                                                            <div className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400">
+                                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                                                CA Portal Access
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {/* Compact Info List */}
                                             <div className="space-y-2 text-xs">
+                                                {profile?.clientType === 'COMPANY' && profile?.companyName && (
+                                                    <div className="flex items-center gap-2.5 p-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                                                        <Building2 className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+                                                        <span className="text-slate-300 truncate font-medium" title={profile.companyName}>{profile.companyName}</span>
+                                                    </div>
+                                                )}
                                                 {profile?.email && (
                                                     <div className="flex items-center gap-2.5 p-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
                                                         <Mail className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
@@ -2513,9 +3006,159 @@ export default function DashboardPage() {
             {editingUser && (
                 <Modal onClose={() => setEditingUser(null)} title={<><Edit className="w-5 h-5 text-blue-400" /> Edit: {editingUser.userId}</>}>
                     <div className="space-y-4">
-                        <Field label="Full Name"><Input value={editFullName} onChange={e => setEditFullName(e.target.value)} className="bg-white/[0.04] text-white border-white/10 focus:border-cyan-500/50" placeholder="e.g. Acme Corp" /></Field>
-                        <Field label="Email"><Input value={editEmail} onChange={e => setEditEmail(e.target.value)} type="email" className="bg-white/[0.04] text-white border-white/10 focus:border-cyan-500/50" placeholder="email@example.com" /></Field>
-                        <Field label="Phone"><Input value={editPhone} onChange={e => setEditPhone(e.target.value)} className="bg-white/[0.04] text-white border-white/10 focus:border-cyan-500/50" placeholder="+91 98765 43210" /></Field>
+                        {/* Unverified Legacy Alert */}
+                        {!editingUser.clientType && (
+                            <div className="p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-2.5">
+                                <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                                <div>
+                                    <div className="font-semibold text-amber-300">Legacy Record — Client Type Unverified</div>
+                                    <p className="mt-0.5 text-amber-200/90 leading-relaxed">
+                                        This client was created before client types were introduced. Please select whether this client is a <strong>Company / Firm</strong> or an <strong>Individual</strong> to verify the record.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {editError && (
+                            <div className="p-3 rounded-lg bg-red-500/15 border border-red-500/30 text-red-300 text-xs flex items-center gap-2">
+                                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                <span>{editError}</span>
+                            </div>
+                        )}
+
+                        {/* Client Type Selector */}
+                        <div>
+                            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                                Client Type *
+                            </label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setEditClientType('COMPANY')}
+                                    className={`flex items-start gap-2.5 p-3 rounded-xl border text-left transition-all ${
+                                        editClientType === 'COMPANY'
+                                            ? 'border-cyan-500/60 bg-cyan-500/15 text-white ring-1 ring-cyan-500/30'
+                                            : 'border-white/[0.08] bg-white/[0.02] text-slate-400 hover:border-white/20 hover:bg-white/[0.04]'
+                                    }`}
+                                >
+                                    <Building2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${editClientType === 'COMPANY' ? 'text-cyan-400' : 'text-slate-400'}`} />
+                                    <div className="min-w-0">
+                                        <div className="text-xs font-semibold text-white flex items-center gap-1">
+                                            Company / Firm
+                                            {editClientType === 'COMPANY' && <CheckCircle className="w-3 h-3 text-cyan-400" />}
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 mt-0.5">Firm with formation date &amp; greetings</p>
+                                    </div>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setEditClientType('INDIVIDUAL')}
+                                    className={`flex items-start gap-2.5 p-3 rounded-xl border text-left transition-all ${
+                                        editClientType === 'INDIVIDUAL'
+                                            ? 'border-purple-500/60 bg-purple-500/15 text-white ring-1 ring-purple-500/30'
+                                            : 'border-white/[0.08] bg-white/[0.02] text-slate-400 hover:border-white/20 hover:bg-white/[0.04]'
+                                    }`}
+                                >
+                                    <User className={`w-4 h-4 mt-0.5 flex-shrink-0 ${editClientType === 'INDIVIDUAL' ? 'text-purple-400' : 'text-slate-400'}`} />
+                                    <div className="min-w-0">
+                                        <div className="text-xs font-semibold text-white flex items-center gap-1">
+                                            Individual
+                                            {editClientType === 'INDIVIDUAL' && <CheckCircle className="w-3 h-3 text-purple-400" />}
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 mt-0.5">Direct personal client (no firm)</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        {editClientType === 'INDIVIDUAL' ? (
+                            /* ── Individual Client Edit Fields ── */
+                            <div className="space-y-4">
+                                <Field label="Individual's Full Name *">
+                                    <Input value={editFullName} onChange={e => setEditFullName(e.target.value)}
+                                        className="bg-white/[0.04] text-white border-white/10 focus:border-purple-500/50" placeholder="e.g. Rajesh Kumar Sharma" />
+                                </Field>
+                                <Field label="Email Address">
+                                    <Input value={editEmail} onChange={e => setEditEmail(e.target.value)} type="email"
+                                        className="bg-white/[0.04] text-white border-white/10 focus:border-purple-500/50" placeholder="rajesh@example.com" />
+                                </Field>
+                                <Field label="Phone / WhatsApp Contact">
+                                    <Input value={editPhone} onChange={e => setEditPhone(e.target.value)}
+                                        className="bg-white/[0.04] text-white border-white/10 focus:border-purple-500/50" placeholder="+91 98765 43210" />
+                                </Field>
+
+                                <div className="pt-1">
+                                    <label className="flex items-start gap-2.5 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06] cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={editWhatsappConsentGiven}
+                                            onChange={e => setEditWhatsappConsentGiven(e.target.checked)}
+                                            className="mt-0.5 rounded border-white/20 bg-white/10 text-emerald-500"
+                                        />
+                                        <div className="text-xs text-white">
+                                            WhatsApp communication consent confirmed
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        ) : (
+                            /* ── Company / Firm Edit Fields ── */
+                            <div className="space-y-4">
+                                <Field label="Company / Firm Name">
+                                    <Input value={editCompanyName} onChange={e => setEditCompanyName(e.target.value)}
+                                        className="bg-white/[0.04] text-white border-white/10 focus:border-cyan-500/50" placeholder="e.g. Acme Technologies Pvt Ltd" />
+                                </Field>
+                                <Field label="Contact Person / Authorized Signatory">
+                                    <Input value={editContactPersonName || editFullName} onChange={e => { setEditContactPersonName(e.target.value); setEditFullName(e.target.value); }}
+                                        className="bg-white/[0.04] text-white border-white/10 focus:border-cyan-500/50" placeholder="e.g. Rajesh Sharma" />
+                                </Field>
+                                <Field label="Email">
+                                    <Input value={editEmail} onChange={e => setEditEmail(e.target.value)} type="email"
+                                        className="bg-white/[0.04] text-white border-white/10 focus:border-cyan-500/50" placeholder="contact@example.com" />
+                                </Field>
+                                <Field label="Phone / WhatsApp Contact">
+                                    <Input value={editPhone} onChange={e => setEditPhone(e.target.value)}
+                                        className="bg-white/[0.04] text-white border-white/10 focus:border-cyan-500/50" placeholder="+91 98765 43210" />
+                                </Field>
+                                <Field label="Company Formation Date">
+                                    <Input
+                                        type="date"
+                                        value={editFormationDate}
+                                        onChange={e => setEditFormationDate(e.target.value)}
+                                        className="bg-white/[0.04] text-white border-white/10 focus:border-cyan-500/50"
+                                    />
+                                    <p className="text-[11px] text-slate-500 mt-1">
+                                        The company will receive an annual WhatsApp greeting on the anniversary of this date, subject to eligibility and consent.
+                                    </p>
+                                </Field>
+
+                                <div className="space-y-2 pt-1">
+                                    <label className="flex items-start gap-2.5 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06] cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={editAnniversaryAutomationEnabled}
+                                            onChange={e => setEditAnniversaryAutomationEnabled(e.target.checked)}
+                                            className="mt-0.5 rounded border-white/20 bg-white/10 text-pink-500"
+                                        />
+                                        <div className="text-xs text-white">
+                                            Enable automatic anniversary greetings
+                                        </div>
+                                    </label>
+                                    <label className="flex items-start gap-2.5 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06] cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={editWhatsappConsentGiven}
+                                            onChange={e => setEditWhatsappConsentGiven(e.target.checked)}
+                                            className="mt-0.5 rounded border-white/20 bg-white/10 text-emerald-500"
+                                        />
+                                        <div className="text-xs text-white">
+                                            WhatsApp greeting consent confirmed
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div className="flex gap-3 justify-end mt-6">
                         <Button variant="ghost" onClick={() => setEditingUser(null)} className="text-slate-400 hover:text-white">Cancel</Button>

@@ -16,6 +16,8 @@ export interface LoginResponse {
     error?: string;
 }
 
+export type ClientType = 'COMPANY' | 'INDIVIDUAL';
+
 export interface UserProfile {
     id: string;
     userId: string;
@@ -24,10 +26,17 @@ export interface UserProfile {
     phone: string;
     role?: string;
     userType?: string;
+    clientType?: ClientType | null;
     employeeId?: string;
     active: boolean;
     createdAt: string;
     createdBy: string;
+    companyName?: string;
+    contactPersonName?: string;
+    formationDate?: string;
+    anniversaryAutomationEnabled?: boolean;
+    whatsappConsentGiven?: boolean;
+    whatsappConsentDate?: string;
 }
 
 export interface UserDocument {
@@ -122,12 +131,19 @@ export interface CreateUserRequest {
     fullName?: string;
     email?: string;
     phone?: string;
+    clientType?: ClientType;
+    companyName?: string;
+    contactPersonName?: string;
+    formationDate?: string;
+    anniversaryAutomationEnabled?: boolean;
+    whatsappConsentGiven?: boolean;
 }
 
 export interface CreateUserResponse {
     message: string;
     userId: string;
     id: string;
+    clientType?: ClientType | null;
     error?: string;
 }
 
@@ -170,13 +186,26 @@ export async function changeUserPassword(userId: string, newPassword: string): P
     return handleResponse<{ message: string; userId: string }>(res);
 }
 
-export async function updateUser(userId: string, data: { fullName?: string, email?: string, phone?: string }): Promise<{ message: string; userId: string }> {
+export async function updateUser(
+    userId: string,
+    data: {
+        fullName?: string;
+        email?: string;
+        phone?: string;
+        clientType?: ClientType;
+        companyName?: string;
+        contactPersonName?: string;
+        formationDate?: string;
+        anniversaryAutomationEnabled?: boolean;
+        whatsappConsentGiven?: boolean;
+    }
+): Promise<{ message: string; userId: string; clientType?: ClientType | null }> {
     const res = await fetch(`${BACKEND_DIRECT}/admin/users/${userId}`, {
         method: 'PUT',
         headers: authHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(data),
     });
-    return handleResponse<{ message: string; userId: string }>(res);
+    return handleResponse<{ message: string; userId: string; clientType?: ClientType | null }>(res);
 }
 
 export async function deleteUser(userId: string): Promise<{ message: string; userId: string }> {
@@ -685,5 +714,473 @@ export async function getAdminAttendanceRecords(params: AttendanceFilterParams =
     });
     return handleResponse<PageResponse<AttendanceRecord>>(res);
 }
+
+// ===================== Company Anniversary Automation APIs =====================
+
+export interface AnniversaryClientDto {
+    userId: string;
+    fullName: string;
+    clientType?: ClientType | null;
+    companyName?: string;
+    contactPersonName?: string;
+    phone?: string;
+    formationDate?: string; // YYYY-MM-DD
+    anniversaryAutomationEnabled: boolean;
+    whatsappConsentGiven: boolean;
+    yearsCompleted: number;
+    anniversaryToday: boolean;
+    latestNotificationStatus?: string;
+}
+
+export type AnniversaryNotificationStatus =
+    | 'PENDING'
+    | 'PROCESSING'
+    | 'ACCEPTED'
+    | 'DELIVERED'
+    | 'READ'
+    | 'RETRY_PENDING'
+    | 'FAILED'
+    | 'AMBIGUOUS'
+    | 'UNKNOWN';
+
+export interface AnniversaryNotificationLog {
+    id: string;
+    clientId: string;
+    userDocId?: string;
+    companyName: string;
+    contactPersonName: string;
+    recipientPhone: string;
+    anniversaryYear: number;
+    anniversaryDate: string; // YYYY-MM-DD
+    notificationType: string;
+    status: AnniversaryNotificationStatus;
+    metaMessageId?: string;
+    templateName?: string;
+    templateLanguage?: string;
+    attemptCount: number;
+    maxAttempts: number;
+    lastAttemptAt?: string;
+    apiAcceptanceAt?: string;
+    deliveryAt?: string;
+    readAt?: string;
+    lastErrorCode?: string;
+    lastErrorMessage?: string;
+    nextRetryAt?: string;
+    manualTrigger: boolean;
+    triggeredBy?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface AnniversarySettingsRequest {
+    clientType?: ClientType;
+    formationDate?: string;
+    companyName?: string;
+    contactPersonName?: string;
+    anniversaryAutomationEnabled?: boolean;
+    whatsappConsentGiven?: boolean;
+}
+
+export interface AnniversaryTestSendRequest {
+    recipientPhone: string;
+    companyName?: string;
+    contactPersonName?: string;
+    templateName?: string;
+}
+
+export interface AnniversaryTestSendResponse {
+    status: 'SUCCESS' | 'FAILED';
+    metaMessageId?: string;
+    message?: string;
+    errorCode?: string;
+    errorMessage?: string;
+    isRetryable?: boolean;
+    isAmbiguous?: boolean;
+}
+
+export interface AnniversarySchedulerSummary {
+    date: string;
+    clientsChecked: number;
+    eligibleCount: number;
+    processedCount: number;
+    successCount: number;
+    failureCount: number;
+    skippedCount: number;
+    executionTimeMs: number;
+}
+
+/**
+ * Get all clients whose company formation anniversary is today.
+ * GET /api/admin/anniversary/today
+ */
+export async function getTodayAnniversaryClients(): Promise<AnniversaryClientDto[]> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/anniversary/today`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<AnniversaryClientDto[]>(res);
+}
+
+/**
+ * Get clients with upcoming formation anniversaries in the next N days.
+ * GET /api/admin/anniversary/upcoming?days=7
+ */
+export async function getUpcomingAnniversaries(days: number = 7): Promise<AnniversaryClientDto[]> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/anniversary/upcoming?days=${encodeURIComponent(days)}`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<AnniversaryClientDto[]>(res);
+}
+
+/**
+ * Retrieve clients whose client type is unresolved/unverified.
+ * GET /api/admin/anniversary/unverified
+ */
+export async function getUnverifiedClients(): Promise<AnniversaryClientDto[]> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/anniversary/unverified`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<AnniversaryClientDto[]>(res);
+}
+
+/**
+ * Retrieve paginated history of anniversary notifications.
+ * GET /api/admin/anniversary/history?page=0&size=20
+ */
+export async function getAnniversaryHistory(
+    page: number = 0,
+    size: number = 20
+): Promise<PageResponse<AnniversaryNotificationLog>> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/anniversary/history?page=${page}&size=${size}`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<PageResponse<AnniversaryNotificationLog>>(res);
+}
+
+/**
+ * Retrieve status details of an individual notification log.
+ * GET /api/admin/anniversary/history/{id}
+ */
+export async function getAnniversaryNotificationLog(id: string): Promise<AnniversaryNotificationLog> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/anniversary/history/${encodeURIComponent(id)}`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<AnniversaryNotificationLog>(res);
+}
+
+/**
+ * Update client anniversary settings (formation date, automation preference, consent).
+ * PUT /api/admin/anniversary/clients/{userId}/settings
+ */
+export async function updateClientAnniversarySettings(
+    userId: string,
+    settings: AnniversarySettingsRequest
+): Promise<{ message: string; client: AnniversaryClientDto }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/anniversary/clients/${encodeURIComponent(userId)}/settings`, {
+        method: 'PUT',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(settings),
+    });
+    return handleResponse<{ message: string; client: AnniversaryClientDto }>(res);
+}
+
+/**
+ * Send a test anniversary template message to an admin-specified phone number.
+ * POST /api/admin/anniversary/test-send
+ */
+export async function sendTestAnniversaryGreeting(
+    request: AnniversaryTestSendRequest
+): Promise<AnniversaryTestSendResponse> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/anniversary/test-send`, {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(request),
+    });
+    return handleResponse<AnniversaryTestSendResponse>(res);
+}
+
+/**
+ * Manually trigger an anniversary greeting for a specific client.
+ * POST /api/admin/anniversary/trigger/{userId}
+ */
+export async function triggerManualAnniversaryGreeting(
+    userId: string
+): Promise<{ message: string; notificationLog: AnniversaryNotificationLog }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/anniversary/trigger/${encodeURIComponent(userId)}`, {
+        method: 'POST',
+        headers: authHeaders(),
+    });
+    return handleResponse<{ message: string; notificationLog: AnniversaryNotificationLog }>(res);
+}
+
+/**
+ * Trigger the anniversary scheduler job on-demand for today.
+ * POST /api/admin/anniversary/scheduler/trigger-now
+ */
+export async function triggerAnniversarySchedulerNow(): Promise<{
+    message: string;
+    summary: AnniversarySchedulerSummary;
+}> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/anniversary/scheduler/trigger-now`, {
+        method: 'POST',
+        headers: authHeaders(),
+    });
+    return handleResponse<{ message: string; summary: AnniversarySchedulerSummary }>(res);
+}
+
+// ===================== Founder Birthday Management APIs =====================
+
+export interface Founder {
+    id: string;
+    companyClientId: string;
+    fullName: string;
+    dateOfBirth: string; // YYYY-MM-DD
+    birthdayMonth: number;
+    birthdayDay: number;
+    whatsappNumber: string;
+    active: boolean;
+    birthdayGreetingEnabled: boolean;
+    whatsappConsentGiven: boolean;
+    whatsappConsentDate?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface FounderRequest {
+    companyClientId?: string;
+    fullName?: string;
+    dateOfBirth?: string; // YYYY-MM-DD
+    whatsappNumber?: string;
+    active?: boolean;
+    birthdayGreetingEnabled?: boolean;
+    whatsappConsentGiven?: boolean;
+}
+
+export interface FounderCreateResponse {
+    message: string;
+    founder: Founder;
+}
+
+export interface FounderUpdateResponse {
+    message: string;
+    founder: Founder;
+}
+
+export interface FounderBirthdayTriggerSummary {
+    executionDate: string;
+    foundersScanned: number;
+    eligible: number;
+    dispatched: number;
+    skippedOrFailed: number;
+    durationMillis: number;
+}
+
+export interface FounderBirthdayJobResponse {
+    message: string;
+    summary: FounderBirthdayTriggerSummary;
+}
+
+export interface FounderTestSendRequest {
+    recipientPhone: string;
+    founderName?: string;
+}
+
+export interface FounderTestSendResponse {
+    status: 'SUCCESS' | 'FAILED';
+    metaMessageId?: string;
+    templateName?: string;
+    templateLanguage?: string;
+    message?: string;
+    errorCode?: string;
+    errorMessage?: string;
+    isRetryable?: boolean;
+    isAmbiguous?: boolean;
+    note?: string;
+}
+
+/**
+ * Create a new founder associated with a company client.
+ * POST /api/admin/founders
+ */
+export async function createFounder(request: FounderRequest): Promise<FounderCreateResponse> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders`, {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(request),
+    });
+    return handleResponse<FounderCreateResponse>(res);
+}
+
+/**
+ * List all founders for a company.
+ * GET /api/admin/founders/company/{companyClientId}
+ */
+export async function getFoundersByCompany(companyClientId: string): Promise<Founder[]> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/company/${encodeURIComponent(companyClientId)}`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<Founder[]>(res);
+}
+
+/**
+ * Retrieve a founder by ID.
+ * GET /api/admin/founders/{founderId}
+ */
+export async function getFounder(founderId: string): Promise<Founder> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/${encodeURIComponent(founderId)}`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<Founder>(res);
+}
+
+/**
+ * Update founder details.
+ * PUT /api/admin/founders/{founderId}
+ */
+export async function updateFounder(
+    founderId: string,
+    request: FounderRequest
+): Promise<FounderUpdateResponse> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/${encodeURIComponent(founderId)}`, {
+        method: 'PUT',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(request),
+    });
+    return handleResponse<FounderUpdateResponse>(res);
+}
+
+/**
+ * Toggle birthday greeting preference for a founder.
+ * PATCH /api/admin/founders/{founderId}/greeting
+ */
+export async function setFounderBirthdayGreeting(
+    founderId: string,
+    enabled: boolean
+): Promise<FounderUpdateResponse> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/${encodeURIComponent(founderId)}/greeting`, {
+        method: 'PATCH',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ enabled }),
+    });
+    return handleResponse<FounderUpdateResponse>(res);
+}
+
+/**
+ * Activate or deactivate a founder.
+ * PATCH /api/admin/founders/{founderId}/active
+ */
+export async function setFounderActive(
+    founderId: string,
+    active: boolean
+): Promise<FounderUpdateResponse> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/${encodeURIComponent(founderId)}/active`, {
+        method: 'PATCH',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ active }),
+    });
+    return handleResponse<FounderUpdateResponse>(res);
+}
+
+/**
+ * Delete a founder record.
+ * DELETE /api/admin/founders/{founderId}
+ */
+export async function deleteFounder(founderId: string): Promise<{ message: string }> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/${encodeURIComponent(founderId)}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+    });
+    return handleResponse<{ message: string }>(res);
+}
+
+/**
+ * Retrieve active founders whose birthday is today.
+ * GET /api/admin/founders/birthday/today
+ */
+export async function getTodayBirthdayFounders(): Promise<Founder[]> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/birthday/today`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<Founder[]>(res);
+}
+
+/**
+ * Retrieve founders with upcoming birthdays in the next N days.
+ * GET /api/admin/founders/birthday/upcoming?days=7
+ */
+export async function getUpcomingBirthdayFounders(days: number = 7): Promise<Founder[]> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/birthday/upcoming?days=${encodeURIComponent(days)}`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<Founder[]>(res);
+}
+
+/**
+ * Manually trigger the birthday greeting scheduler job for today.
+ * POST /api/admin/founders/birthday/trigger-now
+ */
+export async function triggerBirthdayJobNow(): Promise<FounderBirthdayJobResponse> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/birthday/trigger-now`, {
+        method: 'POST',
+        headers: authHeaders(),
+    });
+    return handleResponse<FounderBirthdayJobResponse>(res);
+}
+
+/**
+ * Manually trigger birthday greeting for a specific founder.
+ * POST /api/admin/founders/birthday/trigger/{founderId}?date=YYYY-MM-DD
+ */
+export async function triggerBirthdayForFounder(
+    founderId: string,
+    date?: string
+): Promise<{ message: string; notificationLog: AnniversaryNotificationLog }> {
+    const query = date ? `?date=${encodeURIComponent(date)}` : '';
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/birthday/trigger/${encodeURIComponent(founderId)}${query}`, {
+        method: 'POST',
+        headers: authHeaders(),
+    });
+    return handleResponse<{ message: string; notificationLog: AnniversaryNotificationLog }>(res);
+}
+
+/**
+ * Test-send a birthday greeting message to any phone number without logging.
+ * POST /api/admin/founders/birthday/test-send
+ */
+export async function sendTestBirthdayGreeting(
+    request: FounderTestSendRequest
+): Promise<FounderTestSendResponse> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/birthday/test-send`, {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(request),
+    });
+    return handleResponse<FounderTestSendResponse>(res);
+}
+
+/**
+ * Retrieve paginated birthday notification history.
+ * GET /api/admin/founders/birthday/history?page=0&size=20
+ */
+export async function getBirthdayNotificationHistory(
+    page: number = 0,
+    size: number = 20
+): Promise<AnniversaryNotificationLog[]> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/birthday/history?page=${page}&size=${size}`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<AnniversaryNotificationLog[]>(res);
+}
+
+/**
+ * Retrieve a single birthday notification history log entry.
+ * GET /api/admin/founders/birthday/history/{id}
+ */
+export async function getBirthdayNotificationLog(id: string): Promise<AnniversaryNotificationLog> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/birthday/history/${encodeURIComponent(id)}`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<AnniversaryNotificationLog>(res);
+}
+
 
 
