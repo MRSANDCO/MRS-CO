@@ -26,12 +26,14 @@ import {
     Crown,
     Search,
     Filter,
+    ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import {
-    getAllUsers,
+    getEligibleCompanies,
+    getAllFounders,
     createFounder,
     getFoundersByCompany,
     updateFounder,
@@ -43,7 +45,7 @@ import {
     type Founder,
     type FounderRequest,
     type AnniversaryNotificationLog,
-    type UserProfile,
+    type CompanyDropdownDto,
 } from '@/lib/api';
 
 export interface FounderWithCompany extends Founder {
@@ -179,7 +181,7 @@ export default function FounderManagement() {
     const [activeTab, setActiveTab] = useState<'today' | 'upcoming' | 'all-founders' | 'history'>('today');
 
     // Data states
-    const [companies, setCompanies] = useState<UserProfile[]>([]);
+    const [companies, setCompanies] = useState<CompanyDropdownDto[]>([]);
     const [allFounders, setAllFounders] = useState<FounderWithCompany[]>([]);
     const [todayBirthdays, setTodayBirthdays] = useState<Founder[]>([]);
     const [upcomingBirthdays, setUpcomingBirthdays] = useState<Founder[]>([]);
@@ -189,6 +191,7 @@ export default function FounderManagement() {
 
     // Loaders & feedback
     const [loadingCompanies, setLoadingCompanies] = useState(false);
+    const [companiesError, setCompaniesError] = useState<string | null>(null);
     const [loadingFounders, setLoadingFounders] = useState(false);
     const [loadingToday, setLoadingToday] = useState(false);
     const [loadingUpcoming, setLoadingUpcoming] = useState(false);
@@ -231,39 +234,36 @@ export default function FounderManagement() {
 
     // ─── Fetch Companies & Founders ──────────────────────────────────────────
 
-    const fetchAllData = useCallback(async () => {
+    const fetchCompanies = useCallback(async () => {
         setLoadingCompanies(true);
+        setCompaniesError(null);
+        try {
+            const list = await getEligibleCompanies();
+            setCompanies(list || []);
+        } catch (err: unknown) {
+            setCompaniesError(err instanceof Error ? err.message : 'Failed to load companies');
+        } finally {
+            setLoadingCompanies(false);
+        }
+    }, []);
+
+    const fetchAllData = useCallback(async () => {
         setLoadingFounders(true);
         setErrorMessage(null);
 
         try {
-            const users = await getAllUsers();
-            // Filter to companies / firms
-            const companyList = users.filter((u) => u.clientType === 'COMPANY' || (!u.clientType && u.companyName));
-            setCompanies(companyList);
-
-            // Fetch founders across all companies
-            const results = await Promise.allSettled(
-                companyList.map(async (c) => {
-                    const founders = await getFoundersByCompany(c.userId);
-                    return founders.map((f) => ({
-                        ...f,
-                        companyName: c.companyName || c.fullName || c.userId,
-                    }));
-                })
+            // Use the single GET /api/admin/founders endpoint to retrieve all founders at once
+            const founders = await getAllFounders();
+            // Attach company names from already-loaded companies list (or companyClientId fallback)
+            setAllFounders(
+                founders.map((f) => ({
+                    ...f,
+                    companyName: undefined, // will be resolved via companyMap
+                }))
             );
-
-            const all: FounderWithCompany[] = [];
-            for (const res of results) {
-                if (res.status === 'fulfilled') {
-                    all.push(...res.value);
-                }
-            }
-            setAllFounders(all);
         } catch (err: unknown) {
-            setErrorMessage(err instanceof Error ? err.message : 'Failed to fetch companies and founders');
+            setErrorMessage(err instanceof Error ? err.message : 'Failed to fetch founders');
         } finally {
-            setLoadingCompanies(false);
             setLoadingFounders(false);
         }
     }, []);
@@ -312,15 +312,17 @@ export default function FounderManagement() {
 
     // Initial load
     useEffect(() => {
+        fetchCompanies();
         fetchAllData();
         fetchToday();
         fetchUpcoming(upcomingDays);
         fetchHistory(0);
-    }, [fetchAllData, fetchToday, fetchUpcoming, upcomingDays, fetchHistory]);
+    }, [fetchCompanies, fetchAllData, fetchToday, fetchUpcoming, upcomingDays, fetchHistory]);
 
     const handleRefresh = () => {
         setSuccessMessage(null);
         setErrorMessage(null);
+        fetchCompanies();
         fetchAllData();
         fetchToday();
         fetchUpcoming(upcomingDays);
@@ -332,7 +334,9 @@ export default function FounderManagement() {
     const companyMap = useMemo(() => {
         const map: Record<string, string> = {};
         for (const c of companies) {
-            map[c.userId] = c.companyName || c.fullName || c.userId;
+            const id = c.userId || c.companyId;
+            const name = c.companyName || c.fullName || id;
+            if (id) map[id] = name;
         }
         return map;
     }, [companies]);
@@ -380,12 +384,16 @@ export default function FounderManagement() {
     const openCreateModal = () => {
         setFormError(null);
         setFormData({
-            companyClientId: companies[0]?.userId || '',
+            companyClientId: '',  // force user to explicitly select
             fullName: '',
             dateOfBirth: '',
             whatsappNumber: '',
             birthdayGreetingEnabled: true,
         });
+        // Refresh companies when opening modal to ensure dropdown is fresh
+        if (companies.length === 0 && !loadingCompanies) {
+            fetchCompanies();
+        }
         setIsCreateModalOpen(true);
     };
 
@@ -1188,19 +1196,57 @@ export default function FounderManagement() {
                                     <label className="block text-xs font-medium text-slate-300 mb-1.5">
                                         Associated Company / Firm *
                                     </label>
-                                    <select
-                                        value={formData.companyClientId}
-                                        onChange={(e) => setFormData({ ...formData, companyClientId: e.target.value })}
-                                        className="w-full bg-white/[0.04] border border-white/[0.08] text-white text-xs rounded-lg px-3 py-2.5 focus:outline-none focus:border-amber-500/50"
-                                        required
-                                    >
-                                        <option value="" disabled className="bg-slate-900 text-slate-400">Select company client</option>
-                                        {companies.map((c) => (
-                                            <option key={c.userId} value={c.userId} className="bg-slate-900 text-white">
-                                                {c.companyName || c.fullName || c.userId} (@{c.userId})
-                                            </option>
-                                        ))}
-                                    </select>
+                                    {loadingCompanies ? (
+                                        <div className="flex items-center gap-2 text-xs text-slate-400 py-2.5 px-3 rounded-lg bg-white/[0.04] border border-white/[0.08]">
+                                            <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                                            Loading companies…
+                                        </div>
+                                    ) : companiesError ? (
+                                        <div className="space-y-1.5">
+                                            <div className="flex items-center gap-2 text-xs text-red-300 py-2 px-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                                                <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+                                                <span>{companiesError}</span>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={fetchCompanies}
+                                                className="text-xs text-amber-400 hover:text-amber-300 underline"
+                                            >
+                                                Retry
+                                            </button>
+                                        </div>
+                                    ) : companies.length === 0 ? (
+                                        <div className="flex flex-col gap-2 py-3 px-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                                            <p className="text-xs text-amber-300 flex items-center gap-1.5">
+                                                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                                                No company clients are registered yet.
+                                            </p>
+                                            <a
+                                                href="/admin/employees"
+                                                className="inline-flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 underline"
+                                            >
+                                                <ExternalLink className="w-3 h-3" />
+                                                Go to Client Management to register a company
+                                            </a>
+                                        </div>
+                                    ) : (
+                                        <select
+                                            value={formData.companyClientId}
+                                            onChange={(e) => setFormData({ ...formData, companyClientId: e.target.value })}
+                                            className="w-full bg-white/[0.04] border border-white/[0.08] text-white text-xs rounded-lg px-3 py-2.5 focus:outline-none focus:border-amber-500/50"
+                                            required
+                                        >
+                                            <option value="" disabled className="bg-slate-900 text-slate-400">— Select company client —</option>
+                                            {companies.map((c) => (
+                                                <option key={c.userId || c.companyId} value={c.userId || c.companyId} className="bg-slate-900 text-white">
+                                                    {c.companyName || c.fullName || c.userId}
+                                                    {c.contactPersonName ? ` · ${c.contactPersonName}` : ''}
+                                                    {` (@${c.userId || c.companyId})`}
+                                                    {c.founderCount > 0 ? ` [${c.founderCount} founder${c.founderCount > 1 ? 's' : ''}]` : ''}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
                                 </div>
 
                                 <div>

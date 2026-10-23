@@ -932,6 +932,26 @@ export async function triggerAnniversarySchedulerNow(): Promise<{
 
 // ===================== Founder Birthday Management APIs =====================
 
+/**
+ * Eligible company client for the "Associated Company / Firm" founder dropdown.
+ * Returned by GET /api/admin/founders/eligible-companies
+ */
+export interface CompanyDropdownDto {
+    companyId: string;
+    userId: string;
+    companyName?: string;
+    contactPersonName?: string;
+    fullName?: string;
+    phone?: string;
+    email?: string;
+    formationDate?: string; // YYYY-MM-DD
+    active: boolean;
+    clientType?: string;
+    anniversaryAutomationEnabled: boolean;
+    whatsappConsentGiven: boolean;
+    founderCount: number;
+}
+
 export interface Founder {
     id: string;
     companyClientId: string;
@@ -998,6 +1018,29 @@ export interface FounderTestSendResponse {
     isRetryable?: boolean;
     isAmbiguous?: boolean;
     note?: string;
+}
+
+/**
+ * Retrieve eligible COMPANY clients for the Add Founder dropdown.
+ * GET /api/admin/founders/eligible-companies
+ * Returns only active COMPANY-type clients (excluding admin/employee accounts).
+ */
+export async function getEligibleCompanies(): Promise<CompanyDropdownDto[]> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders/eligible-companies`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<CompanyDropdownDto[]>(res);
+}
+
+/**
+ * List ALL founders across all companies.
+ * GET /api/admin/founders
+ */
+export async function getAllFounders(): Promise<Founder[]> {
+    const res = await fetch(`${BACKEND_DIRECT}/admin/founders`, {
+        headers: authHeaders(),
+    });
+    return handleResponse<Founder[]>(res);
 }
 
 /**

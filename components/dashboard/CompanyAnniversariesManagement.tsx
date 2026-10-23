@@ -166,6 +166,18 @@ function StatusBadge({ status }: { status?: string }) {
                     <XCircle className="w-3 h-3 text-red-400" /> Failed
                 </span>
             );
+        case 'AMBIGUOUS':
+            return (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-500/15 border border-orange-500/30 text-orange-300">
+                    <AlertCircle className="w-3 h-3 text-orange-400" /> Ambiguous
+                </span>
+            );
+        case 'SKIPPED':
+            return (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-500/15 border border-slate-500/30 text-slate-400">
+                    <Check className="w-3 h-3 text-slate-400" /> Skipped — Already Sent
+                </span>
+            );
         default:
             return (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-500/15 border border-slate-500/30 text-slate-300">
@@ -208,6 +220,7 @@ export default function CompanyAnniversariesManagement() {
         userId: string;
         companyName?: string;
         contactPersonName?: string;
+        phone?: string;
         formationDate?: string;
         anniversaryAutomationEnabled?: boolean;
     } | null>(null);
@@ -331,6 +344,7 @@ export default function CompanyAnniversariesManagement() {
         userId: string;
         companyName?: string;
         contactPersonName?: string;
+        phone?: string;
         formationDate?: string;
         anniversaryAutomationEnabled?: boolean;
     }) => {
